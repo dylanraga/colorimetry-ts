@@ -1,0 +1,27 @@
+{
+  "name": "colorimetry-ts",
+  "version": "0.0.1",
+  "description": "Functions related to the colorimetric representation and manipulation using Typescript",
+  "main": "colorimetry.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dylanraga/colorimetry-ts.git"
+  },
+  "keywords": [
+    "color",
+    "colorimetry",
+    "typescript"
+  ],
+  "author": "Dylan Raga",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dylanraga/colorimetry-ts/issues"
+  },
+  "homepage": "https://github.com/dylanraga/colorimetry-ts#readme",
+  "devDependencies": {
+    "typescript": "^4.5.4"
+  }
+}

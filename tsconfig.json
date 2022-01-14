@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ES6",
+		"sourceMap": true,
+		"outDir": "build",
+    "allowJs": true,
+    "checkJs": false,
+	}
+}
