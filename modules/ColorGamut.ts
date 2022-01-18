@@ -14,15 +14,12 @@ class ColorGamut {
 	#mRGB?: number[][];
 	#mXYZ?: number[][];
 
-	constructor(white: xyY, red: xy, green: xy, blue: xy, black?: xyY) {
+	constructor(white?: xyY, red?: xy, green?: xy, blue?: xy) {
 		this.white = white;
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
-
-		if(typeof black === 'undefined') {
-			this.black = {...white, Y: 0};
-		}
+		this.black = {...white, Y: 0};
 	}
 
 	/*
@@ -38,11 +35,11 @@ class ColorGamut {
 
 		const colors = [this.white, this.red, this.green, this.blue];
 
-		const [Xw, Xr, Xg, Xb] = colors.map(u => u.x/u.y);
-		const [Zw, Zr, Zg, Zb] = colors.map(u => (1-u.x-u.y)/u.y);
+		const [Xw, Xr, Xg, Xb] = colors.map(u => +(u.x/u.y).toPrecision(15));
+		const [Zw, Zr, Zg, Zb] = colors.map(u => +(+(1-u.x-u.y).toPrecision(15)/u.y).toPrecision(15));
 
 		const [Sr, Sg, Sb] = mmult(minv([[Xr,Xg,Xb],[1,1,1],[Zr,Zg,Zb]]), [Xw, 1, Zw]);
-		let mXYZ = [[Sr*Xr,Sg*Xg,Sb*Xb],[Sr*1,Sg*1,Sb*1],[Sr*Zr,Sg*Zg,Sb*Zb]];
+		let mXYZ = [[Sr*Xr,Sg*Xg,Sb*Xb],[Sr*1,Sg*1,Sb*1],[Sr*Zr,Sg*Zg,Sb*Zb]].map(u => u.map(v => +v.toPrecision(15)));
 		return this.#mXYZ = mXYZ;
 	}
 
@@ -62,23 +59,31 @@ class ColorGamut {
 	 *	Member methods
 	 */
 
-	 whiteLevel(): number;
-	 whiteLevel(whiteLevel: number): ColorGamut;
-	 whiteLevel(whiteLevel?: number): ColorGamut|number {
-		 if(typeof whiteLevel === 'undefined')	return this.white.Y;
- 
-		 this.white.Y = whiteLevel;
-		 return this;
-	 }
+	whiteLevel(): number;
+	whiteLevel(whiteLevel: number): ColorGamut;
+	whiteLevel(whiteLevel?: number): ColorGamut|number {
+		if(typeof whiteLevel === 'undefined')	return this.white.Y;
 
-	 blackLevel(): number;
-	 blackLevel(blackLevel: number): ColorGamut;
-	 blackLevel(blackLevel?: number): ColorGamut|number {
-		 if(typeof blackLevel === 'undefined')	return this.black.Y;
- 
-		 this.black.Y = blackLevel;
-		 return this;
-	 }
+		let newGamut = new ColorGamut();
+		Object.assign(newGamut, this);
+		newGamut.white = {...this.white};
+		newGamut.white.Y = whiteLevel;
+		
+		return newGamut;
+	}
+
+	blackLevel(): number;
+	blackLevel(blackLevel: number): ColorGamut;
+	blackLevel(blackLevel?: number): ColorGamut|number {
+		if(typeof blackLevel === 'undefined')	return this.black.Y;
+
+		let newGamut = new ColorGamut();
+		Object.assign(newGamut, this);
+		newGamut.black = {...this.black};
+		newGamut.black.Y = blackLevel;
+
+		return newGamut;
+	}
 
 	
 	/*
@@ -128,25 +133,9 @@ class ColorGamut {
 			this[k].name = k;
 		}
 
-		this.SRGB.mXYZ = [
-			[
-				0.41239079926595945,
-				0.357584339383878,
-				0.1804807884018343
-			],
-			[
-				0.21263900587151033,
-				0.715168678767756,
-				0.07219231536073371
-			],
-			[
-				0.01933081871559183,
-				0.11919477979462598,
-				0.9505321522496607
-			]
-		];
 	}
 	
 }
+
 
 export default ColorGamut;

@@ -33,7 +33,7 @@ export const sleep = ms => {
 };
 
 //Source: http://techref.massmind.org/Techref/method/math/matrix.htm
-function minv(M: Array<number>[]){
+function minv(M: number[][]){
 	// I use Guassian Elimination to calculate the inverse:
 	// (1) 'augment' the matrix (left) by the identity (on the right)
 	// (2) Turn the matrix on the left into the identity by elemetry row ops
@@ -96,8 +96,8 @@ function minv(M: Array<number>[]){
 			
 			// Scale this row down by e (so we have a 1 on the diagonal)
 			for(j=0; j<dim; j++){
-					C[i][j] = C[i][j]/e; //apply to original matrix
-					I[i][j] = I[i][j]/e; //apply to identity
+					C[i][j] = +(C[i][j]/e).toPrecision(15); //apply to original matrix
+					I[i][j] = +(I[i][j]/e).toPrecision(15); //apply to identity
 			}
 			
 			// Subtract this row (scaled appropriately for each row) from ALL of
@@ -115,14 +115,15 @@ function minv(M: Array<number>[]){
 					// stuff left of diagonal is 0 (which it should be if we made this
 					// algorithm correctly)
 					for(j=0; j<dim; j++){
-							C[ii][j] -= e*C[i][j]; //apply to original matrix
-							I[ii][j] -= e*I[i][j]; //apply to identity
+							C[ii][j] = +(C[ii][j] - +(e*C[i][j]).toPrecision(15)).toPrecision(15); //apply to original matrix
+							I[ii][j] = +(I[ii][j] - +(e*I[i][j]).toPrecision(15)).toPrecision(15); //apply to identity
 					}
 			}
 	}
 	
 	//we've done all operations, C should be the identity
 	//matrix I should be the inverse:
+	//64-bit round to 15 places for more reliable invertibility
 	return I;
 }
 
@@ -149,16 +150,18 @@ function mmult(A: number[]|number[][], B: number[][]|number[]): number[][]|numbe
 		for (let j = 0; j < M_cols; j++) {
 			var val = 0;
 			for (let k = 0; k < M_rows; k++) {
-					val += (Array.isArray(B[k]))? A[i][k] * B[k][j] : A[i][k] * +B[k];
+					val += (Array.isArray(B[k]))? +(A[i][k] * B[k][j]).toPrecision(15) : +(A[i][k] * +B[k]).toPrecision(15);
 			}
 			
-			//64-bit round to 15 places for consistent invertibility
 			if (M_cols > 1)
-				M[i][j] = parseFloat(val.toPrecision(15));
+				M[i][j] = val;
 			else
-				M[i] = parseFloat(val.toPrecision(15));
+				M[i] = val;
 		}
 	}
+
+	//64-bit round to 15 places for more reliable invertibility
+	M = M.map(u => Array.isArray(u)? u.map(v => parseFloat(v.toPrecision(15))) : parseFloat(u.toPrecision(15)))
 
 	return M;
 }
@@ -181,7 +184,7 @@ function bfsPath(start: any, end: any, graph: {[key: string]: any}): any[] {
 				queue.push([...path, k]);
 		}
 	}
+	return [];
 };
-
 
 export {mmult, minv, bfsPath};

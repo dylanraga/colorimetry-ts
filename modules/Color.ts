@@ -78,7 +78,7 @@ class Color {
 	whiteLevel(whiteLevel?: number): Color|number {
 		if(typeof whiteLevel === 'undefined')	return this.#space.whiteLevel();
 
-		this.#space.whiteLevel(whiteLevel);
+		this.#space = this.#space.whiteLevel(whiteLevel);
 		return this;
 	}
 
@@ -87,7 +87,7 @@ class Color {
 	blackLevel(blackLevel?: number): Color|number {
 		if(typeof blackLevel === 'undefined')	return this.#space.blackLevel();
 
-		this.#space.blackLevel(blackLevel);
+		this.#space = this.#space.blackLevel(blackLevel);
 		return this;
 	}
 

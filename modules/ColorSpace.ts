@@ -11,9 +11,10 @@ class ColorSpace {
 	#trc: ToneResponse;
 	name?: string;
 
-	constructor(gamut: ColorGamut|string, trc: ToneResponse|string) {
+	constructor(gamut?: ColorGamut|string, trc?: ToneResponse|string) {
 		this.gamut = gamut;
 		this.trc = trc;
+
 	}
 
 	/*
@@ -55,8 +56,10 @@ class ColorSpace {
 	whiteLevel(whiteLevel?: number): ColorSpace|number {
 		if(typeof whiteLevel === 'undefined')	return this.#gamut.whiteLevel();
 
-		this.#gamut.whiteLevel(whiteLevel);
-		return this;
+		let newSpace = new ColorSpace(this.gamut, this.trc);
+		Object.assign(newSpace, this);
+		newSpace.gamut = newSpace.gamut.whiteLevel(whiteLevel);
+		return newSpace;
 	}
 
 	blackLevel(): number;
@@ -64,8 +67,10 @@ class ColorSpace {
 	blackLevel(blackLevel?: number): ColorSpace|number {
 		if(typeof blackLevel === 'undefined')	return this.#gamut.blackLevel();
 
-		this.#gamut.blackLevel(blackLevel);
-		return this;
+		let newSpace = new ColorSpace(this.gamut, this.trc);
+		Object.assign(newSpace, this);
+		newSpace.gamut = newSpace.gamut.blackLevel(blackLevel);
+		return newSpace;
 	}
 
 	/*
@@ -81,8 +86,8 @@ class ColorSpace {
 
 	static SRGB = new ColorSpace(ColorGamut.SRGB, ToneResponse.SRGB);
 	static DISPLAYP3 = new ColorSpace(ColorGamut.P3D65, ToneResponse.SRGB);
-	static DCIP3 = new ColorSpace(ColorGamut.P3D65, ToneResponse.GAMMA.options({gamma: 2.6}));
-	static BT2100 = new ColorSpace(ColorGamut.BT2020, ToneResponse.ST2084);
+	static DCIP3 = new ColorSpace(ColorGamut.P3D65.whiteLevel(48), ToneResponse.GAMMA.options({gamma: 2.6}));
+	static BT2100 = new ColorSpace(ColorGamut.BT2020.whiteLevel(10000), ToneResponse.ST2084);
 	static REC709 = new ColorSpace(ColorGamut.SRGB, ToneResponse.BT1886);
 
 	/*
