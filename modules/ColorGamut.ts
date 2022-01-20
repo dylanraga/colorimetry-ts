@@ -4,6 +4,7 @@
 
 import { xy, xyY } from "./ColorModel";
 import { minv, mmult } from "./util.js";
+import Decimal from "./decimal.mjs";
 
 class ColorGamut {
 	white: xyY;
@@ -35,11 +36,11 @@ class ColorGamut {
 
 		const colors = [this.white, this.red, this.green, this.blue];
 
-		const [Xw, Xr, Xg, Xb] = colors.map(u => +(u.x/u.y).toPrecision(15));
-		const [Zw, Zr, Zg, Zb] = colors.map(u => +(+(1-u.x-u.y).toPrecision(15)/u.y).toPrecision(15));
+		const [Xw, Xr, Xg, Xb] = colors.map(u => Decimal(u.x).div(u.y));
+		const [Zw, Zr, Zg, Zb] = colors.map(u => Decimal(1).minus(u.x).minus(u.y).div(u.y));
 
 		const [Sr, Sg, Sb] = mmult(minv([[Xr,Xg,Xb],[1,1,1],[Zr,Zg,Zb]]), [Xw, 1, Zw]);
-		let mXYZ = [[Sr*Xr,Sg*Xg,Sb*Xb],[Sr*1,Sg*1,Sb*1],[Sr*Zr,Sg*Zg,Sb*Zb]].map(u => u.map(v => +v.toPrecision(15)));
+		let mXYZ = [[Decimal(Sr).times(Xr),Decimal(Sg).times(Xg),Decimal(Sb).times(Xb)],[Sr,Sg,Sb],[Decimal(Sr).times(Zr),Decimal(Sg).times(Zg),Decimal(Sb).times(Zb)]];
 		return this.#mXYZ = mXYZ;
 	}
 

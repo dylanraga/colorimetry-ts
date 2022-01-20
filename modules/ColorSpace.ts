@@ -88,6 +88,7 @@ class ColorSpace {
 	static DISPLAYP3 = new ColorSpace(ColorGamut.P3D65, ToneResponse.SRGB);
 	static DCIP3 = new ColorSpace(ColorGamut.P3D65.whiteLevel(48), ToneResponse.GAMMA.options({gamma: 2.6}));
 	static BT2100 = new ColorSpace(ColorGamut.BT2020.whiteLevel(10000), ToneResponse.ST2084);
+	static BT2100_HLG = new ColorSpace(ColorGamut.BT2020.whiteLevel(1000), ToneResponse.HLG);
 	static REC709 = new ColorSpace(ColorGamut.SRGB, ToneResponse.BT1886);
 
 	/*

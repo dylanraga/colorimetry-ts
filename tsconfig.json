@@ -6,5 +6,6 @@
 		"outDir": "build",
     "allowJs": true,
     "checkJs": false,
+		"allowSyntheticDefaultImports": true
 	}
 }

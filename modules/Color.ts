@@ -6,29 +6,31 @@ import ColorModel, { ColorModelType, ColorModelTypeString } from './ColorModel.j
 import ColorSpace from './ColorSpace.js';
 
 class Color {
-	#space: ColorSpace;
 	#data: ColorModel;
+	#space: ColorSpace;
 
 	constructor(data: ColorModel|ColorModelType, colorSpace?: ColorSpace|string) {
-		this.data = data;
-
 		if (typeof colorSpace === 'undefined') {
 			let defaultColorSpace;
 			const colorModelType = (data instanceof ColorModel)? data.type : ColorModel.matchObj(data);
 			switch (colorModelType) {
 				case 'ITP':
 					defaultColorSpace = ColorSpace.BT2100;
+				break;
 				default:
 					defaultColorSpace = ColorSpace.SRGB;
+				break;
 			}
 			this.space = defaultColorSpace;
 		} else {
 			this.space = colorSpace;
 		}
+		
+		this.data = data;
 	}
 
 	/*
-	 *	Member getters & setters
+	 * Member getters & setters
 	 */
 
 	get space(): ColorSpace {
@@ -39,24 +41,36 @@ class Color {
 		if (typeof colorSpace === 'string') {
 			if( !ColorSpace[colorSpace.toUpperCase()] )	throw new Error(`ColorSpace '${colorSpace}' does not exist`);
 
-			this.#space = ColorSpace[colorSpace.toUpperCase()];
-		} else {
-			this.#space = colorSpace;
+			colorSpace = ColorSpace[colorSpace.toUpperCase()] as ColorSpace;
 		}
+
+		/*
+		//re-convert RGB/rgb values when re-assigning ColorSpace
+		//except on initialization
+		const typeOrig = ColorModel.matchObj(this.#data);
+		if (this.#space !== undefined
+				&& colorSpace !== this.#space
+				&& ['RGB', 'rgb'].includes(typeOrig)) {
+			this.#data = this.#data.to('XYZ', {colorSpace: this.#space}).to(typeOrig, {colorSpace});
+		}
+		*/
+
+		this.#space = colorSpace;
 	}
 
 	get data(): ColorModel {
 		return this.#data;
 	}
 
+	//Store color data in an absolute Color Model, e.g. XYZ
 	set data(data: ColorModel|ColorModelType) {
 		if (data instanceof ColorModel) {
-			this.#data = data;
+			this.#data = data.to('XYZ', {colorSpace: this.#space});
 		} else {
 			let colorModelName = ColorModel.matchObj(data);
 			if(!colorModelName)	throw new Error(`ColorModel type '${Object.keys(data).join('')}' does not exist`);
 			
-			this.#data = new ColorModel(colorModelName, data);
+			this.#data = new ColorModel(colorModelName, data).to('XYZ', {colorSpace: this.#space});
 		}
 	}
 
@@ -64,13 +78,18 @@ class Color {
 	 *	Member methods
 	 */
 
-	get(type: ColorModelTypeString): ColorModel {
-		return this.#data.to(type, this.#space);
-	}
+	get(type: ColorModelTypeString, options: {colorSpace?: ColorSpace} = {}): ColorModel {
+		const { colorSpace = this.#space } = options;
+		let dataOrigin = this.#data;
 
-	to(type: ColorModelType|ColorModelTypeString) {
-		this.data = this.data.toRGB(this.space.trc.eotf);
-		return this;
+		/* Only needed when data source isn't XYZ
+		//Convert from XYZ if source->target ColorSpace is different
+		if (colorSpace !== this.#space) {
+			dataOrigin = this.#data.to('XYZ', { colorSpace: this.#space });
+		}
+		*/
+
+		return dataOrigin.to(type, {colorSpace}).toNumbers();
 	}
 
 	whiteLevel(): number;
