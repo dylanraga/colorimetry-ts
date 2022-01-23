@@ -2,7 +2,6 @@
 /* Full Color Space Definitions */
 /*==============================*/
 
-import Color from "./Color.js";
 import ColorGamut from "./ColorGamut.js";
 import ToneResponse from "./ToneResponse.js";
 

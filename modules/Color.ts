@@ -2,18 +2,20 @@
 /* Color Structure */
 /*==========/======*/
 
-import ColorModel, { ColorModelType, ColorModelTypeString } from './ColorModel.js';
+import ColorModel from './ColorModel.js';
 import ColorSpace from './ColorSpace.js';
 
 class Color {
 	#data: ColorModel;
 	#space: ColorSpace;
 
-	constructor(data: ColorModel|ColorModelType, colorSpace?: ColorSpace|string) {
+	constructor(data: ColorModel|{[key: string]: number}, colorSpace?: ColorSpace|string) {
 		if (typeof colorSpace === 'undefined') {
+
 			let defaultColorSpace;
-			const colorModelType = (data instanceof ColorModel)? data.type : ColorModel.matchObj(data);
+			const colorModelType = ColorModel.matchObj(data);
 			switch (colorModelType) {
+				case 'ICtCp':
 				case 'ITP':
 					defaultColorSpace = ColorSpace.BT2100;
 				break;
@@ -63,14 +65,14 @@ class Color {
 	}
 
 	//Store color data in an absolute Color Model, e.g. XYZ
-	set data(data: ColorModel|ColorModelType) {
+	set data(data: ColorModel|{[key: string]: number}) {
 		if (data instanceof ColorModel) {
 			this.#data = data.to('XYZ', {colorSpace: this.#space});
 		} else {
 			let colorModelName = ColorModel.matchObj(data);
 			if(!colorModelName)	throw new Error(`ColorModel type '${Object.keys(data).join('')}' does not exist`);
 			
-			this.#data = new ColorModel(colorModelName, data).to('XYZ', {colorSpace: this.#space});
+			this.#data = new ColorModel(colorModelName, Object.values(data)).to('XYZ', {colorSpace: this.#space});
 		}
 	}
 
@@ -78,7 +80,7 @@ class Color {
 	 *	Member methods
 	 */
 
-	get(type: ColorModelTypeString, options: {colorSpace?: ColorSpace} = {}): ColorModel {
+	get(type: string, options: {colorSpace?: ColorSpace} = {}): ColorModel {
 		const { colorSpace = this.#space } = options;
 		let dataOrigin = this.#data;
 

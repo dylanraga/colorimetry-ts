@@ -1,7 +1,7 @@
 /*======================*/
 /* Tone Response Curves */
 /*======================*/
-import Decimal from './decimal.mjs';
+import Decimal from './common/decimal.mjs';
 
 type TransferFunctionOptions = {
 	Lw?: number;
@@ -12,6 +12,7 @@ type TransferFunctionOptions = {
 type TransferFunction = (u: any, options?: TransferFunctionOptions) => any;
 
 class ToneResponse {
+	[key: string]: any;
 	eotf: TransferFunction;
 	oetf: TransferFunction;
 	name?: string;
@@ -26,7 +27,7 @@ class ToneResponse {
 	 */
 
 	 options(options: TransferFunctionOptions): ToneResponse {
-		return new ToneResponse(V => this.eotf(V, options), L => this.oetf(L, options));
+		return new ToneResponse((V,o) => this.eotf(V, {...options, ...o}), (L,o) => this.oetf(L, {...options, ...o}));
 	}
 	/*
 	 *	Pre-defined Standard Transfer Functions
@@ -42,13 +43,15 @@ class ToneResponse {
 	];
 
 	static GAMMA = new ToneResponse(
-		(V, { Lw=1, Lb=0, gamma=2.2 }={}) => {
+		(V, options: TransferFunctionOptions = {}) => {
+			const { Lw=1, Lb=0, gamma=2.2 } = options;
 			let f = x => Decimal(x).pow(gamma);
 
 			let L = Decimal(Lw).minus(Lb).times(f(V)).plus(Lb);
 			return L;
 		},
-		(L, { Lw=1, Lb=0, gamma=2.2 }={}) => {
+		(L, options: TransferFunctionOptions = {}) => {
+			const { Lw=1, Lb=0, gamma=2.2 } = options;
 			let f = x => Decimal(x).pow(Decimal(1).div(gamma));
 
 			let V = f( Decimal(L).minus(Lb).div(Decimal(Lw).minus(Lb)) );
@@ -57,14 +60,16 @@ class ToneResponse {
 	);
 
 	static BT1886 = new ToneResponse(
-		(V, { Lw=1, Lb=0, gamma=2.4 }={}) => {
+		(V, options: TransferFunctionOptions = {}) => {
+			const { Lw=1, Lb=0, gamma=2.4 } = options;
 			const a = Decimal(Lw).pow(Decimal(1).div(gamma)).minus(Decimal(Lb).pow(Decimal(1).div(gamma))).pow(gamma);
 			const b = Decimal(Lb).pow(Decimal(1).div(gamma)).div( Decimal(Lw).pow(Decimal(1).div(gamma)).minus(Decimal(Lb).pow(Decimal(1).div(gamma))) );
 			
 			let L = Decimal(a).times(Decimal.max(Decimal(V).plus(b), 0).pow(gamma));
 			return L;
 		},
-		(L, { Lw=1, Lb=0, gamma=2.4 }={}) => {
+		(L, options: TransferFunctionOptions = {}) => {
+			const { Lw=1, Lb=0, gamma=2.4 } = options;
 			const a = Decimal(Lw).pow(Decimal(1).div(gamma)).minus(Decimal(Lb).pow(Decimal(1).div(gamma))).pow(gamma);
 			const b = Decimal(Lb).pow(Decimal(1).div(gamma)).div( Decimal(Lw).pow(Decimal(1).div(gamma)).minus(Decimal(Lb).pow(Decimal(1).div(gamma))) );
 			
@@ -110,13 +115,15 @@ class ToneResponse {
 
 	//Extended sRGB, using higher-precision constants
 	static SRGB = new ToneResponse(
-		(V, { Lw=1, Lb=0 }={}) => {
+		(V, options: TransferFunctionOptions = {}) => {
+			const { Lw=1, Lb=0 } = options;
 			let f = x => (Math.abs(x) < 0.0392857)? Decimal(x).div(12.9232102) : Decimal.abs(x).plus(0.055).div(1.055).pow(2.4).times(Math.sign(x));
 			
 			let L = Decimal(Lw).minus(Lb).times(f(V)).plus(Lb);
 			return L;
 		},
-		(L, { Lw=1, Lb=0 }={}) => {
+		(L, options: TransferFunctionOptions = {}) => {
+			const { Lw=1, Lb=0 } = options;
 			let f = x => (Math.abs(x) < (0.0392857/12.9232102))? Decimal(x).times(12.9232102) : Decimal(1.055).times(Decimal.abs(x).pow(Decimal(1).div(2.4))).minus(0.055).times(Math.sign(x)); 
 
 			let V = f( Decimal(L).minus(Lb).div(Decimal(Lw).minus(Lb)));
@@ -125,7 +132,8 @@ class ToneResponse {
 	);
 
 	static ST2084 = new ToneResponse(
-		(V, { Lw=10000, Lb=0 }={}) => {
+		(V, options: TransferFunctionOptions = {}) => {
+			const { Lw=10000, Lb=0 } = options;
 			const m1 = 0.1593017578125;
 			const m2 = 78.84375;
 			const c1 = 0.8359375;
@@ -137,7 +145,8 @@ class ToneResponse {
 
 			return Decimal.max(Decimal.min(L, Lw), Lb).toSignificantDigits(13);
 		},
-		L => {
+		(L, options: TransferFunctionOptions = {}) => {
+			const { Lw=10000, Lb=0 } = options;
 			const m1 = 0.1593017578125;
 			const m2 = 78.84375;
 			const c1 = 0.8359375;
@@ -153,15 +162,17 @@ class ToneResponse {
 	);
 
 	static LSTAR = new ToneResponse(
-		(V, { Lw=1, Lb=0, Yn=100 }={}) => {
+		(V, options: TransferFunctionOptions = {}) => {
+			const { Lw=1, Lb=0, Yn=100 } = options;
 			let d = Decimal(6).div(29);
 			let f = x => (x > d)? Decimal(x).pow(3) : Decimal(d).times(3).pow(2).times(Decimal(x).minus(Decimal(4).div(29)));
 			let L = Decimal(Lw).minus(Lb).times(f(Decimal(Yn).times(V).plus(16).div(116))).plus(Lb);
 			return L;
 		},
-		(L, { Lw=1, Lb=0, Yn=100 }={}) => {
+		(L, options: TransferFunctionOptions = {}) => {
+			const { Lw=1, Lb=0, Yn=100 } = options;
 			let d = Decimal(6).div(29);
-			let f = x => (x > d**3)? Decimal(x).pow(Decimal(1).div(3)) : Decimal(x).div(3).times(Decimal(d).pow(2)).plus(Decimal(4).div(20));
+			let f = x => (x > d**3)? Decimal(x).pow(Decimal(1).div(3)) : Decimal(x).div(3).times(Decimal(d).pow(2)).plus(Decimal(4).div(29));
 			let V = Decimal(116).times(f(Decimal(L).minus(Lb).div(Decimal(Lw).minus(Lb)))).minus(16).div(Yn);
 			return V;
 		}

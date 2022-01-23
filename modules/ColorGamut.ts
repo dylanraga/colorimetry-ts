@@ -2,9 +2,9 @@
 /* Color Gamuts & Primaries */
 /*==========================*/
 
-import { xy, xyY } from "./ColorModel";
-import { minv, mmult } from "./util.js";
-import Decimal from "./decimal.mjs";
+import { minv, mmult } from "./common/util.js";
+import Decimal from "./common/decimal.mjs";
+import { xy, xyY } from "./ColorModel/CIEXYZ.js";
 
 class ColorGamut {
 	white: xyY;
@@ -21,6 +21,7 @@ class ColorGamut {
 		this.green = green;
 		this.blue = blue;
 		this.black = {...white, Y: 0};
+
 	}
 
 	/*
