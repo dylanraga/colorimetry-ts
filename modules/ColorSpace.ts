@@ -1,108 +1,75 @@
-/*==============================*/
-/* Full Color Space Definitions */
-/*==============================*/
-
-import ColorGamut from "./ColorGamut.js";
-import ToneResponse from "./ToneResponse.js";
+import ColorModel from "./ColorModel.js";
 
 class ColorSpace {
-	#gamut: ColorGamut;
-	#trc: ToneResponse;
-	name?: string;
+	#name: string;
+	typeOf: ColorModel;
+	keys: string[];
+	conversions: ColorSpaceConversion[];
+	alias?: string[];
+	options?: {[k: string]: any};
 
-	constructor(gamut?: ColorGamut|string, trc?: ToneResponse|string) {
-		this.gamut = gamut;
-		this.trc = trc;
+	constructor(typeOf: ColorModel, conversions: ColorSpaceConversion[]) {
+		this.typeOf = typeOf;
+		this.conversions = conversions;
 
+		this.keys = typeOf.keys;
+		this.alias = [];
 	}
 
-	/*
-	 *	Member getters & setters
-	 */
-
-	get gamut(): ColorGamut {
-		return this.#gamut;
+	set name(name: string) {
+		this.#name = name;
+		this.alias.push(name);
 	}
 
-	set gamut(gamut: ColorGamut|string) {
-		if (typeof gamut === 'string') {
-			if (!ColorGamut[gamut.toUpperCase()]) throw new Error(`ColorGamut '${gamut}' does not exist`);
-			this.#gamut = ColorGamut[gamut.toUpperCase()];
-		} else{
-			this.#gamut = gamut;
+	get name(): string {
+		return this.#name;
+	}
+
+	static RGBConversion;
+
+	//Executes a BFS through the ColorSpace's possible conversions
+	//`checkFn()` runs on every traversal. `path` and `visited` are arrays including the total traversal path.
+	conversionBFS(checkFn: (currType, path, visited) => any, direction: 'from'|'to' = 'to') {
+		let currType: ColorSpace|ColorModel = this;
+		let queue: (ColorSpace|ColorModel)[][] = [[currType]];
+		let visited: (ColorSpace|ColorModel)[][] = [[]];
+		
+		while (queue.length) {
+			let path: (ColorSpace|ColorModel)[] = queue.shift();
+
+			currType = path[path.length-1];
+			visited.push(path);
+			
+			let response = checkFn(currType, path, visited);
+			if (response)
+				return response;
+
+			//console.log(currType);
+
+			if (currType instanceof ColorSpace) {
+				//only return spaces with conversion path towards/from currType
+				const spaces = Object.values(currType.conversions.filter(v=>v.hasOwnProperty(direction))).map(u => u.space);
+				for (const t in spaces) {
+					//do not add node if it has been visited (by checking the head of the visited path)
+					if (!visited.find(v => v[v.length-1] === spaces[t]))
+						queue.push([...path, spaces[t]]);
+				}
+			}
 		}
+		
 	}
 
-	get trc(): ToneResponse {
-		return this.#trc;
-	}
-
-	set trc(trc: ToneResponse|string) {
-		if (typeof trc === 'string') {
-			if (!ToneResponse[trc.toUpperCase()]) throw new Error(`ToneResponse '${trc}' does not exist`);
-			this.#trc = ToneResponse[trc.toUpperCase()];
-		} else{
-			this.#trc = trc;
-		}
-	}
-
-	/*
-	 *	Member methods
-	 */
-
-	whiteLevel(): number;
-	whiteLevel(whiteLevel: number): ColorSpace;
-	whiteLevel(whiteLevel?: number): ColorSpace|number {
-		if(typeof whiteLevel === 'undefined')	return this.#gamut.whiteLevel();
-
-		let newSpace = new ColorSpace(this.gamut, this.trc);
-		Object.assign(newSpace, this);
-		newSpace.gamut = newSpace.gamut.whiteLevel(whiteLevel);
-		return newSpace;
-	}
-
-	blackLevel(): number;
-	blackLevel(blackLevel: number): ColorSpace;
-	blackLevel(blackLevel?: number): ColorSpace|number {
-		if(typeof blackLevel === 'undefined')	return this.#gamut.blackLevel();
-
-		let newSpace = new ColorSpace(this.gamut, this.trc);
-		Object.assign(newSpace, this);
-		newSpace.gamut = newSpace.gamut.blackLevel(blackLevel);
-		return newSpace;
-	}
-
-	/*
-	 *	Pre-defined standard color spaces
-	 */
-	static names = [
-		'SRGB',
-		'DISPLAYP3',
-		'DCIP3',
-		'BT2100',
-		'REC709'
-	];
-
-	static SRGB = new ColorSpace(ColorGamut.SRGB, ToneResponse.SRGB);
-	static DISPLAYP3 = new ColorSpace(ColorGamut.P3D65, ToneResponse.SRGB);
-	static DCIP3 = new ColorSpace(ColorGamut.P3D65.whiteLevel(48), ToneResponse.GAMMA.options({gamma: 2.6}));
-	static BT2100 = new ColorSpace(ColorGamut.BT2020.whiteLevel(10000), ToneResponse.ST2084);
-	static BT2100_HLG = new ColorSpace(ColorGamut.BT2020.whiteLevel(1000), ToneResponse.HLG);
-	static REC709 = new ColorSpace(ColorGamut.SRGB, ToneResponse.BT1886);
-
-	/*
-	 *	Aliases
-	 */	
-
-	static P3 = ColorSpace.DISPLAYP3;
-	static REC2100 = ColorSpace.BT2100;
-
-	static {
-		//Set the names of each standard
-		for (let k of this.names) {
-			this[k].name = k;
-		}
+	getConversion(space: ColorSpace|ColorModel): any {
+		const f = this.conversions.find(e => e.space === space);
+		return f;
 	}
 }
 
+interface ColorSpaceConversion {
+	space: ColorSpace|ColorModel;
+	from?: any;
+	to?: any
+}
+
 export default ColorSpace;
+export { ColorSpaceConversion };

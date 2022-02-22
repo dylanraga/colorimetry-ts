@@ -4,7 +4,14 @@
 
 import { minv, mmult } from "./common/util.js";
 import Decimal from "./common/decimal.mjs";
-import { xy, xyY } from "./ColorModel/CIEXYZ.js";
+
+interface xyY {
+	x: number;
+	y: number;
+	Y: number;
+}
+type xy = Omit<xyY, 'Y'>;
+
 
 class ColorGamut {
 	white: xyY;
@@ -37,11 +44,11 @@ class ColorGamut {
 
 		const colors = [this.white, this.red, this.green, this.blue];
 
-		const [Xw, Xr, Xg, Xb] = colors.map(u => Decimal(u.x).div(u.y));
-		const [Zw, Zr, Zg, Zb] = colors.map(u => Decimal(1).minus(u.x).minus(u.y).div(u.y));
+		const [Xw, Xr, Xg, Xb] = colors.map(u => u.x/u.y);
+		const [Zw, Zr, Zg, Zb] = colors.map(u => (1-u.x-u.y)/u.y);
 
 		const [Sr, Sg, Sb] = mmult(minv([[Xr,Xg,Xb],[1,1,1],[Zr,Zg,Zb]]), [Xw, 1, Zw]);
-		let mXYZ = [[Decimal(Sr).times(Xr),Decimal(Sg).times(Xg),Decimal(Sb).times(Xb)],[Sr,Sg,Sb],[Decimal(Sr).times(Zr),Decimal(Sg).times(Zg),Decimal(Sb).times(Zb)]];
+		let mXYZ = [[Sr*Xr,Sg*Xg,Sb*Xb],[Sr,Sg,Sb],[Sr*Zr,Sg*Zg,Sb*Zb]];
 		return this.#mXYZ = mXYZ;
 	}
 
@@ -50,7 +57,7 @@ class ColorGamut {
 	}
 
 	get mRGB(): number[][] {
-		if (this.#mRGB)	return this.#mRGB;
+		if (this.#mRGB) return this.#mRGB;
 
 		//just get the inverse of mXYZ
 		let mRGB = minv(this.mXYZ);
@@ -121,7 +128,7 @@ class ColorGamut {
 
 
 	/*
-	 *	Aliases
+	 * Aliases
 	 */
 
 	static BT709 = ColorGamut.SRGB;

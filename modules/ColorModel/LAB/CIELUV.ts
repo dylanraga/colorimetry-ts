@@ -1,55 +1,59 @@
-import Decimal from "../common/decimal.mjs";
-import ToneResponse from "../ToneResponse.js";
-import ColorGamut from "../ColorGamut.js";
-import { xy } from "./CIEXYZ.js";
-import ColorModel from "../ColorModel.js";
-import ColorSpace from "../ColorSpace.js";
+import Decimal from "../../common/decimal.mjs";
+import ColorGamut from "../../ColorGamut.js";
+import ToneResponse from "../../ToneResponse.js";
+import ColorModel from "../../ColorModel.js";
+import ColorSpace from "../../ColorSpace.js";
 
-interface LUV {
-	L: number;
-	U: number;
-	V: number;
-}
-
-ColorModel.types.LUV = {
-	keys: ['L', 'U', 'V'],
-	convertFns: {
-		'XYZ': (LUV: number[], colorSpace: ColorSpace) => {
-			let XYZ = LUV_to_XYZ(LUV, colorSpace.whiteLevel());
+/* CIELUV */
+const CIELUV = new ColorSpace(ColorModel.types.LAB, [
+	{
+		space: ColorModel.types.XYZ,
+		//XYZ -> CIELUV
+		from: (XYZ: number[], o: {gamut?: ColorGamut} = {}) => {
+			const { gamut = ColorGamut.SRGB } = o;
+			let LUV = XYZ_to_LUV(XYZ, gamut.whiteLevel());
+			return LUV;
+		},
+		//CIELUV -> XYZ
+		to: (LUV: number[], o: {gamut?: ColorGamut} = {}) => {
+			const { gamut = ColorGamut.SRGB } = o;
+			let XYZ = LUV_to_XYZ(LUV, gamut.whiteLevel());
 			return XYZ;
 		}
 	}
-};
-ColorModel.types.XYZ.convertFns.LUV = (XYZ: number[], colorSpace: ColorSpace) => {
-	let LUV = XYZ_to_LUV(XYZ, colorSpace.whiteLevel());
-	return LUV;
-}
+]);
+CIELUV.name = 'CIELUV';
+CIELUV.alias.push('LUV', 'Luv');
+ColorModel.types.LAB.spaces.CIELUV = CIELUV;
 
 
-interface uv {
-	u: number;
-	v: number;
-}
-
-ColorModel.types.uv = {
-	keys: ['u', 'v'],
-	convertFns: {
-		'xy': (uv: number[]) => {
+/* CIEuv */
+const CIEuv = new ColorSpace(ColorModel.types.LAB, [
+	{
+		space: ColorModel.types.XYZ,
+		//XYZ -> CIEuv
+		from: (XYZ: number[]) => {
+			let uv = XYZ_to_uv(XYZ);
+			return uv
+		}
+	},
+	{
+		space: ColorModel.types.LAB.spaces.CIExy,
+		//CIExy -> CIEuv
+		from: (xy: number[]) => {
+			let uv = xy_to_uv(xy);
+			return uv;
+		},
+		//CIEuv -> CIExy
+		to: (uv: number[]) => {
 			let xy = uv_to_xy(uv);
 			return xy;
 		}
 	}
-}
-
-ColorModel.types.XYZ.convertFns.uv = (XYZ: number[]) => {
-	let uv = XYZ_to_uv(XYZ);
-	return uv;
-};
-
-ColorModel.types.xy.convertFns.uv = (xy: number[]) => {
-	let uv = xy_to_uv(xy);
-	return uv;
-};
+]);
+CIEuv.name = 'CIEuv';
+CIEuv.alias.push('uv');
+ColorModel.types.LAB.spaces.CIEuv = CIEuv;
 
 /*
  * CIELUV/u'v' conversions
@@ -73,18 +77,18 @@ function uv_to_xy(uv: number[]): number[] {
 	return [x, y];
 }
 
-function XYZ_to_LUV(XYZ: number[], Yn: number = 1, white: xy = ColorGamut.SRGB.white): number[] {
+function XYZ_to_LUV(XYZ: number[], Yn: number = 1, white: {x, y} = ColorGamut.SRGB.white): number[] {
 	const [X, Y, Z] = XYZ;
 	let [u, v] = XYZ_to_uv(XYZ);
 	let [un, vn] = xy_to_uv([white.x, white.y]);
-	let L = Decimal(100).times(ToneResponse.LSTAR.oetf(Y/Yn));
+	let L = Decimal(100).times(ToneResponse.LSTAR.oetf(Decimal(Y).div(Yn)));
 	let U = Decimal(L).times(13).times(Decimal(u).minus(un));
 	let V = Decimal(L).times(13).times(Decimal(v).minus(vn));
 
 	return [L, U, V];
 }
 
-function LUV_to_XYZ(LUV: number[], Yn: number = 1, white: xy = ColorGamut.SRGB.white): number[] {
+function LUV_to_XYZ(LUV: number[], Yn: number = 1, white: {x, y} = ColorGamut.SRGB.white): number[] {
 	const [L, U, V] = LUV;
 	let Y = Decimal(Yn).times(ToneResponse.LSTAR.eotf(Decimal(L).div(100)));
 	let [un, vn] = xy_to_uv([white.x, white.y]);
@@ -96,4 +100,4 @@ function LUV_to_XYZ(LUV: number[], Yn: number = 1, white: xy = ColorGamut.SRGB.w
 	return [X, Y, Z];
 }
 
-export { LUV, uv, LUV_to_XYZ, XYZ_to_LUV, uv_to_xy, xy_to_uv, XYZ_to_uv}
+export { LUV_to_XYZ, XYZ_to_LUV, uv_to_xy, xy_to_uv, XYZ_to_uv };

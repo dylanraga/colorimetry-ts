@@ -97,8 +97,8 @@ function minv(M: number[][]){
 			
 			// Scale this row down by e (so we have a 1 on the diagonal)
 			for(j=0; j<dim; j++){
-					C[i][j] = Decimal(C[i][j]).div(e); //apply to original matrix
-					I[i][j] = Decimal(I[i][j]).div(e); //apply to identity
+					C[i][j] = C[i][j]/e; //apply to original matrix
+					I[i][j] = I[i][j]/e; //apply to identity
 			}
 			
 			// Subtract this row (scaled appropriately for each row) from ALL of
@@ -116,8 +116,8 @@ function minv(M: number[][]){
 					// stuff left of diagonal is 0 (which it should be if we made this
 					// algorithm correctly)
 					for(j=0; j<dim; j++){
-							C[ii][j] = Decimal(C[ii][j]).minus(Decimal(e).times(C[i][j])); //apply to original matrix
-							I[ii][j] = Decimal(I[ii][j]).minus(Decimal(e).times(I[i][j])); //apply to identity
+							C[ii][j] -= e*C[i][j]; //apply to original matrix
+							I[ii][j] -= e*I[i][j]; //apply to identity
 					}
 			}
 	}
@@ -151,7 +151,7 @@ function mmult(A: number[]|number[][], B: number[][]|number[]): number[][]|numbe
 		for (let j = 0; j < M_cols; j++) {
 			var val = 0;
 			for (let k = 0; k < M_rows; k++) {
-					val = (Array.isArray(B[k]))? Decimal(val).plus(Decimal(A[i][k]).times(B[k][j])) : Decimal(val).plus(Decimal(A[i][k]).times(B[k]));
+					val += (Array.isArray(B[k]))? A[i][k]*B[k][j] : A[i][k]*+B[k];
 			}
 			
 			if (M_cols > 1)

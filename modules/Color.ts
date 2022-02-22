@@ -1,118 +1,91 @@
 /*=================*/
 /* Color Structure */
-/*==========/======*/
-
+/*=================*/
 import ColorModel from './ColorModel.js';
 import ColorSpace from './ColorSpace.js';
+import Decimal from './common/decimal.mjs';
 
 class Color {
-	#data: ColorModel;
-	#space: ColorSpace;
+	#data: number[];
+	#space: ColorSpace
 
-	constructor(data: ColorModel|{[key: string]: number}, colorSpace?: ColorSpace|string) {
-		if (typeof colorSpace === 'undefined') {
+	constructor(space: ColorSpace|ColorModel|string, data: number[], options?: {[k: string]: any}) {
+		if (typeof space === 'string')
+			space = ColorModel.getType(space);
+		if (space instanceof ColorModel)
+			space = space.defaultSpace;
+		
+		if (options) {
+			space = new ColorSpace(space.typeOf, [...space.conversions]);
+			space.conversions = space.conversions.map(u => {
+				const from = u.from? (a, o) => u.from(a, {...options, ...o}) : undefined;
+				const to = u.to? (a, o) => u.to(a, {...options, ...o}) : undefined;
+				const v = {space: u.space, from, to};
+				return v;
+			});
+		}
 
-			let defaultColorSpace;
-			const colorModelType = ColorModel.matchObj(data);
-			switch (colorModelType) {
-				case 'ICtCp':
-				case 'ITP':
-					defaultColorSpace = ColorSpace.BT2100;
-				break;
-				default:
-					defaultColorSpace = ColorSpace.SRGB;
-				break;
-			}
-			this.space = defaultColorSpace;
-		} else {
-			this.space = colorSpace;
+		this.#space = space;
+		this.#data = data;
+	}
+
+	//Returns desired ColorModel data
+	//Accepts inputs as ColorSpace, ColorModel, string look-up space
+	//Only ColorSpaces will have conversions; ColorModels can be conversion targets of ColorSpaces.
+	get(toSpace: ColorSpace|ColorModel|string, options?: {[k:string]: any}) {
+		const fromSpace = this.#space;
+
+		if (typeof toSpace === 'string')
+			toSpace = ColorModel.getType(toSpace);
+		
+		if (!toSpace) throw new Error(`ColorSpace '${toSpace}' does not exist`);
+
+		//BFS through conversion spaces
+		//If no path fromSpace -> toSpace, check toSpace -> fromSpace
+		//Otherwise check for intersections by checking if the traversing type matches a head of fromSpace's visitedPaths
+		let visitedPaths: (ColorSpace|ColorModel)[][];
+		var fromSpacePath, toSpacePath;
+		fromSpacePath = fromSpace.conversionBFS((currType, path, visited) => {
+			visitedPaths = visited;
+			if (currType === toSpace)
+				return path;
+		});
+
+		//console.log(visitedPaths.map(u=>u.map(v=>v.name)));
+		if (!fromSpacePath) {
+			//Since ColorModels don't have conversions, assume its defaultSpace
+			if (toSpace instanceof ColorModel)
+				toSpace = toSpace.defaultSpace;
+
+			toSpacePath = toSpace.conversionBFS((currType, path) => {
+				if (currType === fromSpace || currType === fromSpace.typeOf)
+					return path.reverse();
+					
+				const intersectingPath = visitedPaths.find(v => v[v.length-1] === currType);
+				if (intersectingPath)
+					return [...intersectingPath, ...path.reverse().slice(1)];
+			}, 'from');
 		}
 		
-		this.data = data;
-	}
+		let conversionPath = fromSpacePath || toSpacePath;
+		if (!conversionPath) throw new Error(`Could not convert from ColorSpace name '${fromSpace.name}' to '${toSpace.name}'`);
 
-	/*
-	 * Member getters & setters
-	 */
+		//console.log(conversionPath.map(u=>u.name));
+		let newData = this.#data;
+		for (const t in conversionPath.slice(0, -1)) {
+			let conversion;
+			if (conversionPath[t] instanceof ColorSpace) {
+				conversion = conversionPath[t].getConversion(conversionPath[+t+1]) || conversionPath[+t+1].getConversion(conversionPath[t]);
+			} else {
+				conversion = conversionPath[+t+1].getConversion(conversionPath[t]);
+			}
 
-	get space(): ColorSpace {
-		return this.#space;
-	}
-
-	set space(colorSpace: ColorSpace|string) {
-		if (typeof colorSpace === 'string') {
-			if( !ColorSpace[colorSpace.toUpperCase()] )	throw new Error(`ColorSpace '${colorSpace}' does not exist`);
-
-			colorSpace = ColorSpace[colorSpace.toUpperCase()] as ColorSpace;
+			//console.log(conversionPath[t].name, newData.map(u=>+u))
+			newData = conversion.space === conversionPath[+t+1]? conversion.to(newData, options) : conversion.from(newData, options);
 		}
 
-		/*
-		//re-convert RGB/rgb values when re-assigning ColorSpace
-		//except on initialization
-		const typeOrig = ColorModel.matchObj(this.#data);
-		if (this.#space !== undefined
-				&& colorSpace !== this.#space
-				&& ['RGB', 'rgb'].includes(typeOrig)) {
-			this.#data = this.#data.to('XYZ', {colorSpace: this.#space}).to(typeOrig, {colorSpace});
-		}
-		*/
-
-		this.#space = colorSpace;
+		return newData;
 	}
-
-	get data(): ColorModel {
-		return this.#data;
-	}
-
-	//Store color data in an absolute Color Model, e.g. XYZ
-	set data(data: ColorModel|{[key: string]: number}) {
-		if (data instanceof ColorModel) {
-			this.#data = data.to('XYZ', {colorSpace: this.#space});
-		} else {
-			let colorModelName = ColorModel.matchObj(data);
-			if(!colorModelName)	throw new Error(`ColorModel type '${Object.keys(data).join('')}' does not exist`);
-			
-			this.#data = new ColorModel(colorModelName, Object.values(data)).to('XYZ', {colorSpace: this.#space});
-		}
-	}
-
-	/*
-	 *	Member methods
-	 */
-
-	get(type: string, options: {colorSpace?: ColorSpace} = {}): ColorModel {
-		const { colorSpace = this.#space } = options;
-		let dataOrigin = this.#data;
-
-		/* Only needed when data source isn't XYZ
-		//Convert from XYZ if source->target ColorSpace is different
-		if (colorSpace !== this.#space) {
-			dataOrigin = this.#data.to('XYZ', { colorSpace: this.#space });
-		}
-		*/
-
-		return dataOrigin.to(type, {colorSpace}).toNumbers();
-	}
-
-	whiteLevel(): number;
-	whiteLevel(whiteLevel: number): Color;
-	whiteLevel(whiteLevel?: number): Color|number {
-		if(typeof whiteLevel === 'undefined')	return this.#space.whiteLevel();
-
-		this.#space = this.#space.whiteLevel(whiteLevel);
-		return this;
-	}
-
-	blackLevel(): number;
-	blackLevel(blackLevel: number): Color;
-	blackLevel(blackLevel?: number): Color|number {
-		if(typeof blackLevel === 'undefined')	return this.#space.blackLevel();
-
-		this.#space = this.#space.blackLevel(blackLevel);
-		return this;
-	}
-
 }
-
 
 export default Color;
