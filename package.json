@@ -2,8 +2,11 @@
   "name": "colorimetry-ts",
   "version": "0.0.1",
   "description": "Functions related to the colorimetric representation and manipulation using Typescript",
-  "main": "colorimetry.ts",
+  "main": "build/colorimetry.js",
+  "types": "build/colorimetry.d.ts",
   "scripts": {
+    "build": "tsc",
+    "prepublish": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,7 +25,6 @@
   },
   "homepage": "https://github.com/dylanraga/colorimetry-ts#readme",
   "devDependencies": {
-    "@types/big.js": "^6.1.2",
     "typescript": "^4.5.4"
   }
 }

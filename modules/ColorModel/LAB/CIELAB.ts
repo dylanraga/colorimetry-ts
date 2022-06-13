@@ -27,15 +27,13 @@ ColorModel.types.LAB.spaces.CIELAB = CIELAB;
 ColorModel.types.LAB.defaultSpace = CIELAB;
 
 /*
-/*
  * CIELAB conversion functions.
  * ----------------------------
  * Use illuminant D50 since CIELAB was intended for reflective surfaces, not emissive/transmissive displays.
  * Currently using "wrong" Von Kries/XYZ scaling per spec; might implement manual Bradford CAT option in the future
  */
 
-function XYZ_to_CIELAB(XYZ: number[], Yn: number = 1, white: {x, y} = {x: 0.34567, y: 0.35850}): number[] {
-	const [X, Y, Z] = XYZ;
+function XYZ_to_CIELAB([X, Y, Z]: number[], Yn: number = 1, white: {x, y} = {x: 0.34567, y: 0.35850}): number[] {
 	let [Xn, Zn] = [Decimal(white.x).times(Yn).div(white.y), Decimal(1).minus(white.x).minus(white.y).times(Yn).div(white.y)];
 
 	let d = Decimal(6).div(29);
@@ -48,8 +46,7 @@ function XYZ_to_CIELAB(XYZ: number[], Yn: number = 1, white: {x, y} = {x: 0.3456
 	return [L, a, b];
 }
 
-function CIELAB_to_XYZ(Lab: number[], Yn: number = 1, white: {x, y} = {x: 0.34567, y: 0.35850}): number[] {
-	const [L, a, b] = Lab;
+function CIELAB_to_XYZ([L, a, b]: number[], Yn: number = 1, white: {x, y} = {x: 0.34567, y: 0.35850}): number[] {
 	let [Xn, Zn] = [Decimal(white.x).times(Yn).div(white.y), Decimal(1).minus(white.x).minus(white.y).times(Yn).div(white.y)];
 	
 	let d = Decimal(6).div(29);

@@ -1,7 +1,6 @@
 /*======================*/
 /* Tone Response Curves */
 /*======================*/
-import Decimal from './common/decimal.mjs';
 
 type TransferFunctionOptions = {
 	Lw?: number;
@@ -10,13 +9,12 @@ type TransferFunctionOptions = {
 	Yn?: number;
 	[k: string]: any;
 }
-type TransferFunction = (u: any, options?: TransferFunctionOptions) => any;
+type TransferFunction = (u: number, options?: TransferFunctionOptions) => number;
 
 class ToneResponse {
-	[key: string]: any;
+	name?: string;
 	eotf: TransferFunction;
 	oetf: TransferFunction;
-	name?: string;
 
 	constructor(eotf: TransferFunction, oetf: TransferFunction) {
 		this.eotf = eotf;
@@ -105,7 +103,7 @@ class ToneResponse {
 			//let L = Decimal(Lw).times(Decimal.pow(E, gamma));
 			let L = Lw * E**gamma;
 
-			return L.toPrecision(8);
+			return +L.toPrecision(8);
 		},
 		(L, options: TransferFunctionOptions = {}) => {
 			const {

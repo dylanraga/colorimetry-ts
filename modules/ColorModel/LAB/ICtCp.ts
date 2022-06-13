@@ -29,9 +29,9 @@ const ITP = new ColorSpace(ColorModel.types.LAB, [
 	{
 		space: ICtCp,
 		//ICtCp -> ITP
-		from: (ICtCp: number[]) => [ICtCp[0], ICtCp[1]/2, ICtCp[2]],
+		from: ([I, Ct, Cp]: number[]) => [I, Ct/2, Cp],
 		//ITP -> ICtCp
-		to: (ITP: number[]) => [ITP[0], ITP[1]*2, ITP[2]]
+		to: ([I, T, P]: number[]) => [I, T*2, P]
 	}
 ]);
 ITP.name = 'ITP',
@@ -82,9 +82,7 @@ const mLMS_to_ICtCp = [
 ];
 const mICtCp_to_LMS = minv(mLMS_to_ICtCp);
 
-function ICtCp_to_XYZ(ICtCp: number[], trc: ToneResponse = ToneResponse.PQ): number[] {
-	let [I, Ct, Cp] = ICtCp;
-
+function ICtCp_to_XYZ([I, Ct, Cp]: number[], trc: ToneResponse = ToneResponse.ST2084): number[] {
 	let [L_, M_, S_] = mmult(mICtCp_to_LMS, [I, Ct, Cp]);
 	let L = trc.eotf(L_);
 	let M = trc.eotf(M_);
@@ -95,9 +93,7 @@ function ICtCp_to_XYZ(ICtCp: number[], trc: ToneResponse = ToneResponse.PQ): num
 	return [X ,Y, Z];
 }
 
-function XYZ_to_ICtCp(XYZ: number[], trc: ToneResponse = ToneResponse.PQ): number[] {
-	const [X, Y, Z] = XYZ;
-
+function XYZ_to_ICtCp([X, Y, Z]: number[], trc: ToneResponse = ToneResponse.ST2084): number[] {
 	let [L, M, S] = mmult(mXYZ_to_LMS, [X, Y, Z]); //.map(u => Decimal(u).toPrecision(5));
 	let L_ = trc.oetf(L);
 	let M_ = trc.oetf(M);

@@ -41,18 +41,16 @@ const mXpYpZp_to_LMS = [
 	[-0.20151000, 1.120649, 0.0531008],
 	[-0.01660080, 0.264800, 0.6684799]
 ];
+const mLMS_to_XpYpZp = minv(mXpYpZp_to_LMS);
+
 const mLMS_to_IAB = [
 	[0.500000,  0.500000,  0.000000],
 	[3.524000, -4.066708,  0.542708],
 	[0.199076,  1.096799, -1.295875]
 ];
-
 const mIAB_to_LMS = minv(mLMS_to_IAB);
-const mLMS_to_XpYpZp = minv(mXpYpZp_to_LMS);
 
-function XYZ_to_JzAzBz(XYZ: number[], trc: ToneResponse = ToneResponse.ST2084.options({m2: 134.034375})): number[] {
-	const [X, Y, Z] = XYZ;
-
+function XYZ_to_JzAzBz([X, Y, Z]: number[], trc: ToneResponse = ToneResponse.ST2084.options({m2: 134.034375})): number[] {
 	const Xp = b*X - ((b-1)*Z);
 	const Yp = g*Y - ((g-1)*X);
 	
@@ -65,10 +63,9 @@ function XYZ_to_JzAzBz(XYZ: number[], trc: ToneResponse = ToneResponse.ST2084.op
 	return [Jz, az, bz];
 }
 
-function JzAzBz_to_XYZ(JzAzBz: number[], trc: ToneResponse = ToneResponse.ST2084.options({m2: 134.034375})): number[] {
-	let [Jz, az, bz] = JzAzBz;
-
-	let Iz = (Jz + d0) / (1+d-d*(Jz+d0));
+function JzAzBz_to_XYZ([Jz, az, bz]: number[], trc: ToneResponse = ToneResponse.ST2084.options({m2: 134.034375})): number[] {
+	let Jz_ = Jz + d0;
+	let Iz = (Jz_) / (1+d-d*(Jz_));
 
 	let [L_, M_, S_] = mmult(mIAB_to_LMS, [Iz, az, bz]);
 	let [L, M, S] = [L_, M_, S_].map(u => trc.eotf(u));

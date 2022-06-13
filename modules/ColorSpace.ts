@@ -2,10 +2,10 @@ import ColorModel from "./ColorModel.js";
 
 class ColorSpace {
 	#name: string;
-	typeOf: ColorModel;
-	keys: string[];
-	conversions: ColorSpaceConversion[];
 	alias?: string[];
+	keys: string[];
+	typeOf: ColorModel;
+	conversions: ColorSpaceConversion[];
 	options?: {[k: string]: any};
 
 	constructor(typeOf: ColorModel, conversions: ColorSpaceConversion[]) {
@@ -24,8 +24,6 @@ class ColorSpace {
 	get name(): string {
 		return this.#name;
 	}
-
-	static RGBConversion;
 
 	//Executes a BFS through the ColorSpace's possible conversions
 	//`checkFn()` runs on every traversal. `path` and `visited` are arrays including the total traversal path.

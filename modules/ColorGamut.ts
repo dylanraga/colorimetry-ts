@@ -60,8 +60,7 @@ class ColorGamut {
 		if (this.#mRGB) return this.#mRGB;
 
 		//just get the inverse of mXYZ
-		let mRGB = minv(this.mXYZ);
-		return this.#mRGB = mRGB;
+		return this.#mRGB = minv(this.mXYZ);
 	}
 
 	/*

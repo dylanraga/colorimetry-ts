@@ -3,11 +3,11 @@
 /*=================*/
 import ColorModel from './ColorModel.js';
 import ColorSpace from './ColorSpace.js';
-import Decimal from './common/decimal.mjs';
 
 class Color {
 	#data: number[];
-	#space: ColorSpace
+	#space: ColorSpace;
+	options: {[k: string]: any};
 
 	constructor(space: ColorSpace|ColorModel|string, data: number[], options?: {[k: string]: any}) {
 		if (typeof space === 'string')
@@ -15,6 +15,7 @@ class Color {
 		if (space instanceof ColorModel)
 			space = space.defaultSpace;
 		
+		/*
 		if (options) {
 			space = new ColorSpace(space.typeOf, [...space.conversions]);
 			space.conversions = space.conversions.map(u => {
@@ -24,13 +25,15 @@ class Color {
 				return v;
 			});
 		}
+		*/
 
 		this.#space = space;
 		this.#data = data;
+		this.options = options;
 	}
 
 	//Returns desired ColorModel data
-	//Accepts inputs as ColorSpace, ColorModel, string look-up space
+	//Accepts inputs as ColorSpace, ColorModel (default space), string look-up space
 	//Only ColorSpaces will have conversions; ColorModels can be conversion targets of ColorSpaces.
 	get(toSpace: ColorSpace|ColorModel|string, options?: {[k:string]: any}) {
 		const fromSpace = this.#space;
@@ -70,7 +73,7 @@ class Color {
 		let conversionPath = fromSpacePath || toSpacePath;
 		if (!conversionPath) throw new Error(`Could not convert from ColorSpace name '${fromSpace.name}' to '${toSpace.name}'`);
 
-		//console.log(conversionPath.map(u=>u.name));
+		console.log(conversionPath.map(u=>u.name));
 		let newData = this.#data;
 		for (const t in conversionPath.slice(0, -1)) {
 			let conversion;
@@ -80,7 +83,7 @@ class Color {
 				conversion = conversionPath[+t+1].getConversion(conversionPath[t]);
 			}
 
-			//console.log(conversionPath[t].name, newData.map(u=>+u))
+			//console.log(conversionPath[t].name, newData)
 			newData = conversion.space === conversionPath[+t+1]? conversion.to(newData, options) : conversion.from(newData, options);
 		}
 

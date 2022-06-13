@@ -1,4 +1,3 @@
-import Decimal from "../common/decimal.mjs";
 import ColorModel from "../ColorModel.js";
 import ColorSpace from "../ColorSpace.js";
 
@@ -19,16 +18,16 @@ Object.defineProperty(ColorModel.types.LCh, 'defaultSpace', {
 				//LAB -> LCh
 				from: (LAB: number[]) => {
 					const [L, a, b] = LAB;
-					const C = Decimal.sqrt(Decimal.pow(a, 2).plus(Decimal.pow(b, 2)));
-					const h = Decimal.atan2(b, a);
+					const C = Math.sqrt(a*a + b*b);
+					const h = Math.atan2(b, a);
 			
 					return [L, C, h];
 				},
 				//LCh -> LAB
 				to: (LCh: number[]) => {
 					const [L, C, h] = LCh;
-					const a = Decimal.cos(h).times(C);
-					const b = Decimal.sin(h).times(C);
+					const a = C * Math.cos(h);
+					const b = C * Math.sin(h);
 			
 					return [L, a, b];
 				}

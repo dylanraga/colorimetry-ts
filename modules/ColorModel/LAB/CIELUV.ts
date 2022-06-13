@@ -59,27 +59,23 @@ ColorModel.types.LAB.spaces.CIEuv = CIEuv;
  * CIELUV/u'v' conversions
  */
 
-function XYZ_to_uv(XYZ: number[]): number[] {
-	const [X, Y, Z] = XYZ;
+function XYZ_to_uv([X, Y, Z]: number[]): number[] {
 	let [u, v] = [Decimal(X).times(4).div(Decimal(X).plus(Decimal(Y).times(15)).plus(Decimal(Z).times(3))), Decimal(Y).times(9).div(Decimal(X).plus(Decimal(Y).times(15)).plus(Decimal(Z).times(3)))];
 	return [u, v];
 }
 
-function xy_to_uv(xy: number[]): number[] {
-	const [x, y] = xy;
+function xy_to_uv([x, y]: number[]): number[] {
 	let [u, v] = [Decimal(x).times(4).div(Decimal(x).times(-2).plus(Decimal(y).times(12)).plus(3)), Decimal(y).times(9).div(Decimal(x).times(-2).plus(Decimal(y).times(12)).plus(3))];
 	return [u, v];
 }
 
-function uv_to_xy(uv: number[]): number[] {
-	const [u, v] = uv;
+function uv_to_xy([u, v]: number[]): number[] {
 	let [x, y] = [Decimal(u).times(9).div( Decimal(u).times(6).minus( Decimal(v).times(16) ).plus(12) ), Decimal(v).times(4).div( Decimal(u).times(6).minus( Decimal(v).times(16) ).plus(12) )];
 	return [x, y];
 }
 
-function XYZ_to_LUV(XYZ: number[], Yn: number = 1, white: {x, y} = ColorGamut.SRGB.white): number[] {
-	const [X, Y, Z] = XYZ;
-	let [u, v] = XYZ_to_uv(XYZ);
+function XYZ_to_LUV([X, Y, Z]: number[], Yn: number = 1, white: {x, y} = ColorGamut.SRGB.white): number[] {
+	let [u, v] = XYZ_to_uv([X, Y, Z]);
 	let [un, vn] = xy_to_uv([white.x, white.y]);
 	let L = Decimal(100).times(ToneResponse.LSTAR.oetf(Decimal(Y).div(Yn)));
 	let U = Decimal(L).times(13).times(Decimal(u).minus(un));
@@ -88,8 +84,7 @@ function XYZ_to_LUV(XYZ: number[], Yn: number = 1, white: {x, y} = ColorGamut.SR
 	return [L, U, V];
 }
 
-function LUV_to_XYZ(LUV: number[], Yn: number = 1, white: {x, y} = ColorGamut.SRGB.white): number[] {
-	const [L, U, V] = LUV;
+function LUV_to_XYZ([L, U, V]: number[], Yn: number = 1, white: {x, y} = ColorGamut.SRGB.white): number[] {
 	let Y = Decimal(Yn).times(ToneResponse.LSTAR.eotf(Decimal(L).div(100)));
 	let [un, vn] = xy_to_uv([white.x, white.y]);
 	let u = Decimal(U).div(Decimal(L).times(13)).plus(un);

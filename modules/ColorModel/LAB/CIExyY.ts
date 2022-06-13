@@ -1,6 +1,5 @@
 import ColorModel from "../../ColorModel.js";
 import ColorSpace from "../../ColorSpace.js";
-import Decimal from "../../common/decimal.mjs";
 
 
 /* CIExyY */
@@ -8,15 +7,13 @@ const CIExyY = new ColorSpace(ColorModel.types.LAB, [
 	{
 		space: ColorModel.types.XYZ,
 		//XYZ -> CIExyY
-		from: (XYZ: number[]) => {
-			let [X, Y, Z] = XYZ;
-			let [x, y] = [Decimal(X).div(Decimal(X).plus(Y).plus(Z)), Decimal(Y).div(Decimal(X).plus(Y).plus(Z))];
+		from: ([X, Y, Z]: number[]) => {
+			let [x, y] = [X/(X+Y+Z), Y/(X+Y+Z)];
 			return [Y, x, y];
 		},
 		//CIExyY -> XYZ
-		to: (Yxy: number[]) => {
-			let [Y, x, y] = Yxy;
-			let XYZ = [Decimal(x).times(Y).div(y), Y, Decimal(1).minus(x).minus(y).times(Y).div(y)];
+		to: ([Y, x, y]: number[]) => {
+			let XYZ = [x*Y/y , Y, (1-x-y)*Y/y];
 			return XYZ;
 		}
 	}
@@ -32,7 +29,7 @@ const CIExy = new ColorSpace(ColorModel.types.LAB, [
 	{
 		space: CIExyY,
 		//CIExyY -> CIExy
-		from: (Yxy: number[]) => Yxy.slice(-2)
+		from: ([Y, x, y]: number[]) => [x, y]
 	}
 ]);
 CIExy.name = 'CIExy';
