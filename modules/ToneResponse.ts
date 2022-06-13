@@ -200,13 +200,7 @@ class ToneResponse {
 	 */
 
 	static PQ = ToneResponse.ST2084;
-	
-	static {
-		//Set the names of each standard
-		for (let k of this.names) {
-			this[k].name = k;
-		}
-	}
+
 }
 
 export default ToneResponse;

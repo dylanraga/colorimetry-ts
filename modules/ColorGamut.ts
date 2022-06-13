@@ -135,14 +135,6 @@ class ColorGamut {
 	static DISPLAYP3 = ColorGamut.P3D65;
 	static REC2020 = ColorGamut.BT2020;
 	
-	static {
-		//Set the names of each standard
-		for (let k of this.names) {
-			this[k].name = k;
-		}
-
-	}
-	
 }
 
 
