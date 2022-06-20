@@ -3,6 +3,8 @@
 /*=================*/
 import ColorModel from './ColorModel.js';
 import ColorSpace from './ColorSpace.js';
+import * as ColorDifference from './ColorDifference.js';
+
 
 class Color {
 	#data: number[];
@@ -36,7 +38,7 @@ class Color {
 	//Accepts inputs as ColorSpace, ColorModel (default space), string look-up space
 	//Only ColorSpaces will have conversions; ColorModels can be conversion targets of ColorSpaces.
 	get(toSpace: ColorSpace|ColorModel|string, options?: {[k:string]: any}) {
-		const fromSpace = this.#space;
+		const fromSpace: ColorSpace = this.#space;
 
 		if (typeof toSpace === 'string')
 			toSpace = ColorModel.getType(toSpace);
@@ -47,7 +49,7 @@ class Color {
 		//If no path fromSpace -> toSpace, check toSpace -> fromSpace
 		//Otherwise check for intersections by checking if the traversing type matches a head of fromSpace's visitedPaths
 		let visitedPaths: (ColorSpace|ColorModel)[][];
-		var fromSpacePath, toSpacePath;
+		let fromSpacePath: ColorSpace[], toSpacePath: ColorSpace[];
 		fromSpacePath = fromSpace.conversionBFS((currType, path, visited) => {
 			visitedPaths = visited;
 			if (currType === toSpace)
@@ -70,10 +72,10 @@ class Color {
 			}, 'from');
 		}
 		
-		let conversionPath = fromSpacePath || toSpacePath;
+		let conversionPath: ColorSpace[] = fromSpacePath || toSpacePath;
 		if (!conversionPath) throw new Error(`Could not convert from ColorSpace name '${fromSpace.name}' to '${toSpace.name}'`);
 
-		console.log(conversionPath.map(u=>u.name));
+		//console.log(conversionPath.map(u=>u.name));
 		let newData = this.#data;
 		for (const t in conversionPath.slice(0, -1)) {
 			let conversion;
@@ -88,6 +90,32 @@ class Color {
 		}
 
 		return newData;
+	}
+
+	dE(colorB: Color, options: Partial<ColorDifference.dEOptions> = {}): number {
+		return Color.dE(this, colorB, options);
+	}
+
+	whiteLevel(): number;
+	whiteLevel(Lw: number): Color;
+	whiteLevel(parmA?: number): Color|number {
+		if(typeof parmA === 'undefined')	return this.#space.options.gamut.whiteLevel();
+
+		this.#space.options.gamut = this.#space.options.gamut.whiteLevel(parmA);
+		return this;
+	}
+
+	/*
+	 * Static methods
+	 */
+
+	static dE(colorA: Color, colorB: Color, options: Partial<ColorDifference.dEOptions> = {}): number {
+		const {
+			dEMethod = ColorDifference.dEITP,
+			excludeLuminance = false
+		} = options;
+
+		return dEMethod(colorA, colorB, options);
 	}
 }
 

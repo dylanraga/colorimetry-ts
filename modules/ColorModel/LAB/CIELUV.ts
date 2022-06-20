@@ -1,4 +1,3 @@
-import Decimal from "../../common/decimal.mjs";
 import ColorGamut from "../../ColorGamut.js";
 import ToneResponse from "../../ToneResponse.js";
 import ColorModel from "../../ColorModel.js";
@@ -11,13 +10,13 @@ const CIELUV = new ColorSpace(ColorModel.types.LAB, [
 		//XYZ -> CIELUV
 		from: (XYZ: number[], o: {gamut?: ColorGamut} = {}) => {
 			const { gamut = ColorGamut.SRGB } = o;
-			let LUV = XYZ_to_LUV(XYZ, gamut.whiteLevel());
+			let LUV = XYZ_to_LUV(XYZ);
 			return LUV;
 		},
 		//CIELUV -> XYZ
 		to: (LUV: number[], o: {gamut?: ColorGamut} = {}) => {
 			const { gamut = ColorGamut.SRGB } = o;
-			let XYZ = LUV_to_XYZ(LUV, gamut.whiteLevel());
+			let XYZ = LUV_to_XYZ(LUV);
 			return XYZ;
 		}
 	}
@@ -60,37 +59,46 @@ ColorModel.types.LAB.spaces.CIEuv = CIEuv;
  */
 
 function XYZ_to_uv([X, Y, Z]: number[]): number[] {
-	let [u, v] = [Decimal(X).times(4).div(Decimal(X).plus(Decimal(Y).times(15)).plus(Decimal(Z).times(3))), Decimal(Y).times(9).div(Decimal(X).plus(Decimal(Y).times(15)).plus(Decimal(Z).times(3)))];
+	let [u, v] = [
+		4*X / (X + 15*Y + 3*Z),
+		9*Y / (X + 15*Y + 3*Z)
+	];
 	return [u, v];
 }
 
 function xy_to_uv([x, y]: number[]): number[] {
-	let [u, v] = [Decimal(x).times(4).div(Decimal(x).times(-2).plus(Decimal(y).times(12)).plus(3)), Decimal(y).times(9).div(Decimal(x).times(-2).plus(Decimal(y).times(12)).plus(3))];
+	let [u, v] = [
+		4*x / (-2*x + 12*y + 3),
+		9*y / (-2*x + 12*y + 3)
+	];
 	return [u, v];
 }
 
 function uv_to_xy([u, v]: number[]): number[] {
-	let [x, y] = [Decimal(u).times(9).div( Decimal(u).times(6).minus( Decimal(v).times(16) ).plus(12) ), Decimal(v).times(4).div( Decimal(u).times(6).minus( Decimal(v).times(16) ).plus(12) )];
+	let [x, y] = [
+		9*u / (6*u - 16*v + 12),
+		4*v / (6*u - 16*v + 12)
+	];
 	return [x, y];
 }
 
-function XYZ_to_LUV([X, Y, Z]: number[], Yn: number = 1, white: {x, y} = ColorGamut.SRGB.white): number[] {
+function XYZ_to_LUV([X, Y, Z]: number[], Yn: number = 100, white: {x, y} = ColorGamut.SRGB.white): number[] {
 	let [u, v] = XYZ_to_uv([X, Y, Z]);
 	let [un, vn] = xy_to_uv([white.x, white.y]);
-	let L = Decimal(100).times(ToneResponse.LSTAR.oetf(Decimal(Y).div(Yn)));
-	let U = Decimal(L).times(13).times(Decimal(u).minus(un));
-	let V = Decimal(L).times(13).times(Decimal(v).minus(vn));
+	let L = 100 * ToneResponse.LSTAR.oetf(Y, {Yn});
+	let U = 13*L * (u-un);
+	let V = 13*L * (v-vn);
 
 	return [L, U, V];
 }
 
-function LUV_to_XYZ([L, U, V]: number[], Yn: number = 1, white: {x, y} = ColorGamut.SRGB.white): number[] {
-	let Y = Decimal(Yn).times(ToneResponse.LSTAR.eotf(Decimal(L).div(100)));
+function LUV_to_XYZ([L, U, V]: number[], Yn: number = 100, white: {x, y} = ColorGamut.SRGB.white): number[] {
+	let Y = ToneResponse.LSTAR.eotf(L/100);
 	let [un, vn] = xy_to_uv([white.x, white.y]);
-	let u = Decimal(U).div(Decimal(L).times(13)).plus(un);
-	let v = Decimal(V).div(Decimal(L).times(13)).plus(vn);
-	let X = Decimal(Y).times( Decimal(u).times(9).div( Decimal(v).times(4) ) );
-	let Z = Decimal(Y).times( Decimal(12).minus( Decimal(u).times(3) ).minus( Decimal(v).times(20) ).div( Decimal(v).times(4) ) );
+	let u = U/(13*L) + un;
+	let v = V/(13*L) + vn;
+	let X = Y * (9*u) / (4*v);
+	let Z = Y * (12 - 3*u - 20*v) / (4*v);
 
 	return [X, Y, Z];
 }

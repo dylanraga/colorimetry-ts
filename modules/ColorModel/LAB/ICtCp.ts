@@ -1,7 +1,6 @@
 //output is significant to 5 digits, limited by precision of von kries and ebner matrices
 //might be worth investigating internally quantizing the conversion to 12 bits RGB (=4095 codewords)
 import { minv, mmult } from "../../common/util.js";
-import Decimal from "../../common/decimal.mjs";
 import ToneResponse from "../../ToneResponse.js";
 import ColorModel from "../../ColorModel.js";
 import ColorSpace from "../../ColorSpace.js";

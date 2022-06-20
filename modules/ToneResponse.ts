@@ -127,17 +127,18 @@ class ToneResponse {
 	);
 
 	//Extended sRGB, using higher-precision constants
+	//https://entropymine.com/imageworsener/srgbformula/
 	static SRGB = new ToneResponse(
 		(V, options: TransferFunctionOptions = {}) => {
 			const { Lw=1, Lb=0 } = options;
-			let f = x => (Math.abs(x) < 0.0392857)? x/12.9232102 : Math.sign(x)*((Math.abs(x) + 0.055)/1.055) ** 2.4;
+			let f = x => (Math.abs(x) <= 0.0404482362771082)? x/12.92 : Math.sign(x)*((Math.abs(x) + 0.055)/1.055) ** 2.4;
 			
 			let L = (Lw-Lb)*f(V)+Lb;
 			return L;
 		},
 		(L, options: TransferFunctionOptions = {}) => {
 			const { Lw=1, Lb=0 } = options;
-			let f = x => (Math.abs(x) < (0.0392857/12.9232102))? x*12.9232102 : Math.sign(x) * ((1.055*Math.abs(x)**(1/2.4)) - 0.055); 
+			let f = x => (Math.abs(x) <= 0.00313066844250063)? x*12.92 : Math.sign(x) * ((1.055*Math.abs(x)**(1/2.4)) - 0.055); 
 
 			let V = f( (L-Lb)/(Lw-Lb) )
 			return V;
@@ -146,26 +147,26 @@ class ToneResponse {
 
 	static ST2084 = new ToneResponse(
 		(V, options: TransferFunctionOptions = {}) => {
-			const { Lw=10000, Lb=0, m2=78.84375 } = options;
+			const { Lw=10000, Lb=0, m2=78.84375, Yn=10000 } = options;
 			const m1 = 0.1593017578125;
 			const c1 = 0.8359375;
 			const c2 = 18.8515625;
 			const c3 = 18.6875;
 		
 			//let L = Decimal(10000).times( Decimal.pow(Decimal.max(Decimal.pow(V, Decimal(1).div(m2)).minus(c1), 0).div(Decimal(c2).minus(Decimal(c3).times(Decimal.pow(V,Decimal(1).div(m2))))), Decimal(1).div(m1) ));
-			let L = 10000 * (Math.max(V**(1/m2)-c1, 0)/(c2-c3*V**(1/m2)))**(1/m1)
+			let L = Yn * (Math.max(V**(1/m2)-c1, 0)/(c2-c3*V**(1/m2)))**(1/m1)
 
-			return Math.max(Math.min(L, Lw), Lb);
+			return Math.max(Math.min(L, Yn), Lb);
 			//return Decimal.max(Decimal.min(L, Lw), Lb).toSignificantDigits(13);
 		},
 		(L, options: TransferFunctionOptions = {}) => {
-			const { Lw=10000, Lb=0, m2=78.84375 } = options;
+			const { Lw=10000, Lb=0, m2=78.84375, Yn=10000 } = options;
 			const m1 = 0.1593017578125;
 			const c1 = 0.8359375;
 			const c2 = 18.8515625;
 			const c3 = 18.6875;
 			
-			let V = ((c1+c2*(L/10000)**m1)/(1+c3*(L/10000)**m1))**m2;
+			let V = ((c1+c2*(L/Yn)**m1)/(1+c3*(L/Yn)**m1))**m2;
 			
 			return V;
 		}
@@ -173,23 +174,17 @@ class ToneResponse {
 
 	static LSTAR = new ToneResponse(
 		(V, options: TransferFunctionOptions = {}) => {
-			const { Lw=1, Lb=0, Yn=100 } = options;
-			//let d = Decimal(6).div(29);
+			const { Lw=100, Lb=0 } = options;
 			const d = 6/29;
-			//let f = x => (x > d)? Decimal(x).pow(3) : Decimal(d).times(3).pow(2).times(Decimal(x).minus(Decimal(4).div(29)));
-			let f = x => (x > d)? x*x*x : (d*3)*(d*3)*(x-(4/29));
-			//let L = Decimal(Lw).minus(Lb).times(f(Decimal(Yn).times(V).plus(16).div(116))).plus(Lb);
-			let L = (Lw-Lb) * f((Yn*V + 16)/116) + Lb;
+			let f = x => (x > d)? x*x*x : 3*(d*d)*(x-(4/29));
+			let L = (Lw-Lb) * f((100*V + 16)/116) + Lb;
 			return L;
 		},
 		(L, options: TransferFunctionOptions = {}) => {
-			const { Lw=1, Lb=0, Yn=100 } = options;
-			//let d = Decimal(6).div(29);
+			const { Lw=100, Lb=0 } = options;
 			const d = 6/29;
-			//let f = x => (x > d**3)? Decimal(x).pow(Decimal(1).div(3)) : Decimal(x).div(3).times(Decimal(d).pow(2)).plus(Decimal(4).div(29));
-			let f = x => (x > d*d*d)? x**(1/3) : (x/3)*(d*d)+(4/29);
-			//let V = Decimal(116).times(f(Decimal(L).minus(Lb).div(Decimal(Lw).minus(Lb)))).minus(16).div(Yn);
-			let V = (116 * f((L-Lb)/(Lw-Lb)) - 16) / Yn;
+			let f = x => (x > d*d*d)? x**(1/3) : x/(3*d*d) + (4/29);
+			let V = (116 * f((L-Lb)/(Lw-Lb)) - 16) / 100;
 			return V;
 		}
 	);

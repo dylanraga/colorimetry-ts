@@ -9,7 +9,7 @@ import ToneResponse from '../ToneResponse.js';
 
 ColorModel.types.RGB = new ColorModel('RGB', ['R', 'G', 'B']);
 
-class RGBColorSpace extends ColorSpace {
+export class RGBColorSpace extends ColorSpace {
 	constructor(gamut: ColorGamut, trc: ToneResponse) {
 		super(ColorModel.types.RGB, []);
 		this.options = { gamut, trc };
@@ -53,7 +53,7 @@ class RGBColorSpace extends ColorSpace {
  */
 
 //sRGB
-const SRGB = new RGBColorSpace(ColorGamut.SRGB, ToneResponse.SRGB);
+const SRGB = new RGBColorSpace(ColorGamut.SRGB.whiteLevel(100), ToneResponse.SRGB);
 SRGB.name = 'SRGB';
 ColorModel.types.RGB.spaces.SRGB = SRGB;
 
@@ -64,7 +64,7 @@ REC709.alias.push('BT709');
 ColorModel.types.RGB.spaces.REC709 = REC709;
 
 //Display P3
-const DISPLAYP3 = new RGBColorSpace(ColorGamut.P3D65, ToneResponse.SRGB);
+const DISPLAYP3 = new RGBColorSpace(ColorGamut.P3D65.whiteLevel(100), ToneResponse.SRGB);
 DISPLAYP3.name = 'DISPLAYP3';
 DISPLAYP3.alias.push('P3', 'DISPLAY P3');
 ColorModel.types.RGB.spaces.DISPLAYP3 = DISPLAYP3;

@@ -6,6 +6,7 @@
 //Essentials
 export { default as ColorModel } from './modules/ColorModel.js';
 export { default as ColorSpace } from './modules/ColorSpace.js';
+export { RGBColorSpace } from './modules/ColorModel/RGB.js';
 import './modules/ColorModel/XYZ.js';
 import './modules/ColorModel/RGB.js';
 import './modules/ColorModel/LAB.js';
@@ -23,3 +24,4 @@ import './modules/ColorModel/LCh.js';
 export { default as ColorGamut } from './modules/ColorGamut.js';
 export { default as ToneResponse } from './modules/ToneResponse.js';
 export { default as Color } from './modules/Color.js';
+export * as ColorDifference from './modules/ColorDifference.js';

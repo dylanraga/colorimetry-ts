@@ -3,7 +3,6 @@
 /*==========================*/
 
 import { minv, mmult } from "./common/util.js";
-import Decimal from "./common/decimal.mjs";
 
 interface xyY {
 	x: number;
@@ -22,12 +21,12 @@ class ColorGamut {
 	#mRGB?: number[][];
 	#mXYZ?: number[][];
 
-	constructor(white?: xyY, red?: xy, green?: xy, blue?: xy) {
+	constructor(white?: xyY, red?: xy, green?: xy, blue?: xy, black: xyY = {...white, Y: 0}) {
 		this.white = white;
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
-		this.black = {...white, Y: 0};
+		this.black = black;
 
 	}
 
@@ -67,6 +66,7 @@ class ColorGamut {
 	 *	Member methods
 	 */
 
+	//returns new ColorGamut (non-destructive) with new whiteLevel
 	whiteLevel(): number;
 	whiteLevel(whiteLevel: number): ColorGamut;
 	whiteLevel(whiteLevel?: number): ColorGamut|number {
@@ -74,7 +74,7 @@ class ColorGamut {
 
 		let newGamut = new ColorGamut();
 		Object.assign(newGamut, this);
-		newGamut.white = {...this.white};
+		Object.assign(newGamut.white, this.white);
 		newGamut.white.Y = whiteLevel;
 		
 		return newGamut;

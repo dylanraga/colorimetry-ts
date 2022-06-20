@@ -5,8 +5,9 @@
 		"declaration": true,
 		"sourceMap": true,
 		"outDir": "build",
-    "allowJs": true,
+    //"allowJs": true,
     "checkJs": false,
 		"allowSyntheticDefaultImports": true
-	}
+	},
+	"exclude": ["node_modules", "build"]
 }
