@@ -1,20 +1,11 @@
 # colorimetry-ts
-=========
 
-Functions related to the colorimetric representation and manipulation using Typescript
+Class library involving colorimetric representation and manipulation with Typescript support
 
 ## Installation
 
-  `npm install colorimetry-ts`
+    npm install colorimetry-ts`
 
-## Usage
+## Examples
 
     const cmtry = require('colorimetry-ts');
-  
-  
-  Hello world
-
-
-## Tests
-
-  `npm test`

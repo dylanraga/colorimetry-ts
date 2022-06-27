@@ -1,16 +1,15 @@
 /*===================*/
 /* Utility functions */
 /*===================*/
-import Decimal from "./decimal.mjs";
 
-export const arrayEquals = (a, b)=>
+export const arrayEquals = (a: number[], b: number[])=>
 	a.length === b.length &&
 	a.every((v, i) => v === b[i]);
 
-export const arrayEqualsApprox = (a, b)=>
+export const arrayEqualsApprox = (a: number[], b: number[], precision: number = 4)=>
 	a && b &&
 	a.length === b.length &&
-	a.every((v, i) => v.toFixed(4) === b[i].toFixed(4));
+	a.every((v, i) => v.toFixed(precision) === b[i].toFixed(precision));
 
 export const shallowEquals = (a, b)=> {
 	if(typeof a === 'object' && a !== null && typeof b === 'object' && b !== null) {
@@ -26,7 +25,7 @@ export const shallowEquals = (a, b)=> {
 	return false;
 }
 
-export const roundHTE = a =>
+export const roundHTE = (a: number) =>
 	a % 1 === 0.5 ? 2 * Math.round(a / 2) : Math.round(a);
 
 export const sleep = ms => {
