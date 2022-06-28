@@ -187,4 +187,4 @@ function bfsPath(start: any, end: any, graph: {[key: string]: any}): any[] {
 	return [];
 };
 
-export {mmult, minv, bfsPath};
+export { mmult, minv, bfsPath };

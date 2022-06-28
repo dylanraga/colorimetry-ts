@@ -25,3 +25,5 @@ export { default as ColorGamut } from './modules/ColorGamut.js';
 export { default as ToneResponse } from './modules/ToneResponse.js';
 export { default as Color } from './modules/Color.js';
 export * as ColorDifference from './modules/ColorDifference.js';
+
+export { mmult, minv } from './modules/common/util.js';
