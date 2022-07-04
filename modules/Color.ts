@@ -3,6 +3,7 @@
 /*=================*/
 import { ColorSpace } from './ColorSpace/ColorSpace';
 import { DE_ITP } from './ColorDifference';
+import { RGBSpace, XYZSpace } from '../colorimetry';
 
 class Color {
 	public space: ColorSpace;
@@ -15,7 +16,7 @@ class Color {
 		this.data = data;
 	}
 
-	get(toSpace: ColorSpace | string) {
+	public get(toSpace: ColorSpace | string) {
 		const fromSpace = this.space;
 		let currData = this.data;
 		if (fromSpace === toSpace) return currData;
@@ -30,9 +31,20 @@ class Color {
 	}
 
 	
-	dE(colorB: Color, options: {[k: string]: any} = {}): number {
+	public dE(colorB: Color, options: {[k: string]: any} = {}): number {
 		return Color.dE(this, colorB, options);
 	}
+
+	public get luminance() {
+		return this.get(XYZSpace.defaultSpace)[1];
+	}
+
+	/*
+	public get luma() {
+		if (this.space !instanceof RGBSpace)
+			throw new TypeError(`Only colors with defined RGB ColorSpace can have luma`);
+	}
+	*/
 
 	/*
 	whiteLevel(): number;
