@@ -2,38 +2,27 @@
 /* Utility functions */
 /*===================*/
 
-export const arrayEquals = (a: number[], b: number[])=>
-	a.length === b.length &&
-	a.every((v, i) => v === b[i]);
-
-export const arrayEqualsApprox = (a: number[], b: number[], precision: number = 4)=>
-	a && b &&
-	a.length === b.length &&
-	a.every((v, i) => v.toFixed(precision) === b[i].toFixed(precision));
-
-export const shallowEquals = (a, b)=> {
-	if(typeof a === 'object' && a !== null && typeof b === 'object' && b !== null) {
-		return (
-			Object.keys(a).length === Object.keys(b).length &&
-			Object.keys(b).every(key => a[key] === b[key])
-		);
-	}
-	else if((a === null && a === null) || (a === undefined && b === undefined)) {
-		return true;
-	}
-
-	return false;
+export function arrayEquals(a: number[], b: number[]) {
+	return	a.length === b.length &&
+		a.every((v, i) => v === b[i]);
 }
 
-export const roundHTE = (a: number) =>
-	a % 1 === 0.5 ? 2 * Math.round(a / 2) : Math.round(a);
+/**
+ * Rounds n.5 to the nearest even number
+ * e.g.
+ * - 3.5 => 4
+ * - 6.5 => 6.
+*/
+export function roundHTE(a: number) {
+	return (a - (a|0)) === 0.5 ? 2 * Math.round(a / 2) : Math.round(a);
+}
 
-export const sleep = ms => {
-	return new Promise(res => setTimeout(res, ms));
+export const sleep = (ms: number) => {
+	return new Promise<any>(res => setTimeout(res, ms));
 };
 
 //Source: http://techref.massmind.org/Techref/method/math/matrix.htm
-function minv(M: number[][]){
+export function minv(M: number[][]): number[][] {
 	// I use Guassian Elimination to calculate the inverse:
 	// (1) 'augment' the matrix (left) by the identity (on the right)
 	// (2) Turn the matrix on the left into the identity by elemetry row ops
@@ -44,11 +33,12 @@ function minv(M: number[][]){
 	// (c) Add 2 rows
 	
 	//if the matrix isn't square: exit (error)
-	if(M.length !== M[0].length){return;}
+	if (M.length !== M[0].length)
+		throw new Error("Matrix isn't square");
 	
 	//create the identity matrix (I), and a copy (C) of the original
 	var i=0, ii=0, j=0, dim=M.length, e=0;
-	var I = [], C = [];
+	var I: number[][] = [], C: number[][] = [];
 	for(i=0; i<dim; i+=1){
 			// Create the row
 			I[I.length]=[];
@@ -91,7 +81,8 @@ function minv(M: number[][]){
 					//get the new diagonal
 					e = C[i][i];
 					//if it's still 0, not invertable (error)
-					if(e===0){return}
+					if(e===0)
+						throw new Error("Matrix isn't invertible");
 			}
 			
 			// Scale this row down by e (so we have a 1 on the diagonal)
@@ -126,65 +117,93 @@ function minv(M: number[][]){
 	//64-bit round to 15 places for more reliable invertibility
 	return I;
 }
+export const is2dArray = <T>(x: any): x is T[][] => Array.isArray(x[0]);
 
-function mmult(A: number[], B: number[]): number[];
-function mmult(A: number[][], B: number[]): number[];
-function mmult(A: number[], B: number[][]): number[][];
-function mmult(A: number[][], B: number[][]): number[][];
-function mmult(A: number[]|number[][], B: number[][]|number[]): number[][]|number[] {
-	if (typeof A[0] === 'undefined' || typeof B[0] === 'undefined')	throw new Error(`Matrices must have values`);
+/**
+ * Generic Matrix multication function
+ * @param A -m×n matrix as 2D array, or 1×n rowspace as 1D array
+ * @param B n×p matrix as 2D array, or n×1 colspace as 1D array
+ * @returns m×p result as 2D array, or single colspaces/rowspaces as 1D array
+ */
+export function mmult(A: number[], B: number[][]): number[];
+export function mmult(A: number[][], B: number[]): number[];
+export function mmult(A: number[][], B: number[][]): number[][];
+export function mmult(A: number[] | number[][], B: number[] | number[][]): number[] | number[][] {
+	const isA2d = is2dArray<number>(A);
+	const isB2d = is2dArray<number>(B);
 
-	let A_cols = Array.isArray(A[0])? A[0].length : A.length;
-	let B_rows = B.length;
-	if (A_cols !== B_rows) throw new Error(`Matrix dimensions do not match`);
+	//Promote row-space and col-space inputs into 2D
+	const M: number[][] = isA2d? A : [A];
+	const N: number[][] = isB2d? B : B.map(u => [u as number]);
 	
-	let M_rows = Array.isArray(A[0])? A.length : 1;
-	let M_cols = Array.isArray(B[0])? B[0].length : 1;
+	const M_cols = M.length;
+	const N_rows = N.length;
+	if (M_cols !== N_rows) throw new Error(`Matrix dimensions are not compatible`);
+	
+	const R_rows = M.length;
+	const R_cols = N[0].length;
 
-	let M = new Array(M_rows);
-	for (let i in A){
-		M[i] = (M_cols > 1)? new Array(M_cols).fill(0) : 0;
+	let R = new Array(R_rows);
+	for (let i = 0; i < R_rows; i++) {
+		R[i] = new Array(M_cols).fill(0);
 	}
 
-	for (let i = 0; i < M_rows; i++) {
-		for (let j = 0; j < M_cols; j++) {
-			var val = 0;
-			for (let k = 0; k < M_rows; k++) {
-					val += (Array.isArray(B[k]))? A[i][k]*B[k][j] : A[i][k]*+B[k];
+	for (let i = 0; i < R_rows; i++) {
+		const Ri = R[i];
+		for (let j = 0; j < R_cols; j++) {
+			let val = 0;
+			for (let k = 0; k < N_rows; k++) {
+				val += M[i][k] * N[k][j];
 			}
-			
-			if (M_cols > 1)
-				M[i][j] = val;
-			else
-				M[i] = val;
+			Ri[j] = val;
 		}
 	}
 
-	//64-bit round to 15 places for more reliable invertibility
-	//M = M.map(u => Array.isArray(u)? u.map(v => +(v.toPrecision(15))) : +(u.toPrecision(15)))
+	//Flatten single-row / -column spaces
+	if (R_rows === 1) R = [].concat(...R);
+	if (R_cols === 1) R = R[0];
 
-	return M;
+	return R;
 }
 
-export const quantize = (v, bitDepth)=> roundHTE((Math.pow(2, bitDepth)-1)*v)/(Math.pow(2, bitDepth)-1);
+/**
+ * Optimized matrix multiplication for matrices M of size 3×3 and N of size 3×1
+ * @param M 3×3 matrix as 2D array
+ * @param N 3×1  matrix as 1D array
+ * @returns 3×1  matrix as 1D array
+ */
+export function mmult3331([[Ma, Mb, Mc], [Md, Me, Mf], [Mg, Mh, Mi]]: number[][], [Na, Nb, Nc]: number[]) {
+	return [Ma*Na+Mb*Nb+Mc*Nc, Md*Na+Me*Nb+Mf*Nc, Mg*Na+Mh*Nb+Mi*Nc];
+}
 
-function bfsPath(start: any, end: any, graph: {[key: string]: any}): any[] {
-	let queue = [[start]];
-	let visited = [];
+export const quantize = (v: number, bitDepth = 8) =>
+	roundHTE( (Math.pow(2, bitDepth)-1)*v );
+
+/**
+ * Breadth-first search, used to find conversion path from one `ColorSpace` to another
+ * @param start Beginning node
+ * @param end Node to find
+ * @param searchedNode Source of edges as a function of the current node
+ * @returns Path array from `start` to `end`
+ */
+export function bfsPath<T>(start: T, end: T, edges: (curr: T) => T[]): T[] | undefined {
 	let curr = start;
+	const queue = [[curr]];
+	const visited: T[][] = [[]];
+
 	while (queue.length) {
-		let path = queue.shift();
+		let path = queue.shift() as T[];
+
 		curr = path[path.length-1];
-		visited.push(curr);
+		visited.push(path);
+
 		if (curr === end) return path;
 		
-		if (!graph[curr]) continue;
-		for (let k of graph[curr]) {
-			if (!visited.includes(k))
+		if (!curr) continue;
+		for (const k of edges(curr)) {
+			if (!visited.find(v => v[v.length-1] === k))
 				queue.push([...path, k]);
 		}
 	}
-	return [];
+	return undefined;
 };
-
-export { mmult, minv, bfsPath };

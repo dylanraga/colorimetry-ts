@@ -1,101 +1,40 @@
 /*=================*/
 /* Color Structure */
 /*=================*/
-import ColorModel from './ColorModel.js';
-import ColorSpace from './ColorSpace.js';
-import * as ColorDifference from './ColorDifference.js';
-
+import { ColorSpace } from './ColorSpace/ColorSpace';
+import { DE_ITP } from './ColorDifference';
 
 class Color {
-	#data: number[];
-	#space: ColorSpace;
-	options: {[k: string]: any};
-
-	constructor(space: ColorSpace|ColorModel|string, data: number[], options?: {[k: string]: any}) {
+	public space: ColorSpace;
+	public data: number[]
+	constructor( space: ColorSpace | string, data: number[] ) {
 		if (typeof space === 'string')
-			space = ColorModel.getType(space);
-		if (space instanceof ColorModel)
-			space = space.defaultSpace;
+			space = ColorSpace.getSpaceByString(space);
 		
-		/*
-		if (options) {
-			space = new ColorSpace(space.typeOf, [...space.conversions]);
-			space.conversions = space.conversions.map(u => {
-				const from = u.from? (a, o) => u.from(a, {...options, ...o}) : undefined;
-				const to = u.to? (a, o) => u.to(a, {...options, ...o}) : undefined;
-				const v = {space: u.space, from, to};
-				return v;
-			});
-		}
-		*/
-
-		this.#space = space;
-		this.#data = data;
-		this.options = options;
+		this.space = space;
+		this.data = data;
 	}
 
-	//Returns desired ColorModel data
-	//Accepts inputs as ColorSpace, ColorModel (default space), string look-up space
-	//Only ColorSpaces will have conversions; ColorModels can be conversion targets of ColorSpaces.
-	get(toSpace: ColorSpace|ColorModel|string, options?: {[k:string]: any}) {
-		const fromSpace: ColorSpace = this.#space;
+	get(toSpace: ColorSpace | string) {
+		const fromSpace = this.space;
+		let currData = this.data;
+		if (fromSpace === toSpace) return currData;
 
-		if (typeof toSpace === 'string')
-			toSpace = ColorModel.getType(toSpace);
+		if (typeof toSpace === "string")
+			toSpace = ColorSpace.getSpaceByString(toSpace);
+
+		const conversion = fromSpace.getConversion(toSpace)!;
+		const newData = conversion(currData);
 		
-		if (!toSpace) throw new Error(`ColorSpace '${toSpace}' does not exist`);
-
-		//BFS through conversion spaces
-		//If no path fromSpace -> toSpace, check toSpace -> fromSpace
-		//Otherwise check for intersections by checking if the traversing type matches a head of fromSpace's visitedPaths
-		let visitedPaths: (ColorSpace|ColorModel)[][];
-		let fromSpacePath: ColorSpace[], toSpacePath: ColorSpace[];
-		fromSpacePath = fromSpace.conversionBFS((currType, path, visited) => {
-			visitedPaths = visited;
-			if (currType === toSpace)
-				return path;
-		});
-
-		//console.log(visitedPaths.map(u=>u.map(v=>v.name)));
-		if (!fromSpacePath) {
-			//Since ColorModels don't have conversions, assume its defaultSpace
-			if (toSpace instanceof ColorModel)
-				toSpace = toSpace.defaultSpace;
-
-			toSpacePath = toSpace.conversionBFS((currType, path) => {
-				if (currType === fromSpace || currType === fromSpace.typeOf)
-					return path.reverse();
-					
-				const intersectingPath = visitedPaths.find(v => v[v.length-1] === currType);
-				if (intersectingPath)
-					return [...intersectingPath, ...path.reverse().slice(1)];
-			}, 'from');
-		}
-		
-		let conversionPath: ColorSpace[] = fromSpacePath || toSpacePath;
-		if (!conversionPath) throw new Error(`Could not convert from ColorSpace name '${fromSpace.name}' to '${toSpace.name}'`);
-
-		//console.log(conversionPath.map(u=>u.name));
-		let newData = this.#data;
-		for (const t in conversionPath.slice(0, -1)) {
-			let conversion;
-			if (conversionPath[t] instanceof ColorSpace) {
-				conversion = conversionPath[t].getConversion(conversionPath[+t+1]) || conversionPath[+t+1].getConversion(conversionPath[t]);
-			} else {
-				conversion = conversionPath[+t+1].getConversion(conversionPath[t]);
-			}
-
-			//console.log(conversionPath[t].name, newData)
-			newData = conversion.space === conversionPath[+t+1]? conversion.to(newData, options) : conversion.from(newData, options);
-		}
-
 		return newData;
 	}
 
-	dE(colorB: Color, options: Partial<ColorDifference.dEOptions> = {}): number {
+	
+	dE(colorB: Color, options: {[k: string]: any} = {}): number {
 		return Color.dE(this, colorB, options);
 	}
 
+	/*
 	whiteLevel(): number;
 	whiteLevel(Lw: number): Color;
 	whiteLevel(parmA?: number): Color|number {
@@ -104,19 +43,22 @@ class Color {
 		this.#space.options.gamut = this.#space.options.gamut.whiteLevel(parmA);
 		return this;
 	}
+	*/
+	
 
 	/*
 	 * Static methods
 	 */
 
-	static dE(colorA: Color, colorB: Color, options: Partial<ColorDifference.dEOptions> = {}): number {
+	
+	static dE(colorA: Color, colorB: Color, options: {[k: string]: any} = {}): number {
 		const {
-			dEMethod = ColorDifference.dEITP,
-			excludeLuminance = false
+			method = DE_ITP
 		} = options;
 
-		return dEMethod(colorA, colorB, options);
+		return method(colorA, colorB, options);
 	}
+	
 }
 
-export default Color;
+export { Color };

@@ -1,8 +1,5 @@
-import ColorModel from "../../ColorModel.js";
-import ColorSpace from "../../ColorSpace.js";
 
-
-/* CIExyY */
+/* CIExyY
 const CIExyY = new ColorSpace(ColorModel.types.LAB, [
 	{
 		space: ColorModel.types.XYZ,
@@ -24,7 +21,7 @@ CIExyY.keys = ['Y', 'x', 'y'];
 ColorModel.types.LAB.spaces.CIExyY = CIExyY;
 
 
-/* CIExy */
+//CIExy
 const CIExy = new ColorSpace(ColorModel.types.LAB, [
 	{
 		space: CIExyY,
@@ -36,3 +33,4 @@ CIExy.name = 'CIExy';
 CIExy.alias.push('xy');
 CIExy.keys = ['x', 'y'];
 ColorModel.types.LAB.spaces.CIExy = CIExy;
+*/

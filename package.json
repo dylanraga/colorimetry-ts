@@ -4,7 +4,6 @@
   "description": "Functions related to the colorimetric representation and manipulation using Typescript",
   "main": "build/colorimetry.js",
   "types": "build/colorimetry.d.ts",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "prepublish": "npm run build",
@@ -26,6 +25,6 @@
   },
   "homepage": "https://github.com/dylanraga/colorimetry-ts#readme",
   "devDependencies": {
-    "typescript": "^4.5.4"
+    "@types/node": "^18.0.0"
   }
 }

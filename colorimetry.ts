@@ -4,26 +4,32 @@
 
 /* ColorModels */
 //Essentials
-export { default as ColorModel } from './modules/ColorModel.js';
-export { default as ColorSpace } from './modules/ColorSpace.js';
-export { RGBColorSpace } from './modules/ColorModel/RGB.js';
-import './modules/ColorModel/XYZ.js';
-import './modules/ColorModel/RGB.js';
-import './modules/ColorModel/LAB.js';
-import './modules/ColorModel/LAB/CIExyY.js';
+//import './modules/ColorSpace/LAB/CIExyY';
 //Optionals
-import './modules/ColorModel/LAB/CIELAB.js';
-import './modules/ColorModel/LAB/CIELUV.js';
-import './modules/ColorModel/LAB/ICtCp.js';
-import './modules/ColorModel/LAB/JzAzBz.js';
-import './modules/ColorModel/LCh.js';
+//import './modules/ColorSpace/LAB/CIELAB';
+//import './modules/ColorSpace/LAB/CIELUV';
+//import './modules/ColorSpace/LAB/ICtCp';
+//import './modules/ColorSpace/LAB/JzAzBz';
+//import './modules/ColorModel/LCh';
 //defaults
-//import './modules/ColorModel/RGB/spaces.js';
+//import './modules/ColorModel/RGB/spaces';
 
+export { ColorSpace } from './modules/ColorSpace/ColorSpace';
+export { ColorGamut } from './modules/ColorGamut/ColorGamut';
+export { ToneResponse } from './modules/ToneResponse/ToneResponse';
+export { Color } from './modules/Color';
+//export * as ColorDifference from './modules/ColorDifference';
+export { curves } from './modules/ToneResponse/StandardToneResponses';
+export { gamuts } from './modules/ColorGamut/StandardColorGamuts';
 
-export { default as ColorGamut } from './modules/ColorGamut.js';
-export { default as ToneResponse } from './modules/ToneResponse.js';
-export { default as Color } from './modules/Color.js';
-export * as ColorDifference from './modules/ColorDifference.js';
+export { XYZSpace } from './modules/ColorSpace/XYZ/XYZSpace';
+export { xyzSpaces } from './modules/ColorSpace/XYZ/StandardXYZSpaces';
 
-export { mmult, minv } from './modules/common/util.js';
+export { RGBSpace } from './modules/ColorSpace/RGB/RGBSpace';
+export { rgbSpaces } from './modules/ColorSpace/RGB/StandardRGBSpaces';
+
+export { LabSpace } from './modules/ColorSpace/Lab/LabSpace';
+export { LABSPACE_ITP } from './modules/ColorSpace/Lab/ICtCp';
+export { LABSPACE_JZAZBZ } from './modules/ColorSpace/Lab/JzAzBz';
+
+export { mmult3331, minv, mmult } from './modules/common/util';

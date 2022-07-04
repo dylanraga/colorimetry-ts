@@ -1,13 +1,17 @@
 {
 	"compilerOptions": {
-		"target": "ES2017",
-		"module": "ES6",
+		"target": "ES2019",
+		"module": "CommonJS",
 		"declaration": true,
 		"sourceMap": true,
 		"outDir": "build",
+		"lib": ["ES2019", "DOM"],
     //"allowJs": true,
-    "checkJs": false,
-		"allowSyntheticDefaultImports": true
+    //"checkJs": false,
+		"moduleResolution": "node",
+		"strict": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true
 	},
 	"exclude": ["node_modules", "build", "test"]
 }
