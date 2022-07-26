@@ -2,8 +2,8 @@
 /* Standard Color Gamuts    */
 /*==========================*/
 
-import { illuminants } from "../Illuminants/Illuminants";
-import { ColorGamut } from "./ColorGamut";
+import { illuminants } from "./illuminants";
+import { ColorGamut } from "./gamut";
 
 const COLORGAMUT_SRGB = new ColorGamut({
 	white: 	{...illuminants.D65, Y: 1},

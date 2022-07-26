@@ -9,6 +9,7 @@
     //"allowJs": true,
     //"checkJs": false,
 		"moduleResolution": "node",
+		"resolveJsonModule": true,
 		"strict": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true

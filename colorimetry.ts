@@ -2,34 +2,37 @@
 /* Author: Dylan Raga */
 /*====================*/
 
-/* ColorModels */
-//Essentials
-//import './modules/ColorSpace/LAB/CIExyY';
-//Optionals
-//import './modules/ColorSpace/LAB/CIELAB';
-//import './modules/ColorSpace/LAB/CIELUV';
-//import './modules/ColorSpace/LAB/ICtCp';
-//import './modules/ColorSpace/LAB/JzAzBz';
-//import './modules/ColorModel/LCh';
-//defaults
-//import './modules/ColorModel/RGB/spaces';
+export { XYZSpace } from './modules/space/xyz';
+export { xyzSpaces } from './modules/space/xyz.standard';
 
-export { ColorSpace } from './modules/ColorSpace/ColorSpace';
-export { ColorGamut } from './modules/ColorGamut/ColorGamut';
-export { ToneResponse } from './modules/ToneResponse/ToneResponse';
-export { Color } from './modules/Color';
+export { RGBSpace } from './modules/space/rgb';
+export { rgbSpaces } from './modules/space/rgb.standard';
+
+export { ChromaticitySpace } from './modules/space/chromaticity';
+export { CHROMATICITY_XY } from './modules/space/chromaticity/xy';
+export { CHROMATICITY_UV } from './modules/space/chromaticity/uv';
+
+export { LabSpace } from './modules/space/lab';
+export { LABSPACE_CIE1931 } from './modules/space/lab/cie1931';
+export { LABSPACE_CIELUV } from './modules/space/lab/cieluv';
+export { LABSPACE_ITP } from './modules/space/lab/ictcp';
+export { LABSPACE_JZAZBZ } from './modules/space/lab/jzazbz';
+
+export { ColorSpace } from './modules/space';
+export { ColorGamut } from './modules/gamut';
+export { ToneResponse } from './modules/trc';
+export { Color } from './modules/color';
 //export * as ColorDifference from './modules/ColorDifference';
-export { curves } from './modules/ToneResponse/StandardToneResponses';
-export { gamuts } from './modules/ColorGamut/StandardColorGamuts';
+export { curves } from './modules/trc.standard';
+export { gamuts } from './modules/gamut.standard';
 
-export { XYZSpace } from './modules/ColorSpace/XYZ/XYZSpace';
-export { xyzSpaces } from './modules/ColorSpace/XYZ/StandardXYZSpaces';
+import './modules/difference';
+import './modules/color/luminance';
+import './modules/color/luma';
+import './modules/color/cct';
+import * as cctData from './modules/common/locus_10nm.json';
+export { cctData };
 
-export { RGBSpace } from './modules/ColorSpace/RGB/RGBSpace';
-export { rgbSpaces } from './modules/ColorSpace/RGB/StandardRGBSpaces';
-
-export { LabSpace } from './modules/ColorSpace/Lab/LabSpace';
-export { LABSPACE_ITP } from './modules/ColorSpace/Lab/ICtCp';
-export { LABSPACE_JZAZBZ } from './modules/ColorSpace/Lab/JzAzBz';
+import './modules/defaults';
 
 export { mmult3331, minv, mmult } from './modules/common/util';

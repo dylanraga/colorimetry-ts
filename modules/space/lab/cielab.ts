@@ -5,14 +5,14 @@
  * Currently using "wrong" Von Kries/XYZ scaling per spec; consider implementing manual Bradford CAT option in the future
  */
 
-import { XYZSpace } from '../XYZ/XYZSpace';
-import { LabSpace } from './LabSpace';
-import { illuminants } from '../../Illuminants/Illuminants';
+import { LabSpace } from '../lab';
+import { illuminants } from '../../illuminants';
+import { XYZSPACE_CIED65 } from '../xyz.standard';
 
 interface xy { x: number, y: number }
 
-const LABSPACE_CIELAB = new LabSpace(['L', 'a', 'b']);
-LABSPACE_CIELAB.addConversion(XYZSpace.defaultSpace,
+const LABSPACE_CIELAB = new LabSpace();
+LABSPACE_CIELAB.addConversion(XYZSPACE_CIED65,
 	(Lab: number[], o: { whiteY?: number, white?: xy } = {}) => {
 		const { whiteY, white } = o;
 		let XYZ = CIELAB_to_XYZ(Lab, whiteY, white);
@@ -24,6 +24,7 @@ LABSPACE_CIELAB.addConversion(XYZSpace.defaultSpace,
 		return Lab;
 	});
 LABSPACE_CIELAB.name = 'CIELab';
+LABSPACE_CIELAB.keys = ['L', 'a', 'b'];
 
 function XYZ_to_CIELAB([X, Y, Z]: number[], whiteY: number = 100, white: xy = illuminants.D50): number[] {
 	let [Xn, Zn] = [white.x*whiteY/white.y, (1-white.x-white.y)*whiteY/white.y];
@@ -49,5 +50,6 @@ function CIELAB_to_XYZ([L, a, b]: number[], whiteY: number = 100, white: xy = il
 
 	return [X, Y, Z];
 }
+
 
 export { LABSPACE_CIELAB, XYZ_to_CIELAB, CIELAB_to_XYZ };

@@ -1,14 +1,14 @@
 //output is significant to 5 digits, limited by precision of von kries and ebner matrices
 //might be worth investigating internally quantizing the conversion to 12 bits RGB (=4095 codewords)
-import { minv, mmult3331 } from "../../common/util";
-import { curves } from "../../ToneResponse/StandardToneResponses";
-import { ToneResponse } from "../../ToneResponse/ToneResponse";
-import { ColorSpace } from "../ColorSpace";
-import { XYZSpace } from "../XYZ/XYZSpace";
-import { LabSpace } from "./LabSpace";
+import { minv, mmult3331 as mmult } from "../../common/util";
+import { curves } from "../../trc.standard";
+import { ToneResponse } from "../../trc";
+import { ColorSpace } from "../../space";
+import { LabSpace } from "../lab";
+import { XYZSPACE_CIED65 } from "../xyz.standard";
 
-export const LABSPACE_JZAZBZ = new LabSpace(['Jz', 'az', 'bz']);
-LABSPACE_JZAZBZ.addConversion(XYZSpace.defaultSpace,	
+export const LABSPACE_JZAZBZ = new LabSpace();
+LABSPACE_JZAZBZ.addConversion(XYZSPACE_CIED65,
 	//JzAzBz -> XYZ
 	(JzAzBz: number[]) => {
 		let XYZ = JzAzBz_to_XYZ(JzAzBz);
@@ -20,6 +20,7 @@ LABSPACE_JZAZBZ.addConversion(XYZSpace.defaultSpace,
 		return JzAzBz;
 	});
 LABSPACE_JZAZBZ.name = 'Jzazbz';
+LABSPACE_JZAZBZ.keys = ['Jz', 'az', 'bz'];
 ColorSpace.list['JZAZBZ'] = LABSPACE_JZAZBZ;
 
 
@@ -51,9 +52,9 @@ function XYZ_to_JzAzBz([X, Y, Z]: number[], trc: ToneResponse = curves.ST2084.op
 	const Xp = b*X - ((b-1)*Z);
 	const Yp = g*Y - ((g-1)*X);
 	
-	let [L, M, S] = mmult3331(mXpYpZp_to_LMS, [Xp, Yp, Z]);
+	let [L, M, S] = mmult(mXpYpZp_to_LMS, [Xp, Yp, Z]);
 	let [L_, M_, S_] = [L, M, S].map(u => trc.invEotf(u));
-	let [Iz, az, bz] = mmult3331(mLMS_to_IAB, [L_, M_, S_]);
+	let [Iz, az, bz] = mmult(mLMS_to_IAB, [L_, M_, S_]);
 
 	let Jz = ( ((1+d)*Iz)/(1+d*Iz) ) - d0;
 
@@ -64,9 +65,9 @@ function JzAzBz_to_XYZ([Jz, az, bz]: number[], trc: ToneResponse = curves.ST2084
 	let Jz_ = Jz + d0;
 	let Iz = (Jz_) / (1+d-d*(Jz_));
 
-	let [L_, M_, S_] = mmult3331(mIAB_to_LMS, [Iz, az, bz]);
+	let [L_, M_, S_] = mmult(mIAB_to_LMS, [Iz, az, bz]);
 	let [L, M, S] = [L_, M_, S_].map(u => trc.eotf(u));
-	let [Xp, Yp, Zp] = mmult3331(mLMS_to_XpYpZp, [L, M, S]);
+	let [Xp, Yp, Zp] = mmult(mLMS_to_XpYpZp, [L, M, S]);
 
 	let X = (1/b) * (Xp + (b-1)*Zp);
 	let Y = (1/g) * (Yp + (g-1)*X);

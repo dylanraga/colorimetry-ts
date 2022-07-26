@@ -1,14 +1,15 @@
-import { bfsPath } from "../common/util";
+import { bfsPath } from "./common/util";
 
-class ColorSpace {
+export abstract class ColorSpace {
 	public name: string = 'Unnamed ColorSpace';
-	public conversions: Array<{ space: ColorSpace, to: ColorSpaceConversion }> = [];
+	public keys?: string[]
+	public conversions: ColorSpaceConversionObj[] = [];
 	public static defaultSpace: ColorSpace;
 	public static list: { [name: string]: ColorSpace } = {};
 
-	constructor(public keys: string[]) { }
+	constructor() { }
 
-	static getSpaceByString(spaceString: string) {
+	public static getSpaceByString(spaceString: string) {
 		spaceString = spaceString.toUpperCase();
 		if (this.list.hasOwnProperty(spaceString))
 			return this.list[spaceString];
@@ -67,5 +68,7 @@ class ColorSpace {
 
 export type ColorSpaceConversion = (data: number[], options?: {[k: string]: any}) => number[];
 
-
-export { ColorSpace };
+interface ColorSpaceConversionObj {
+	space: ColorSpace;
+	to: ColorSpaceConversion
+}
