@@ -25,21 +25,15 @@ export interface ColorGamutPrimaries {
  * RGB Space Color Gamut
  */
 export class ColorGamut {
-	public white: xyY;
-	public red: xy;
-	public green: xy;
-	public blue: xy;
-	public black: xyY;
+	public primaries: ColorGamutPrimaries;
 	private mRGBCached?: number[][];
 	private mXYZCached?: number[][];
 
 	constructor(options: Optional<ColorGamutPrimaries, 'black'>) {
 		const { white, red, green, blue, black = { ...white, Y: 0 } } = options;
-		this.white = white;
-		this.red = red;
-		this.green = green;
-		this.blue = blue;
-		this.black = black;
+		this.primaries = {
+			white, red, green, blue, black
+		};
 	}
 
 	//
@@ -53,7 +47,7 @@ export class ColorGamut {
 	public get mXYZ(): number[][] {
 		if (this.mXYZCached) return this.mXYZCached;
 
-		const colors = [this.white, this.red, this.green, this.blue];
+		const colors = [this.primaries.white, this.primaries.red, this.primaries.green, this.primaries.blue];
 
 		const [Xw, Xr, Xg, Xb] = colors.map(u => u.x/u.y);
 		const [Zw, Zr, Zg, Zb] = colors.map(u => (1-u.x-u.y)/u.y);
@@ -75,19 +69,19 @@ export class ColorGamut {
 	}
 
 	public get whiteLevel() {
-		return this.white.Y;
+		return this.primaries.white.Y;
 	}
 
 	public set whiteLevel(value: number) {
-		this.white.Y = value;
+		this.primaries.white.Y = value;
 	}
 
 	public get blackLevel() {
-		return this.black.Y;
+		return this.primaries.black.Y;
 	}
 
 	public set blackLevel(value: number) {
-		this.black.Y = value;
+		this.primaries.black.Y = value;
 	}
 
 	/**
@@ -96,11 +90,11 @@ export class ColorGamut {
 
 	public options(newProps: { [P in keyof ColorGamut]?: ColorGamut[P] }) {
 		const newGamut = new ColorGamut({
-			white: { ...this.white },
-			red: { ...this.red },
-			green: { ...this.green },
-			blue: { ...this.blue },
-			black: { ...this.black }
+			white: { ...this.primaries.white },
+			red: { ...this.primaries.red },
+			green: { ...this.primaries.green },
+			blue: { ...this.primaries.blue },
+			black: { ...this.primaries.black }
 		});
 		
 		Object.assign(newGamut, { ...newProps });

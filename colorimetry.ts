@@ -25,6 +25,7 @@ export { Color } from './modules/color';
 //export * as ColorDifference from './modules/ColorDifference';
 export { curves } from './modules/trc.standard';
 export { gamuts } from './modules/gamut.standard';
+export { illuminants } from './modules/illuminants';
 
 import './modules/difference';
 import './modules/color/luminance';
