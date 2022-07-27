@@ -176,7 +176,7 @@ export function mmult3331([[Ma, Mb, Mc], [Md, Me, Mf], [Mg, Mh, Mi]]: number[][]
 	return [Ma*Na+Mb*Nb+Mc*Nc, Md*Na+Me*Nb+Mf*Nc, Mg*Na+Mh*Nb+Mi*Nc];
 }
 
-export const quantize = (v: number, bitDepth = 8) =>
+export const quantizeToBits = (v: number, bitDepth = 8) =>
 	roundHTE( (Math.pow(2, bitDepth)-1)*v );
 
 /**
