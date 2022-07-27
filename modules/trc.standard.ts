@@ -176,6 +176,7 @@ export const curves = {
 	 */
 	"PQ": TRC_ST2084,
 	"L*": TRC_LSTAR,
+	"G2.2": TRC_GAMMA.options({ gamma: 2.2 }),
 	"G2.4": TRC_GAMMA.options({ gamma: 2.4 }),
 	"G2.6": TRC_GAMMA.options({ gamma: 2.6 })
 };

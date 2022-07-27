@@ -36,4 +36,4 @@ export { cctData };
 
 import './modules/defaults';
 
-export { mmult3331, minv, mmult } from './modules/common/util';
+export { mmult3331, minv, mmult, quantize, roundHTE } from './modules/common/util';
