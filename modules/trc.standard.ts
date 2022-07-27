@@ -11,14 +11,14 @@ const TRC_GAMMA = new ToneResponse<{
 }>(
 	(V, options = {} ) => {
 		const { whiteLevel = 1, blackLevel = 0, gamma = 2.2 } = options;
-		const f = (x: number) => x ** gamma
+		const f = (x: number) => x > 0 ? x ** gamma : -((-x) ** gamma);
 
 		const L = (whiteLevel-blackLevel) * f(V) + blackLevel;
 		return L;
 	},
 	(L, options = {}) => {
 		const { whiteLevel = 1, blackLevel = 0, gamma = 2.2 } = options;
-		const f = (x: number) => x ** (1/gamma);
+		const f = (x: number) => x > 0 ? x ** (1/gamma) : -((-x) ** (1/gamma));
 
 		const V = f ( (L-blackLevel)/(whiteLevel-blackLevel) );
 		return V;
