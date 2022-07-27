@@ -23,13 +23,13 @@ class RGBSpace extends ColorSpace {
 		this.addConversion(XYZSPACE_CIED65,
 			//RGB->XYZ
 			(rgb: number[], props: Partial<RGBSpaceProps> = {}) => {
-				const { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear, whiteLevel, blackLevel, isQuantized } = props;
-				return RGB_to_XYZ(rgb, { gamut, trc, isLinear, bitDepth, whiteLevel, blackLevel, isQuantized })
+				const { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear, whiteLevel, blackLevel } = props;
+				return RGB_to_XYZ(rgb, { gamut, trc, isLinear, bitDepth, whiteLevel, blackLevel })
 			},
 			//XYZ->RGB
 			(XYZ: number[], props: Partial<RGBSpaceProps> = {}) => {
-				const { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear, whiteLevel, blackLevel, isQuantized } = props;
-				return XYZ_to_RGB(XYZ, { gamut, trc, isLinear, bitDepth, whiteLevel, blackLevel, isQuantized });
+				const { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear, whiteLevel, blackLevel } = props;
+				return XYZ_to_RGB(XYZ, { gamut, trc, isLinear, bitDepth, whiteLevel, blackLevel });
 			}
 		);
 	}
@@ -42,43 +42,28 @@ interface RGBSpaceProps {
 	isLinear: boolean;
 	whiteLevel?: number;
 	blackLevel?: number;
-	isQuantized?: boolean;
 };
 
 function RGB_to_XYZ(RGB: number[], props: RGBSpaceProps) {
-	const { gamut, trc, bitDepth, isLinear, whiteLevel = gamut.whiteLevel, blackLevel = gamut.blackLevel, isQuantized } = props;
+	const { gamut, trc, isLinear, whiteLevel = gamut.whiteLevel, blackLevel = gamut.blackLevel } = props;
 	
-	/*
 	RGB = (isLinear)
 		? RGB.map(u => (whiteLevel-blackLevel)*u+blackLevel)
 		: RGB.map(u => trc.eotf(u, { whiteLevel, blackLevel }));
-	*/
-
-	if (!isLinear) {
-		if (isQuantized) RGB = RGB.map(u => u / bitDepth);
-		RGB = RGB.map(u => trc.eotf(u, { whiteLevel, blackLevel }));
-	}
-
+	
 	const XYZ = mmult(gamut.mXYZ, RGB);
 	return XYZ;
 }
 
 function XYZ_to_RGB(XYZ: number[], props: RGBSpaceProps) {
-	const { gamut, trc, bitDepth, isLinear, whiteLevel = gamut.whiteLevel, blackLevel = gamut.blackLevel, isQuantized } = props;
+	const { gamut, trc, isLinear, whiteLevel = gamut.whiteLevel, blackLevel = gamut.blackLevel } = props;
 	
 	let RGB = mmult(gamut.mRGB, XYZ);
-
-	if (!isLinear) {
-		RGB = RGB.map(u => trc.invEotf(u, { whiteLevel, blackLevel }));
-
-		if (isQuantized) RGB = RGB.map(u => quantizeToBits(u, bitDepth));
-	}
-
-	/*
-	let rgb = (isLinear)
+	
+	RGB = (isLinear)
 		? RGB.map(u => (u-blackLevel)/(whiteLevel-blackLevel))
 		: RGB.map(u => trc.invEotf(u, { whiteLevel, blackLevel }));
-	*/
+	
 	return RGB;
 }
 
