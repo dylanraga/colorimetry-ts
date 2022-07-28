@@ -14,7 +14,7 @@ interface Color {
 	get: (toSpace: ColorSpace | string, options?: {}) => number[];
 }
 
-const Color = class Color<T> {
+const Color = class Color {
 	public space: ColorSpace;
 	public values: number[]
 
