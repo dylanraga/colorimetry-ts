@@ -10,7 +10,7 @@ export type DEMethod<Options = {}> = (colorA: Color, colorB: Color, options: Opt
 /**
  * Calculates Delta E between two Colors depending on method
  */
-function getDifference(colorA: Color, colorB: Color, options: {[k: string]: any} = {}) {
+function getDifference(colorA: Color, colorB: Color, options: {[k: string]: any}) {
 	const { method = DE_ITP } = options;
 	return method(colorA, colorB, options);
 }
@@ -18,7 +18,7 @@ function getDifference(colorA: Color, colorB: Color, options: {[k: string]: any}
 /**
  * Member method for getDifference
  */
-function _getDifference(this: Color, colorB: Color, options: Parameters<typeof getDifference>['2']) {
+function _getDifference(this: Color, colorB: Color, options: Parameters<typeof getDifference>['2'] = {}) {
 	getDifference(this, colorB, options);
 }
 
