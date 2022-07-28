@@ -8,6 +8,9 @@ class LabSpace extends ColorSpace {
 		super();
 	}
 
+	/**
+	 * Converts a LabSpace mapping to an LChSpace mapping
+	 */
 	toLCh() {
 
 	}

@@ -3,25 +3,36 @@ import { LabSpace } from "../lab";
 import { XYZSPACE_CIED65 } from "../xyz.standard";
 
 /* CIE1931 Yxy */
-export const LABSPACE_CIE1931 = new LabSpace();
-LABSPACE_CIE1931.addConversion(XYZSPACE_CIED65,
-	//CIE1931 -> XYZ
+export const LABSPACE_CIEYXY = new LabSpace();
+LABSPACE_CIEYXY.name = 'CIE1931 Yxy';
+LABSPACE_CIEYXY.keys = ['Y', 'x', 'y'];
+
+LABSPACE_CIEYXY.addConversion(XYZSPACE_CIED65,
+	//Yxy -> XYZ
 	(Yxy: number[], o: {} = {}) => {
 		let XYZ = Yxy_to_XYZ(Yxy);
 		return XYZ;
 	},
-	//XYZ -> CIE1931
+	//XYZ -> Yxy
 	(XYZ: number[], o: {} = {}) => {
 		let Yxy = XYZ_to_Yxy(XYZ);
 		return Yxy;
 	}
 );
-LABSPACE_CIE1931.name = 'CIEYxy';
-LABSPACE_CIE1931.keys = ['Y', 'x', 'y'];
-ColorSpace.list[LABSPACE_CIE1931.name] = LABSPACE_CIE1931;
-ColorSpace.list['YXY'] = LABSPACE_CIE1931;
-ColorSpace.list['XYY'] = LABSPACE_CIE1931;
+ColorSpace.list[LABSPACE_CIEYXY.name] = LABSPACE_CIEYXY;
+ColorSpace.list['YXY'] = LABSPACE_CIEYXY;
+ColorSpace.list['XYY'] = LABSPACE_CIEYXY;
 
+declare module '../../space' {
+	interface ColorSpaceMap {
+		YXY: LabSpace;
+		XYY: LabSpace;
+	}
+}
+
+/**
+ * CIE1931 Yxy<->XYZ conversion functions
+ */
 
 export function Yxy_to_XYZ([Y, x, y]: number[]) {
 	const X = x*Y/y;

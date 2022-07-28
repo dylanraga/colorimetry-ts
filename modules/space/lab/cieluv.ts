@@ -9,6 +9,9 @@ interface xy { x: number, y: number }
 
 /* CIELUV */
 export const LABSPACE_CIELUV = new LabSpace();
+LABSPACE_CIELUV.name = 'CIELUV';
+LABSPACE_CIELUV.keys = ['L', 'U', 'V'];
+
 LABSPACE_CIELUV.addConversion(XYZSPACE_CIED65,
 	//CIELUV -> XYZ
 	(LUV: number[], o: { whiteLevel?: number, white?: xy } = {}) => {
@@ -21,15 +24,20 @@ LABSPACE_CIELUV.addConversion(XYZSPACE_CIED65,
 		const { whiteLevel, white } = o;
 		let LUV = XYZ_to_LUV(XYZ, whiteLevel, white);
 		return LUV;
-	});
-LABSPACE_CIELUV.name = 'CIELUV';
-LABSPACE_CIELUV.keys = ['L', 'U', 'V'];
-ColorSpace.list['CIELUV'] = LABSPACE_CIELUV;
+	}
+);
+
 ColorSpace.list['LUV'] = LABSPACE_CIELUV;
+
+declare module '../../space' {
+	interface ColorSpaceMap {
+		LUV: LabSpace;
+	}
+}
 
 
 /*
- * CIELUV/u'v' conversions
+ * CIELUV/u'v' <-> XYZ conversions
  */
 
 function XYZ_to_LUV([X, Y, Z]: number[], whiteLevel: number = 100, white: xy = illuminants.D65): number[] {

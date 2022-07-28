@@ -1,56 +1,46 @@
 /*=================*/
 /* Color Structure */
 /*=================*/
-import { ColorSpace } from './space';
+import { ColorSpace, ColorSpaceName } from './space';
 
-export class Color {
+interface ColorConstructor {
+	new (space: ColorSpace | string, data: number[]): Color;
+	readonly prototype: Color;
+}
+
+interface Color {
+	space: ColorSpace | string;
+	values: number[];
+	get: (toSpace: ColorSpace | string, options?: {}) => number[];
+}
+
+const Color = class Color<T> {
 	public space: ColorSpace;
-	public data: number[]
+	public values: number[]
 
-	constructor( space: ColorSpace | string, data: number[] ) {
+	constructor(space: ColorSpace | ColorSpaceName, data: number[] ) {
 		if (typeof space === 'string')
-			space = ColorSpace.getSpaceByString(space);
+			space = ColorSpace.getSpaceByName(space);
 		
 		this.space = space;
-		this.data = data;
+		this.values = data;
 	}
 
-	public get(toSpace: ColorSpace | string, options = {}) {
+	public get(toSpace: ColorSpace | ColorSpaceName, options = {}) {
 		const fromSpace = this.space;
-		let currData = this.data;
+		let currData = this.values;
 		if (fromSpace === toSpace) return currData;
 
-		if (typeof toSpace === "string")
-			toSpace = ColorSpace.getSpaceByString(toSpace);
+		if (typeof toSpace === 'string') {
+			toSpace = ColorSpace.getSpaceByName(toSpace);
+		}
 
-		const conversion = fromSpace.getConversion(toSpace)!;
+		const conversion = fromSpace.getConversionBySpace(toSpace)!;
 		const newData = conversion(currData, options);
 		
 		return newData;
 	}
 	
-	/*
-	public dE(colorB: Color, options: {[k: string]: any} = {}): number {
-		return Color.dE(this, colorB, options);
-	}
-	*/
+} as ColorConstructor;
 
-	/*
-	public get luma() {
-		if (this.space !instanceof RGBSpace)
-			throw new TypeError(`Only colors with defined RGB ColorSpace can have luma`);
-	}
-	*/
-
-	/*
-	whiteLevel(): number;
-	whiteLevel(Lw: number): Color;
-	whiteLevel(parmA?: number): Color|number {
-		if(typeof parmA === 'undefined')	return this.#space.options.gamut.whiteLevel();
-
-		this.#space.options.gamut = this.#space.options.gamut.whiteLevel(parmA);
-		return this;
-	}
-	*/
-	
-}
+export { Color, ColorConstructor };

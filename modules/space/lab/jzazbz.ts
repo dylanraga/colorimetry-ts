@@ -8,6 +8,9 @@ import { LabSpace } from "../lab";
 import { XYZSPACE_CIED65 } from "../xyz.standard";
 
 export const LABSPACE_JZAZBZ = new LabSpace();
+LABSPACE_JZAZBZ.name = 'Jzazbz';
+LABSPACE_JZAZBZ.keys = ['Jz', 'az', 'bz'];
+
 LABSPACE_JZAZBZ.addConversion(XYZSPACE_CIED65,
 	//JzAzBz -> XYZ
 	(JzAzBz: number[]) => {
@@ -18,14 +21,20 @@ LABSPACE_JZAZBZ.addConversion(XYZSPACE_CIED65,
 	(XYZ: number[]) => {
 		let JzAzBz = XYZ_to_JzAzBz(XYZ);
 		return JzAzBz;
-	});
-LABSPACE_JZAZBZ.name = 'Jzazbz';
-LABSPACE_JZAZBZ.keys = ['Jz', 'az', 'bz'];
+	}
+);
+
 ColorSpace.list['JZAZBZ'] = LABSPACE_JZAZBZ;
+
+declare module '../../space' {
+	interface ColorSpaceMap {
+		JZAZBZ: LabSpace;
+	}
+}
 
 
 /*
- * JzAzBz conversions
+ * JzAzBz <-> XYZ conversions
  */
 
 //constants

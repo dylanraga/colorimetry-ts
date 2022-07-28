@@ -8,10 +8,14 @@
 import { LabSpace } from '../lab';
 import { illuminants } from '../../illuminants';
 import { XYZSPACE_CIED65 } from '../xyz.standard';
+import { ColorSpace } from '../../space';
 
 interface xy { x: number, y: number }
 
 const LABSPACE_CIELAB = new LabSpace();
+LABSPACE_CIELAB.name = 'CIELab';
+LABSPACE_CIELAB.keys = ['L', 'a', 'b'];
+
 LABSPACE_CIELAB.addConversion(XYZSPACE_CIED65,
 	(Lab: number[], o: { whiteY?: number, white?: xy } = {}) => {
 		const { whiteY, white } = o;
@@ -22,9 +26,20 @@ LABSPACE_CIELAB.addConversion(XYZSPACE_CIED65,
 		const { whiteY, white } = o;
 		let Lab = XYZ_to_CIELAB(XYZ, whiteY, white);
 		return Lab;
-	});
-LABSPACE_CIELAB.name = 'CIELab';
-LABSPACE_CIELAB.keys = ['L', 'a', 'b'];
+	}
+);
+
+ColorSpace.list['LAB'] = LABSPACE_CIELAB;
+
+declare module '../../space' {
+	interface ColorSpaceMap {
+		LAB: LabSpace;
+	}
+}
+
+/**
+ * CIELAB <-> XYZ conversion functions
+ */
 
 function XYZ_to_CIELAB([X, Y, Z]: number[], whiteY: number = 100, white: xy = illuminants.D50): number[] {
 	let [Xn, Zn] = [white.x*whiteY/white.y, (1-white.x-white.y)*whiteY/white.y];

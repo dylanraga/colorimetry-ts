@@ -1,6 +1,5 @@
 /**
  * Correlated Color Temperature module
- * Warning: This is a slow operation!
  */
 
 import { Color } from "../color";
@@ -17,8 +16,8 @@ const k = [
 ];
 
 /**
- * Retrieves Correlated Color Temperature of a Color
- * Performs a binary search for the nearest CIExy coords on the blackbody locus
+ * Calculates the Correlated Color Temperature of a Color in Kelvins
+ * Source: https://cormusa.org/wp-content/uploads/2018/04/CORM_2011_Calculation_of_CCT_and_Duv_and_Practical_Conversion_Formulae.pdf
  * @param color Color to find CCT of
  */
 function getCCT(color: Color) {
@@ -50,10 +49,10 @@ function getCCT(color: Color) {
 
 }
 
-Object.defineProperty(Color.prototype, "cct", { get: function() { return getCCT(this); } });
-
 declare module '../color' {
 	interface Color {
 		cct: ReturnType<typeof getCCT>
 	}
 }
+
+Object.defineProperty(Color.prototype, "cct", { get: function() { return getCCT(this); } });

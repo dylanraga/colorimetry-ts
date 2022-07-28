@@ -7,19 +7,36 @@ import { DE_ITP } from "./difference/deitp";
 
 export type DEMethod<Options = {}> = (colorA: Color, colorB: Color, options: Options) => number;
 
+/**
+ * Calculates Delta E between two Colors depending on method
+ */
 function getDifference(colorA: Color, colorB: Color, options: {[k: string]: any} = {}) {
 	const { method = DE_ITP } = options;
 	return method(colorA, colorB, options);
 }
 
-declare module './color' {
-	interface Color {
-		dE: ReturnType<typeof getDifference>;
-	}
-
+/**
+ * Member method for getDifference
+ */
+function _getDifference(this: Color, colorB: Color, options: Parameters<typeof getDifference>['2']) {
+	getDifference(this, colorB, options);
 }
 
-Color.prototype.dE = function(colorB: Color, options: {[k: string]: any} = {}) { return getDifference(this, colorB, options) };
+declare module './color' {
+	interface ColorConstructor {
+		dE: typeof getDifference;
+	}
+	interface Color {
+		dE: typeof _getDifference;
+	}	
+}
+
+Object.defineProperty(Color, 'dE', getDifference);
+Object.defineProperty(Color.prototype, 'dE', _getDifference);
+
+
+
+
 
 
 export const DE_UV: DEMethod = (colorA, colorB, options = {}) => {

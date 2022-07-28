@@ -3,7 +3,7 @@
 
 import { ColorGamut } from '../gamut';
 import { ColorSpace } from '../space';
-import { mmult3331 as mmult, quantizeToBits } from '../common/util';
+import { mmult3331 as mmult } from '../common/util';
 import { ToneResponse } from '../trc';
 import { XYZSPACE_CIED65 } from './xyz.standard';
 

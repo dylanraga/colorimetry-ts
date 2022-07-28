@@ -8,6 +8,9 @@ import { LabSpace } from "../lab";
 import { XYZSPACE_CIED65 } from "../xyz.standard";
 
 export const LABSPACE_ICTCP = new LabSpace();
+LABSPACE_ICTCP.name = 'ICtCp';
+LABSPACE_ICTCP.keys = ['I', 'Ct', 'Cp'];
+
 LABSPACE_ICTCP.addConversion(XYZSPACE_CIED65,
 	//XYZ -> ICtCp
 	(ICtCp: number[]) => {
@@ -18,20 +21,30 @@ LABSPACE_ICTCP.addConversion(XYZSPACE_CIED65,
 	(XYZ: number[]) => {
 		let ICtCp = XYZ_to_ICtCp(XYZ);
 		return ICtCp;
-	});
-LABSPACE_ICTCP.name = 'ICtCp';
-LABSPACE_ICTCP.keys = ['I', 'Ct', 'Cp'];
+	}
+);
+
 ColorSpace.list['ICTCP'] = LABSPACE_ICTCP;
 
 export const LABSPACE_ITP = new LabSpace();
+LABSPACE_ITP.name = 'ITP',
+LABSPACE_ITP.keys = ['I', 'T', 'P'],
+
 LABSPACE_ITP.addConversion(LABSPACE_ICTCP,
 	//ITP -> ICtCp
 	([I, T, P]: number[]) => [I, T*2, P],
 	//ICtCp -> ITP
-	([I, Ct, Cp]: number[]) => [I, Ct/2, Cp]);
-LABSPACE_ITP.name = 'ITP',
-LABSPACE_ITP.keys = ['I', 'T', 'P'],
+	([I, Ct, Cp]: number[]) => [I, Ct/2, Cp]
+);
+
 ColorSpace.list['ITP'] = LABSPACE_ITP;
+
+declare module '../../space' {
+	interface ColorSpaceMap {
+		ICTCP: LabSpace;
+		ITP: LabSpace;
+	}
+}
 
 /*
 const mEbner = [
@@ -49,7 +62,7 @@ const mVonKries = [
 */
 
 /*
- * ICtCp/ITP conversions
+ * ICtCp/ITP <-XYZ> conversions
  */
 
 /*

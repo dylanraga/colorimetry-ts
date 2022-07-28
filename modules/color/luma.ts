@@ -13,13 +13,15 @@ function getLuma(color: Color, rgbSpace: RGBSpace) {
 	return luma;
 }
 
-Color.prototype.luma = function(rgbSpace: RGBSpace = DEFAULT_RGBSPACE) {
+function _getLuma(this: Color, rgbSpace: Parameters<typeof getLuma>['1'] = DEFAULT_RGBSPACE) {
 	return getLuma(this, rgbSpace);
-};
+}
 
 
 declare module '../color' {
 	interface Color {
-		luma: (rgbSpace?: RGBSpace) => ReturnType<typeof getLuma>
+		readonly luma: typeof _getLuma;
 	}
 }
+
+Object.defineProperty(Color.prototype, 'luma', { get: _getLuma });
