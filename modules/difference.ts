@@ -24,10 +24,10 @@ function _getDifference(this: Color, colorB: Color, options: Parameters<typeof g
 
 declare module './color' {
 	interface ColorConstructor {
-		dE: typeof getDifference;
+		dE: ReturnType<typeof getDifference>;
 	}
 	interface Color {
-		dE: typeof _getDifference;
+		dE: ReturnType<typeof _getDifference>;
 	}	
 }
 

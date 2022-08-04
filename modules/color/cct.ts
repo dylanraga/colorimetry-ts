@@ -49,10 +49,14 @@ function getCCT(color: Color) {
 
 }
 
+function _getCCT(this: Color) {
+	return getCCT(this);
+}
+
 declare module '../color' {
 	interface Color {
-		cct: ReturnType<typeof getCCT>
+		readonly cct: ReturnType<typeof _getCCT>
 	}
 }
 
-Object.defineProperty(Color.prototype, "cct", { get: function() { return getCCT(this); } });
+Object.defineProperty(Color.prototype, "cct", { get: _getCCT });

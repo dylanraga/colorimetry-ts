@@ -1,6 +1,5 @@
-import { ColorSpace } from "../../space";
 import { ChromaticitySpace } from "../chromaticity";
-import { XYZSPACE_CIED65 } from "../xyz.standard";
+import { XYZSPACE_D65 } from "../xyz.standard";
 
 interface xy {
 	x: number;
@@ -9,7 +8,7 @@ interface xy {
 
 /* CIE1931 xy */
 export const CHROMATICITY_XY = new ChromaticitySpace();
-CHROMATICITY_XY.addConversion(XYZSPACE_CIED65,
+CHROMATICITY_XY.addConversion(XYZSPACE_D65,
 	//CIExy -> XYZ
 	(xy: number[], o: { whiteLevel?: number } = {}) => {
 		let XYZ = xy_to_XYZ(xy, o);
@@ -23,8 +22,15 @@ CHROMATICITY_XY.addConversion(XYZSPACE_CIED65,
 );
 CHROMATICITY_XY.name = 'CIExy';
 CHROMATICITY_XY.keys = ['x', 'y'];
-ColorSpace.list[CHROMATICITY_XY.name] = CHROMATICITY_XY;
-ColorSpace.list['XY'] = CHROMATICITY_XY;
+CHROMATICITY_XY.register('XY');
+
+
+declare module '../chromaticity' {
+	interface ChromaticitySpaceNamedMap {
+		XY: typeof CHROMATICITY_XY;
+	}
+}
+
 
 export function XYZ_to_xy([X, Y, Z]: number[]) {
 	const denom = X+Y+Z;

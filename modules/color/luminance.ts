@@ -16,7 +16,7 @@ function _getLuminance(this: Color) {
 
 declare module '../color' {
 	interface Color {
-		readonly luminance: typeof _getLuminance;
+		readonly luminance: ReturnType<typeof _getLuminance>;
 	}
 }
 

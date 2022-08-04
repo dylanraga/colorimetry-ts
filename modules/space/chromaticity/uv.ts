@@ -1,11 +1,10 @@
-import { ColorSpace } from "../../space";
 import { ChromaticitySpace } from "../chromaticity";
-import { XYZSPACE_CIED65 } from "../xyz.standard";
+import { XYZSPACE_D65 } from "../xyz.standard";
 import { CHROMATICITY_XY } from "./xy";
 
 /* CIE1976 u'v' */
 export const CHROMATICITY_UV = new ChromaticitySpace();
-CHROMATICITY_UV.addConversion(XYZSPACE_CIED65,
+CHROMATICITY_UV.addConversion(XYZSPACE_D65,
 	//CIE1976 u'v' -> XYZ
 	(uv: number[], o: { whiteLevel?: number } = {}) => {
 		let XYZ = uv_to_XYZ(uv, o);
@@ -31,9 +30,13 @@ CHROMATICITY_UV.addConversion(CHROMATICITY_XY,
 );
 CHROMATICITY_UV.name = 'CIEuv';
 CHROMATICITY_UV.keys = ['u', 'v'];
-ColorSpace.list[CHROMATICITY_UV.name] = CHROMATICITY_UV;
-ColorSpace.list['UV'] = CHROMATICITY_UV;
+CHROMATICITY_UV.register('UV');
 
+declare module '../chromaticity' {
+	interface ChromaticitySpaceNamedMap {
+		UV: typeof CHROMATICITY_UV;
+	}
+}
 
 
 export function XYZ_to_uv([X, Y, Z]: number[]) {

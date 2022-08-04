@@ -1,9 +1,8 @@
 import { illuminants } from "../../illuminants";
-import { ColorSpace } from "../../space";
-import { curves } from "../../trc.standard";
+import { curves } from "../../trc";
 import { uv_to_XYZ, XYZ_to_uv, xy_to_uv } from "../chromaticity/uv";
 import { LabSpace } from "../lab";
-import { XYZSPACE_CIED65 } from "../xyz.standard";
+import { XYZSPACE_D65 } from "../xyz.standard";
 
 interface xy { x: number, y: number }
 
@@ -12,25 +11,23 @@ export const LABSPACE_CIELUV = new LabSpace();
 LABSPACE_CIELUV.name = 'CIELUV';
 LABSPACE_CIELUV.keys = ['L', 'U', 'V'];
 
-LABSPACE_CIELUV.addConversion(XYZSPACE_CIED65,
+LABSPACE_CIELUV.addConversion<{ whiteLevel: number, white: xy }>(XYZSPACE_D65,
 	//CIELUV -> XYZ
-	(LUV: number[], o: { whiteLevel?: number, white?: xy } = {}) => {
-		const { whiteLevel, white } = o;
-		let XYZ = LUV_to_XYZ(LUV, whiteLevel, white);
+	(LUV: number[], { whiteLevel, white }) => {
+		let XYZ = LUV_to_XYZ(LUV, { whiteLevel, white });
 		return XYZ;
 	},
 	//XYZ -> CIELUV
-	(XYZ: number[], o: { whiteLevel?: number, white?: xy} = {}) => {
-		const { whiteLevel, white } = o;
-		let LUV = XYZ_to_LUV(XYZ, whiteLevel, white);
+	(XYZ: number[], { whiteLevel, white }) => {
+		let LUV = XYZ_to_LUV(XYZ, { whiteLevel, white });
 		return LUV;
 	}
 );
 
-ColorSpace.list['LUV'] = LABSPACE_CIELUV;
+LABSPACE_CIELUV.register('LUV');
 
-declare module '../../space' {
-	interface ColorSpaceMap {
+declare module '../lab' {
+	interface LabSpaceNamedMap {
 		LUV: LabSpace;
 	}
 }
@@ -40,7 +37,7 @@ declare module '../../space' {
  * CIELUV/u'v' <-> XYZ conversions
  */
 
-function XYZ_to_LUV([X, Y, Z]: number[], whiteLevel: number = 100, white: xy = illuminants.D65): number[] {
+function XYZ_to_LUV([X, Y, Z]: number[], { whiteLevel = 100, white = illuminants.D65 }: { whiteLevel: number, white: xy}): number[] {
 	let [u, v] = XYZ_to_uv([X, Y, Z]);
 	let [un, vn] = xy_to_uv([white.x, white.y]);
 	let L = 100 * curves.LSTAR.invEotf(Y, { whiteLevel });
@@ -50,7 +47,7 @@ function XYZ_to_LUV([X, Y, Z]: number[], whiteLevel: number = 100, white: xy = i
 	return [L, U, V];
 }
 
-function LUV_to_XYZ([L, U, V]: number[], whiteLevel: number = 100, white: xy = illuminants.D65): number[] {
+function LUV_to_XYZ([L, U, V]: number[], { whiteLevel = 100, white = illuminants.D65 }: { whiteLevel: number, white: xy}): number[] {
 	let Y = curves.LSTAR.eotf(L/100);
 	let [un, vn] = xy_to_uv([white.x, white.y]);
 	let u = U/(13*L) + un;

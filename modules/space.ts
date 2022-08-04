@@ -1,36 +1,32 @@
 import { bfsPath } from "./common/util";
 
-type ColorSpaceConversionFunction = (data: number[], options?: {[k: string]: any}) => number[];
+type ColorSpaceConversionFunction<Props = {}> = (values: number[], props: Props) => number[];
 
 interface ColorSpaceConversion {
 	space: ColorSpace;
-	fn: ColorSpaceConversionFunction
+	fn: ColorSpaceConversionFunction<any>
 }
-
-export interface ColorSpaceMap {}
-export type ColorSpaceName = keyof ColorSpaceMap | (string & Record<never, never>);
 
 abstract class ColorSpace {
 	public name: string = 'Unnamed ColorSpace';
 	public keys: string[] = [];
 	public conversions: ColorSpaceConversion[] = [];
 	public static defaultSpace: ColorSpace;
-	public static list: { [name: string]: ColorSpace } = {};
+	public static named: { [k: string]: ColorSpace } = {};
 
 	public static getSpaceByName(spaceName: ColorSpaceName) {
 		const spaceString = (spaceName as string).toUpperCase();
-		if (this.list.hasOwnProperty(spaceString))
-			return this.list[spaceString];
+		if (this.named.hasOwnProperty(spaceString))
+			return this.named[spaceString];
 		else
 			throw new ReferenceError(`ColorSpace '${spaceString}' does not exist`);
 	}
-
 
 	private getExistingConversionBySpace(dstSpace: ColorSpace | (() => ColorSpace)) {
 		return this.conversions.find(s => s.space === dstSpace);
 	}
 
-	public addConversion(spaceB: ColorSpace, toFn: ColorSpaceConversionFunction, fromFn: ColorSpaceConversionFunction) {
+	public addConversion<Props = {}>(spaceB: ColorSpace, toFn: ColorSpaceConversionFunction<Props>, fromFn: ColorSpaceConversionFunction<Props>) {
 		this.conversions.push({
 			space: spaceB,
 			fn: toFn
@@ -71,7 +67,22 @@ abstract class ColorSpace {
 		return conversion;
 	}
 
+	public register(nameList: string[]): void;
+	public register(name: string): void;
+	public register(arg1: string | string[]): void {
+		const strings = typeof arg1 === 'string'? [arg1] : arg1;
+		
+		for (const name of strings) {
+			ColorSpace.named[name] = this;
+		}
+	}
+
 }
 
+
+export interface ColorSpaceNamedMap { }
+export type ColorSpaceName = keyof ColorSpaceNamedMap | (string & Record<never, never>);
+
+export const spaces = ColorSpace.named as { [P in keyof ColorSpaceNamedMap]: ColorSpaceNamedMap[P] };
 
 export { ColorSpace };

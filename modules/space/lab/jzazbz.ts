@@ -1,17 +1,16 @@
 //output is significant to 5 digits, limited by precision of von kries and ebner matrices
 //might be worth investigating internally quantizing the conversion to 12 bits RGB (=4095 codewords)
 import { minv, mmult3331 as mmult } from "../../common/util";
-import { curves } from "../../trc.standard";
+import { curves } from "../../trc";
 import { ToneResponse } from "../../trc";
-import { ColorSpace } from "../../space";
 import { LabSpace } from "../lab";
-import { XYZSPACE_CIED65 } from "../xyz.standard";
+import { XYZSPACE_D65 } from "../xyz.standard";
 
 export const LABSPACE_JZAZBZ = new LabSpace();
 LABSPACE_JZAZBZ.name = 'Jzazbz';
 LABSPACE_JZAZBZ.keys = ['Jz', 'az', 'bz'];
 
-LABSPACE_JZAZBZ.addConversion(XYZSPACE_CIED65,
+LABSPACE_JZAZBZ.addConversion(XYZSPACE_D65,
 	//JzAzBz -> XYZ
 	(JzAzBz: number[]) => {
 		let XYZ = JzAzBz_to_XYZ(JzAzBz);
@@ -24,10 +23,10 @@ LABSPACE_JZAZBZ.addConversion(XYZSPACE_CIED65,
 	}
 );
 
-ColorSpace.list['JZAZBZ'] = LABSPACE_JZAZBZ;
+LABSPACE_JZAZBZ.register('JZAZBZ');
 
-declare module '../../space' {
-	interface ColorSpaceMap {
+declare module '../lab' {
+	interface LabSpaceNamedMap {
 		JZAZBZ: LabSpace;
 	}
 }

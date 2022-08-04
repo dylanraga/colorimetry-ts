@@ -2,8 +2,11 @@
 /* Standard Tone Response Curves */
 /*===============================*/
 
-import { ToneResponse } from "./trc";
+import { ToneResponse, curves } from "./trc";
 
+/**
+ * Simple gamma power function
+ */
 const TRC_GAMMA = new ToneResponse<{
 	whiteLevel?: number;
 	blackLevel?: number;
@@ -24,7 +27,26 @@ const TRC_GAMMA = new ToneResponse<{
 		return V;
 	}
 );
+TRC_GAMMA.register('GAMMA');
+TRC_GAMMA.options({ gamma: 1.8 }).register('G18');
+TRC_GAMMA.options({ gamma: 2.2 }).register('G22');
+TRC_GAMMA.options({ gamma: 2.4 }).register('G24');
+TRC_GAMMA.options({ gamma: 2.6 }).register('G26');
 
+declare module './trc' {
+	interface ToneResponseNamedMap {
+		GAMMA: typeof TRC_GAMMA;
+		G18: typeof TRC_GAMMA;
+		G22: typeof TRC_GAMMA;
+		G24: typeof TRC_GAMMA;
+		G26: typeof TRC_GAMMA;
+	}
+}
+
+
+/**
+ * ITU-R BT.1886
+ */
 const TRC_BT1886 = new ToneResponse<{
 	whiteLevel?: number;
 	blackLevel?: number;
@@ -47,7 +69,18 @@ const TRC_BT1886 = new ToneResponse<{
 		return V;	
 	}
 );
+TRC_BT1886.register('BT1886');
 
+declare module './trc' {
+	interface ToneResponseNamedMap {
+		BT1886: typeof TRC_BT1886;
+	}
+}
+
+
+/**
+ * Hybrid-Log Gamma / Rec.2100 / ARIB STD-B67
+ */
 const TRC_HLG = new ToneResponse<{
 	whiteLevel?: number;
 	blackLevel?: number;
@@ -60,7 +93,7 @@ const TRC_HLG = new ToneResponse<{
 		} = options;
 		const a = 0.17883277;
 		const b = 0.28466892;
-		const c = 0.5 - a*Math.log(4*a);
+		const c = 0.55991073;
 		const beta = Math.sqrt(3*(blackLevel/whiteLevel)**(1/gamma));
 
 		const f = (x: number) => (x > 1/2)? (Math.exp((x-c)/a)+b)/12 : (x*x)/3;
@@ -76,7 +109,7 @@ const TRC_HLG = new ToneResponse<{
 		} = options;
 		const a = 0.17883277;
 		const b = 0.28466892;
-		const c = 0.5 - a*Math.log(4*a);
+		const c = 0.55991073;
 		const beta = Math.sqrt(3*(blackLevel/whiteLevel)**(1/gamma));
 
 		const E = (L/whiteLevel) ** (1/gamma);
@@ -86,9 +119,18 @@ const TRC_HLG = new ToneResponse<{
 		return V;
 	}
 );
+TRC_HLG.register('HLG');
 
-//Extended sRGB, using higher-precision constants
-//https://entropymine.com/imageworsener/srgbformula/
+declare module './trc' {
+	interface ToneResponseNamedMap {
+		HLG: typeof TRC_HLG;
+	}
+}
+
+/**
+ * Extended sRGB, using higher-precision constants
+ * https://entropymine.com/imageworsener/srgbformula/
+ */
 const TRC_SRGB = new ToneResponse<{
 	whiteLevel?: number;
 	blackLevel?: number
@@ -108,9 +150,16 @@ const TRC_SRGB = new ToneResponse<{
 		return V;
 	}
 );
+TRC_SRGB.register('SRGB');
+
+declare module './trc' {
+	interface ToneResponseNamedMap {
+		SRGB: typeof TRC_SRGB;
+	}
+}
 
 /**
- * ST.2084 HDR absolute transfer function
+ * ST.2084 HDR / Rec.2100
  * TODO: Add tonemap knee w.r.t whiteLevel & blackLevel
  */
 const TRC_ST2084 = new ToneResponse<{
@@ -142,41 +191,44 @@ const TRC_ST2084 = new ToneResponse<{
 		return V;
 	}
 );
+TRC_ST2084.register(['ST2084', 'PQ']);
 
+declare module './trc' {
+	interface ToneResponseNamedMap {
+		ST2084: typeof TRC_ST2084;
+		PQ: typeof TRC_ST2084;
+	}
+}
 
+/**
+ * CIELab L*
+ * http://www.brucelindbloom.com/index.html?Eqn_Luv_to_XYZ.html
+ */
 const TRC_LSTAR = new ToneResponse<{
 	whiteLevel?: number;
 	blackLevel?: number;
 }>(
 	(V, options = {}) => {
 		const { whiteLevel = 100, blackLevel = 0 } = options;
-		const d = 6/29;
-		const f = (x: number) => (x > d)? x*x*x : 3*(d*d)*(x-(4/29));
-		const L = (whiteLevel-blackLevel) * f((100*V + 16)/116) + blackLevel;
+		const κ = 24389/27;
+		const f = (x: number) => (x > 6/29)? ((x+16)/116)**(1/3) : x/κ;
+		const L = (whiteLevel-blackLevel) * f(V) + blackLevel;
 		return L;
 	},
 	(L, options = {}) => {
 		const { whiteLevel = 100, blackLevel = 0 } = options;
-		const d = 6/29;
-		const f = (x: number) => (x > d*d*d)? x**(1/3) : x/(3*d*d) + (4/29);
-		const V = (116 * f((L-blackLevel)/(whiteLevel-blackLevel)) - 16) / 100;
+		const ϵ = 216/24389;
+		const κ = 24389/27;
+		const f = (x: number) => (x > ϵ)? 116*(x**(1/3))-16 : κ*x;
+		const V = f((L-blackLevel)/(whiteLevel-blackLevel));
 		return V;
 	}
 );
+TRC_LSTAR.register(['LSTAR', 'L*'])
 
-export const curves = {
-	"GAMMA": TRC_GAMMA,
-	"SRGB": TRC_SRGB,
-	"BT1886": TRC_BT1886,
-	"ST2084": TRC_ST2084,
-	"HLG": TRC_HLG,
-	"LSTAR": TRC_LSTAR,
-	/**
-	 * Aliases
-	 */
-	"PQ": TRC_ST2084,
-	"L*": TRC_LSTAR,
-	"G2.2": TRC_GAMMA.options({ gamma: 2.2 }),
-	"G2.4": TRC_GAMMA.options({ gamma: 2.4 }),
-	"G2.6": TRC_GAMMA.options({ gamma: 2.6 })
-};
+declare module './trc' {
+	interface ToneResponseNamedMap {
+		LSTAR: typeof TRC_LSTAR;
+		'L*': typeof TRC_LSTAR;
+	}
+}

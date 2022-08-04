@@ -4,7 +4,6 @@
 
 import { Color } from "../color";
 import { RGBSpace } from "../../colorimetry";
-import { DEFAULT_RGBSPACE } from "../defaults";
 
 function getLuma(color: Color, rgbSpace: RGBSpace) {
 	const [yr, yg, yb] = rgbSpace.gamut.mXYZ[1];
@@ -13,14 +12,14 @@ function getLuma(color: Color, rgbSpace: RGBSpace) {
 	return luma;
 }
 
-function _getLuma(this: Color, rgbSpace: Parameters<typeof getLuma>['1'] = DEFAULT_RGBSPACE) {
+function _getLuma(this: Color, rgbSpace: Parameters<typeof getLuma>['1'] = RGBSpace.defaultSpace) {
 	return getLuma(this, rgbSpace);
 }
 
 
 declare module '../color' {
 	interface Color {
-		readonly luma: typeof _getLuma;
+		readonly luma: ReturnType<typeof _getLuma>;
 	}
 }
 

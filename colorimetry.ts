@@ -2,31 +2,32 @@
 /* Author: Dylan Raga */
 /*====================*/
 
-export { XYZSpace } from './modules/space/xyz';
-export { xyzSpaces } from './modules/space/xyz.standard';
+export { ColorGamut, gamuts } from './modules/gamut';
+import './modules/gamut.standard';
 
-export { RGBSpace } from './modules/space/rgb';
-export { rgbSpaces } from './modules/space/rgb.standard';
+export { ToneResponse, curves } from './modules/trc';
+import './modules/trc.standard';
 
-export { ChromaticitySpace } from './modules/space/chromaticity';
-export { CHROMATICITY_XY } from './modules/space/chromaticity/xy';
-export { CHROMATICITY_UV } from './modules/space/chromaticity/uv';
-
-export { LabSpace } from './modules/space/lab';
-export { LABSPACE_CIEYXY } from './modules/space/lab/cieyxy';
-export { LABSPACE_CIELUV } from './modules/space/lab/cieluv';
-export { LABSPACE_ITP } from './modules/space/lab/ictcp';
-export { LABSPACE_JZAZBZ } from './modules/space/lab/jzazbz';
-
-
-export { ColorSpace, ColorSpaceName } from './modules/space';
-
-export { ColorGamut } from './modules/gamut';
-export { ToneResponse } from './modules/trc';
-//export * as ColorDifference from './modules/ColorDifference';
-export { curves } from './modules/trc.standard';
-export { gamuts } from './modules/gamut.standard';
 export { illuminants } from './modules/illuminants';
+
+export { XYZSpace, xyzSpaces } from './modules/space/xyz';
+import './modules/space/xyz.standard';
+
+export { RGBSpace, rgbSpaces } from './modules/space/rgb';
+import './modules/space/rgb.standard';
+
+export { ChromaticitySpace, chromaticitySpaces } from './modules/space/chromaticity';
+import './modules/space/chromaticity/xy';
+import './modules/space/chromaticity/uv';
+
+export { LabSpace, labSpaces } from './modules/space/lab';
+import './modules/space/lab/cieyxy';
+import './modules/space/lab/cieluv';
+import './modules/space/lab/ictcp';
+import './modules/space/lab/jzazbz';
+
+
+export { ColorSpace, ColorSpaceName, spaces } from './modules/space';
 
 import { Color } from './modules/color';
 import './modules/difference';

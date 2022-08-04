@@ -5,29 +5,14 @@
 import { Optional } from "./common/types";
 import { minv, mmult3331 as mmult } from "./common/util";
 
-interface xyY {
-	x: number;
-	y: number;
-	Y: number;
-}
-type xy = Omit<xyY, 'Y'>;
-
-export interface ColorGamutPrimaries {
-	white: xyY;
-	red: xy;
-	green: xy;
-	blue: xy;
-	black: xyY;
-}
-
-
 /**
  * RGB Space Color Gamut
  */
-export class ColorGamut {
+class ColorGamut {
 	public primaries: ColorGamutPrimaries;
 	private mRGBCached?: number[][];
 	private mXYZCached?: number[][];
+	public static named: { [k: string]: ColorGamut } = {};
 
 	constructor(options: Optional<ColorGamutPrimaries, 'black'>) {
 		const { white, red, green, blue, black = { ...white, Y: 0 } } = options;
@@ -100,5 +85,40 @@ export class ColorGamut {
 		Object.assign(newGamut, { ...newProps });
 		return newGamut;
 	}
+
+	public register(nameList: string[]): void;
+	public register(name: string): void;
+	public register(arg1: string | string[]): void {
+		if (Array.isArray(arg1)) {
+			for (const name of arg1) {
+				ColorGamut.named[name] = this;
+			}
+		} else {
+			ColorGamut.named[arg1] = this;
+		}
+	}
 	
 }
+
+interface xyY {
+	x: number;
+	y: number;
+	Y: number;
+}
+type xy = Omit<xyY, 'Y'>;
+
+interface ColorGamutPrimaries {
+	white: xyY;
+	red: xy;
+	green: xy;
+	blue: xy;
+	black: xyY;
+}
+
+export interface ColorGamutNamedMap { };
+export type ColorGamutName = keyof ColorGamutNamedMap | (string & Record<never, never>);
+type ColorGamutNamedMapType = ColorGamutNamedMap & { [k: string]: ColorGamut };
+
+export const gamuts = ColorGamut.named as ColorGamutNamedMapType;
+
+export { ColorGamut, ColorGamutPrimaries };

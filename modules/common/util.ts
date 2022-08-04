@@ -179,6 +179,9 @@ export function mmult3331([[Ma, Mb, Mc], [Md, Me, Mf], [Mg, Mh, Mi]]: number[][]
 export const quantizeToBits = (v: number, bitDepth = 8) =>
 	roundHTE( (Math.pow(2, bitDepth)-1)*v );
 
+export const rad2deg = (x: number) => x*(180/Math.PI);
+export const deg2rad = (x: number) => x*(Math.PI/180);
+
 /**
  * Breadth-first search, used to find conversion path from one `ColorSpace` to another
  * @param start Beginning node

@@ -1,43 +1,53 @@
 /* Gamma-compressed signal RGB values (non-isLinear) */
 /* TODO: Gamut mapping */
 
-import { ColorGamut } from '../gamut';
+import { ColorGamut, ColorGamutName, gamuts } from '../gamut';
 import { ColorSpace } from '../space';
 import { mmult3331 as mmult } from '../common/util';
-import { ToneResponse } from '../trc';
-import { XYZSPACE_CIED65 } from './xyz.standard';
+import { curves, ToneResponse, ToneResponseName } from '../trc';
+import { XYZSPACE_D65 } from './xyz.standard';
 
 class RGBSpace extends ColorSpace {
 	public name: string = 'RGB ColorSpace';
 	public key: string[] = ['R', 'G', 'B'];
 	public gamut: ColorGamut;
-	public trc: ToneResponse;
+	public trc: ToneResponse<any>;
 	public bitDepth: 8 | 10 | 12 = 8;
-	public isLinear: boolean = false;
+	public isLinear = false;
+	public static defaultSpace: RGBSpace;
 	
-	constructor(gamut: ColorGamut, trc: ToneResponse) {
+	constructor(_gamut: ColorGamut | ColorGamutName, _trc: ToneResponse<any> | ToneResponseName) {
 		super();
+
+		const gamut = typeof _gamut === 'string'? gamuts[_gamut] : _gamut;
+		const trc = typeof _trc === 'string'? curves[_trc] : _trc;
+
 		this.gamut = gamut;
 		this.trc = trc;
 
-		this.addConversion(XYZSPACE_CIED65,
+		this.addConversion<RGBSpaceProps>(XYZSPACE_D65,
 			//RGB->XYZ
-			(rgb: number[], props: Partial<RGBSpaceProps> = {}) => {
-				const { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear, whiteLevel, blackLevel } = props;
-				return RGB_to_XYZ(rgb, { gamut, trc, isLinear, bitDepth, whiteLevel, blackLevel })
-			},
+			(RGB, { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear, whiteLevel = this.gamut.whiteLevel, blackLevel = this.gamut.blackLevel }) => RGB_to_XYZ(RGB, { gamut, trc, bitDepth, isLinear, whiteLevel, blackLevel }),
 			//XYZ->RGB
-			(XYZ: number[], props: Partial<RGBSpaceProps> = {}) => {
-				const { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear, whiteLevel, blackLevel } = props;
-				return XYZ_to_RGB(XYZ, { gamut, trc, isLinear, bitDepth, whiteLevel, blackLevel });
-			}
+			(XYZ, { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear, whiteLevel = this.gamut.whiteLevel, blackLevel = this.gamut.blackLevel }) => XYZ_to_RGB(XYZ, { gamut, trc, bitDepth, isLinear, whiteLevel, blackLevel }),
 		);
+	}
+
+	public register(nameList: string[]): void;
+	public register(name: string): void;
+	public register(arg1: string | string[]): void {
+		const strings = typeof arg1 === 'string'? [arg1] : arg1;
+		
+		super.register(strings);
+		for (const name of strings) {
+			RGBSpace.named[name] = this;
+		}
 	}
 }
 
 interface RGBSpaceProps {
 	gamut: ColorGamut;
-	trc: ToneResponse;
+	trc: ToneResponse<any>;
 	bitDepth: 8 | 10 | 12;
 	isLinear: boolean;
 	whiteLevel?: number;
@@ -68,5 +78,14 @@ function XYZ_to_RGB(XYZ: number[], props: RGBSpaceProps) {
 }
 
 
+export interface RGBSpaceNamedMap { }
+export type RGBSpaceName = keyof RGBSpaceNamedMap | (string & Record<never, never>);
+
+declare module '../space' {
+	interface ColorSpaceNamedMap extends RGBSpaceNamedMap {}
+}
+
+type RGBSpaceNamedMapType = RGBSpaceNamedMap & { [k: string]: RGBSpace };
+export const rgbSpaces = RGBSpace.named as RGBSpaceNamedMapType;
 
 export { RGBSpace };

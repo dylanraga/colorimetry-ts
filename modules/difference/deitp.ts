@@ -1,5 +1,5 @@
-import { LABSPACE_ITP } from "../../colorimetry";
 import { DEMethod } from "../difference";
+import { LABSPACE_ITP } from "../space/lab/ictcp";
 
 export const DE_ITP: DEMethod<{
 	excludeLuminance?: boolean;

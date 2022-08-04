@@ -1,17 +1,16 @@
 //output is significant to 5 digits, limited by precision of von kries and ebner matrices
 //might be worth investigating internally quantizing the conversion to 12 bits RGB (=4095 codewords)
 import { minv, mmult3331 as mmult } from "../../common/util";
-import { curves } from "../../trc.standard";
+import { curves } from "../../trc";
 import { ToneResponse } from "../../trc";
-import { ColorSpace } from "../../space";
 import { LabSpace } from "../lab";
-import { XYZSPACE_CIED65 } from "../xyz.standard";
+import { XYZSPACE_D65 } from "../xyz.standard";
 
 export const LABSPACE_ICTCP = new LabSpace();
 LABSPACE_ICTCP.name = 'ICtCp';
 LABSPACE_ICTCP.keys = ['I', 'Ct', 'Cp'];
 
-LABSPACE_ICTCP.addConversion(XYZSPACE_CIED65,
+LABSPACE_ICTCP.addConversion(XYZSPACE_D65,
 	//XYZ -> ICtCp
 	(ICtCp: number[]) => {
 		let XYZ = ICtCp_to_XYZ(ICtCp);
@@ -24,7 +23,7 @@ LABSPACE_ICTCP.addConversion(XYZSPACE_CIED65,
 	}
 );
 
-ColorSpace.list['ICTCP'] = LABSPACE_ICTCP;
+LABSPACE_ICTCP.register('ICTCP');
 
 export const LABSPACE_ITP = new LabSpace();
 LABSPACE_ITP.name = 'ITP',
@@ -37,10 +36,10 @@ LABSPACE_ITP.addConversion(LABSPACE_ICTCP,
 	([I, Ct, Cp]: number[]) => [I, Ct/2, Cp]
 );
 
-ColorSpace.list['ITP'] = LABSPACE_ITP;
+LABSPACE_ITP.register('ITP');
 
-declare module '../../space' {
-	interface ColorSpaceMap {
+declare module '../lab' {
+	interface LabSpaceNamedMap {
 		ICTCP: LabSpace;
 		ITP: LabSpace;
 	}
