@@ -211,7 +211,7 @@ const TRC_LSTAR = new ToneResponse<{
 	(V, options = {}) => {
 		const { whiteLevel = 100, blackLevel = 0 } = options;
 		const κ = 24389/27;
-		const f = (x: number) => (x > 6/29)? ((x+16)/116)**(1/3) : x/κ;
+		const f = (x: number) => (x > 6/29)? ((x+16)/116)**3 : x/κ;
 		const L = (whiteLevel-blackLevel) * f(V) + blackLevel;
 		return L;
 	},

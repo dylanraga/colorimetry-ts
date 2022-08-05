@@ -40,19 +40,20 @@ declare module '../lab' {
 function XYZ_to_LUV([X, Y, Z]: number[], { whiteLevel = 100, white = illuminants.D65 }: { whiteLevel: number, white: xy}): number[] {
 	let [u, v] = XYZ_to_uv([X, Y, Z]);
 	let [un, vn] = xy_to_uv([white.x, white.y]);
-	let L = 100 * curves.LSTAR.invEotf(Y, { whiteLevel });
+	let L = curves.LSTAR.invEotf(Y, { whiteLevel });
 	let U = 13*L * (u-un);
 	let V = 13*L * (v-vn);
+
 
 	return [L, U, V];
 }
 
 function LUV_to_XYZ([L, U, V]: number[], { whiteLevel = 100, white = illuminants.D65 }: { whiteLevel: number, white: xy}): number[] {
-	let Y = curves.LSTAR.eotf(L/100);
+	let Y = curves.LSTAR.eotf(L, { whiteLevel });
 	let [un, vn] = xy_to_uv([white.x, white.y]);
 	let u = U/(13*L) + un;
 	let v = V/(13*L) + vn;
-	let [X,, Z] = uv_to_XYZ([u, v], { whiteLevel: Y });
+	let [X,, Z] = uv_to_XYZ([u, v], { Y });
 
 	return [X, Y, Z];
 }

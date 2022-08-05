@@ -6,7 +6,7 @@ import { CHROMATICITY_XY } from "./xy";
 export const CHROMATICITY_UV = new ChromaticitySpace();
 CHROMATICITY_UV.addConversion(XYZSPACE_D65,
 	//CIE1976 u'v' -> XYZ
-	(uv: number[], o: { whiteLevel?: number } = {}) => {
+	(uv: number[], o: { Y?: number } = {}) => {
 		let XYZ = uv_to_XYZ(uv, o);
 		return XYZ;
 	},
@@ -47,12 +47,12 @@ export function XYZ_to_uv([X, Y, Z]: number[]) {
 	return [u, v];
 }
 
-export function uv_to_XYZ([u, v]: number[], { whiteLevel = 1 }: { whiteLevel?: number }) {
+export function uv_to_XYZ([u, v]: number[], { Y = 1 }: { Y?: number }) {
 	const denom = 4*v;
-	const X = whiteLevel * (9*u)/denom;
-	const Z = whiteLevel * (12-3*u-20*v)/denom;
+	const X = Y * (9*u)/denom;
+	const Z = Y * (12-3*u-20*v)/denom;
 
-	return [X, whiteLevel, Z];
+	return [X, Y, Z];
 }
 
 

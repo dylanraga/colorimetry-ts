@@ -8,15 +8,9 @@ LABSPACE_CIEYXY.keys = ['Y', 'x', 'y'];
 
 LABSPACE_CIEYXY.addConversion(XYZSPACE_D65,
 	//Yxy -> XYZ
-	(Yxy: number[]) => {
-		let XYZ = Yxy_to_XYZ(Yxy);
-		return XYZ;
-	},
+	(Yxy: number[]) => Yxy_to_XYZ(Yxy),
 	//XYZ -> Yxy
-	(XYZ: number[]) => {
-		let Yxy = XYZ_to_Yxy(XYZ);
-		return Yxy;
-	}
+	(XYZ: number[]) => XYZ_to_Yxy(XYZ)
 );
 LABSPACE_CIEYXY.register(['YXY', 'XYY']);
 

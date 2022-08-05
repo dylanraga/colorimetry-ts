@@ -36,7 +36,8 @@ declare module '../lab' {
 /**
  * CIELAB <-> XYZ conversion functions
  */
-
+const ϵ = 216/24389;
+const κ = 24389/27;
 
 function XYZ_to_CIELAB([X, Y, Z]: number[], { whiteLevel = 100, white = illuminants.D50 }: { whiteLevel: number, white: xy}): number[] {
 	let [Xn, Zn] = [white.x*whiteLevel/white.y, (1-white.x-white.y)*whiteLevel/white.y];

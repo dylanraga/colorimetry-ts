@@ -21,10 +21,12 @@ import './modules/space/chromaticity/xy';
 import './modules/space/chromaticity/uv';
 
 export { LabSpace, labSpaces } from './modules/space/lab';
-import './modules/space/lab/cieyxy';
+import './modules/space/lab/cielab';
 import './modules/space/lab/cieluv';
+import './modules/space/lab/cieyxy';
 import './modules/space/lab/ictcp';
 import './modules/space/lab/jzazbz';
+import './modules/space/lab/oklab';
 
 
 export { ColorSpace, ColorSpaceName, spaces } from './modules/space';

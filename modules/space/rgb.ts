@@ -27,9 +27,9 @@ class RGBSpace extends ColorSpace {
 
 		this.addConversion<RGBSpaceProps>(XYZSPACE_D65,
 			//RGB->XYZ
-			(RGB, { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear, whiteLevel = this.gamut.whiteLevel, blackLevel = this.gamut.blackLevel }) => RGB_to_XYZ(RGB, { gamut, trc, bitDepth, isLinear, whiteLevel, blackLevel }),
+			(RGB, { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear }) => RGB_to_XYZ(RGB, { gamut, trc, bitDepth, isLinear }),
 			//XYZ->RGB
-			(XYZ, { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear, whiteLevel = this.gamut.whiteLevel, blackLevel = this.gamut.blackLevel }) => XYZ_to_RGB(XYZ, { gamut, trc, bitDepth, isLinear, whiteLevel, blackLevel }),
+			(XYZ, { gamut = this.gamut, trc = this.trc, bitDepth = this.bitDepth, isLinear = this.isLinear }) => XYZ_to_RGB(XYZ, { gamut, trc, bitDepth, isLinear }),
 		);
 	}
 
@@ -60,7 +60,7 @@ function RGB_to_XYZ(RGB: number[], props: RGBSpaceProps) {
 	RGB = (isLinear)
 		? RGB.map(u => (whiteLevel-blackLevel)*u+blackLevel)
 		: RGB.map(u => trc.eotf(u, { whiteLevel, blackLevel }));
-	
+
 	const XYZ = mmult(gamut.mXYZ, RGB);
 	return XYZ;
 }

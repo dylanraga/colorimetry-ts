@@ -11,16 +11,10 @@ LABSPACE_ICTCP.name = 'ICtCp';
 LABSPACE_ICTCP.keys = ['I', 'Ct', 'Cp'];
 
 LABSPACE_ICTCP.addConversion(XYZSPACE_D65,
+	//ICtCp -> XYZ
+	(ICtCp: number[]) => ICtCp_to_XYZ(ICtCp),
 	//XYZ -> ICtCp
-	(ICtCp: number[]) => {
-		let XYZ = ICtCp_to_XYZ(ICtCp);
-		return XYZ;
-	},
-	//XYZ -> ICtCp
-	(XYZ: number[]) => {
-		let ICtCp = XYZ_to_ICtCp(XYZ);
-		return ICtCp;
-	}
+	(XYZ: number[]) => XYZ_to_ICtCp(XYZ)
 );
 
 LABSPACE_ICTCP.register('ICTCP');
@@ -89,24 +83,20 @@ const mLMS_to_ICtCp = [
 ];
 const mICtCp_to_LMS = minv(mLMS_to_ICtCp);
 
-function ICtCp_to_XYZ([I, Ct, Cp]: number[], trc: ToneResponse = curves.ST2084): number[] {
-	let [L_, M_, S_] = mmult(mICtCp_to_LMS, [I, Ct, Cp]);
-	let L = trc.eotf(L_);
-	let M = trc.eotf(M_);
-	let S = trc.eotf(S_);
+function XYZ_to_ICtCp(XYZ: number[], trc: ToneResponse = curves.ST2084): number[] {
+	const LMS = mmult(mXYZ_to_LMS, XYZ); //.map(u => Decimal(u).toPrecision(5));
+	const LMSp = LMS.map(u => trc.invEotf(u));
 
-	let [X, Y, Z] = mmult(mLMS_to_XYZ, [L, M, S]); //.map(u => Decimal(u).toPrecision(5));
+	const ICtCp = mmult(mLMS_to_ICtCp, LMSp);
 
-	return [X ,Y, Z];
+	return ICtCp;
 }
 
-function XYZ_to_ICtCp([X, Y, Z]: number[], trc: ToneResponse = curves.ST2084): number[] {
-	let [L, M, S] = mmult(mXYZ_to_LMS, [X, Y, Z]); //.map(u => Decimal(u).toPrecision(5));
-	let L_ = trc.invEotf(L);
-	let M_ = trc.invEotf(M);
-	let S_ = trc.invEotf(S);
+function ICtCp_to_XYZ(ICtCp: number[], trc: ToneResponse = curves.ST2084): number[] {
+	const LMSp = mmult(mICtCp_to_LMS, ICtCp);
+	const LMS = LMSp.map(u => trc.eotf(u));
 
-	let [I, Ct, Cp] = mmult(mLMS_to_ICtCp, [L_, M_, S_]);
+	const XYZ = mmult(mLMS_to_XYZ, LMS); //.map(u => Decimal(u).toPrecision(5));
 
-	return [I, Ct, Cp];
+	return XYZ;
 }
