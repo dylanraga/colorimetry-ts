@@ -1,50 +1,40 @@
-import { deg2rad, rad2deg } from "../common/util";
-import { ColorSpace } from "../space";
-import { LCHSpace } from "./lch";
+import { ColorSpace, ColorSpaceConstructorProps } from '../space.js';
+import { Lab_to_LCh, LChSpace, LCh_to_Lab } from './lch.js';
 
-class LabSpace extends ColorSpace {
-	public name: string = 'Lab ColorSpace';
-	public keys: string[] = ['L', 'a', 'b'];
-	constructor(
-	) {
-		super();
+export class LabSpace extends ColorSpace {
+	constructor({ name = 'Lab ColorSpace', keys = ['L', 'a', 'b'], ...props }: ColorSpaceConstructorProps) {
+		super({ name, keys, ...props });
 	}
 
 	/**
 	 * Returns the cylindrical LCh form of the current Lab space
 	 */
-	public toLCH() {
-		const lchSpace = new LCHSpace();
-		lchSpace.name = this.name + ' (LCH)';
-		lchSpace.addConversion(this,
-			([L, C, h]) => [L, C*Math.cos(deg2rad(h)), C*Math.sin(deg2rad(h))],
-			([L, a, b]) => [L, (a*a + b*b)**(1/2), rad2deg(Math.atan2(b, a))]
-		);
+	public toLCh() {
+		const lchSpace = new LChSpace({
+			name: `LCh ColorSpace (${this.name})`,
+			conversions: [
+				{
+					space: this,
+					toFn: LCh_to_Lab,
+					fromFn: Lab_to_LCh,
+				},
+			],
+		});
+
 		return lchSpace;
 	}
 
-	public register(nameList: string[]): void;
-	public register(name: string): void;
-	public register(arg1: string | string[]): void {
-		const strings = typeof arg1 === 'string'? [arg1] : arg1;
-		
-		super.register(strings);
-		for (const name of strings) {
-			LabSpace.named[name] = this;
-		}
-	}
+	/**
+	 * Static
+	 */
+	public static named = {} as LabSpaceNamedMap & Record<string, LabSpace>;
 }
 
-
-
-export interface LabSpaceNamedMap { }
+export interface LabSpaceNamedMap {}
 export type LabSpaceName = keyof LabSpaceNamedMap | (string & Record<never, never>);
 
 declare module '../space' {
 	interface ColorSpaceNamedMap extends LabSpaceNamedMap {}
 }
 
-type LabSpaceNamedMapType = LabSpaceNamedMap & { [k: string]: LabSpace };
-export const labSpaces = LabSpace.named as LabSpaceNamedMapType;
-
-export { LabSpace };
+export const labSpaces = LabSpace.named;

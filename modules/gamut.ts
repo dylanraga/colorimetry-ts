@@ -1,124 +1,95 @@
-/*==========================*/
-/* Color Gamuts & Primaries */
-/*==========================*/
+import { Optional } from './common/types.js';
+import { minv, mmult3331 as mmult } from './common/util.js';
+import { Registerable, RegisterableConstructorProps } from './registerable.js';
+import { xy } from './space/chromaticity/xy.js';
 
-import { Optional } from "./common/types";
-import { minv, mmult3331 as mmult } from "./common/util";
+interface ColorGamutConstructorProps extends RegisterableConstructorProps {
+	primaries: Optional<ColorGamutPrimaries, 'black'>;
+}
 
 /**
  * RGB Space Color Gamut
  */
-class ColorGamut {
-	public primaries: ColorGamutPrimaries;
-	private mRGBCached?: number[][];
-	private mXYZCached?: number[][];
-	public static named: { [k: string]: ColorGamut } = {};
+export class ColorGamut extends Registerable {
+	public readonly primaries: ColorGamutPrimaries;
+	private cachedMatrixRGBToXYZ?: number[][];
+	private cachedMatrixXYZToRGB?: number[][];
 
-	constructor(options: Optional<ColorGamutPrimaries, 'black'>) {
-		const { white, red, green, blue, black = { ...white, Y: 0 } } = options;
-		this.primaries = {
-			white, red, green, blue, black
-		};
+	constructor({
+		name = 'Unnamed ColorGamut',
+		primaries: { white, black = { ...white }, ...rgb },
+		...props
+	}: ColorGamutConstructorProps) {
+		super({ name, ...props });
+		this.primaries = { white, black, ...rgb };
 	}
 
-	//
-	//Member getters & setters
-	//
-
-	public set mXYZ(mXYZ: Array<number[]>) {
-		this.mXYZCached = mXYZ;
-	}
-
-	public get mXYZ(): number[][] {
-		if (this.mXYZCached) return this.mXYZCached;
+	public getMatrixRGBToXYZ(): number[][] {
+		if (this.cachedMatrixRGBToXYZ) return this.cachedMatrixRGBToXYZ;
 
 		const colors = [this.primaries.white, this.primaries.red, this.primaries.green, this.primaries.blue];
 
-		const [Xw, Xr, Xg, Xb] = colors.map(u => u.x/u.y);
-		const [Zw, Zr, Zg, Zb] = colors.map(u => (1-u.x-u.y)/u.y);
+		const [Xw, Xr, Xg, Xb] = colors.map((u) => u.x / u.y);
+		const [Zw, Zr, Zg, Zb] = colors.map((u) => (1 - u.x - u.y) / u.y);
 
-		const [Sr, Sg, Sb] = mmult(minv([[Xr,Xg,Xb],[1,1,1],[Zr,Zg,Zb]]), [Xw, 1, Zw]);
-		let mXYZ = [[Sr*Xr,Sg*Xg,Sb*Xb],[Sr,Sg,Sb],[Sr*Zr,Sg*Zg,Sb*Zb]];
-		return this.mXYZ = mXYZ;
+		const [Sr, Sg, Sb] = mmult(
+			minv([
+				[Xr, Xg, Xb],
+				[1, 1, 1],
+				[Zr, Zg, Zb],
+			]),
+			[Xw, 1, Zw]
+		);
+		const mtxRGBToXYZ = [
+			[Sr * Xr, Sg * Xg, Sb * Xb],
+			[Sr, Sg, Sb],
+			[Sr * Zr, Sg * Zg, Sb * Zb],
+		];
+
+		return (this.cachedMatrixRGBToXYZ = mtxRGBToXYZ);
 	}
 
-	public set mRGB(mRGB: number[][]) {
-		this.mRGBCached = mRGB;
-	}
+	public getMatrixXYZToRGB(): number[][] {
+		if (this.cachedMatrixXYZToRGB) return this.cachedMatrixXYZToRGB;
 
-	public get mRGB(): number[][] {
-		if (this.mRGBCached) return this.mRGBCached;
-
-		//just get the inverse of mXYZ
-		return this.mRGBCached = minv(this.mXYZ);
-	}
-
-	public get whiteLevel() {
-		return this.primaries.white.Y;
-	}
-
-	public set whiteLevel(value: number) {
-		this.primaries.white.Y = value;
-	}
-
-	public get blackLevel() {
-		return this.primaries.black.Y;
-	}
-
-	public set blackLevel(value: number) {
-		this.primaries.black.Y = value;
+		return (this.cachedMatrixXYZToRGB = minv(this.getMatrixRGBToXYZ()));
 	}
 
 	/**
 	 * Member methods
 	 */
 
-	public options(newProps: { [P in keyof ColorGamut]?: ColorGamut[P] }) {
+	public props(newProps: { [P in keyof ColorGamut]?: ColorGamut[P] }) {
 		const newGamut = new ColorGamut({
-			white: { ...this.primaries.white },
-			red: { ...this.primaries.red },
-			green: { ...this.primaries.green },
-			blue: { ...this.primaries.blue },
-			black: { ...this.primaries.black }
+			name: `${this.name} (copy)`,
+			primaries: {
+				white: { ...this.primaries.white },
+				red: { ...this.primaries.red },
+				green: { ...this.primaries.green },
+				blue: { ...this.primaries.blue },
+				black: { ...this.primaries.black },
+			},
 		});
-		
+
 		Object.assign(newGamut, { ...newProps });
 		return newGamut;
 	}
 
-	public register(nameList: string[]): void;
-	public register(name: string): void;
-	public register(arg1: string | string[]): void {
-		if (Array.isArray(arg1)) {
-			for (const name of arg1) {
-				ColorGamut.named[name] = this;
-			}
-		} else {
-			ColorGamut.named[arg1] = this;
-		}
-	}
-	
+	/**
+	 * Static
+	 */
+	public static named = {} as ColorGamutNamedMap & Record<string, ColorGamut>;
 }
-
-interface xyY {
-	x: number;
-	y: number;
-	Y: number;
-}
-type xy = Omit<xyY, 'Y'>;
 
 interface ColorGamutPrimaries {
-	white: xyY;
+	white: xy;
 	red: xy;
 	green: xy;
 	blue: xy;
-	black: xyY;
+	black: xy;
 }
 
-export interface ColorGamutNamedMap { };
+//export interface ColorGamutNamedMap {}
 export type ColorGamutName = keyof ColorGamutNamedMap | (string & Record<never, never>);
-type ColorGamutNamedMapType = ColorGamutNamedMap & { [k: string]: ColorGamut };
 
-export const gamuts = ColorGamut.named as ColorGamutNamedMapType;
-
-export { ColorGamut, ColorGamutPrimaries };
+export const gamuts = ColorGamut.named;

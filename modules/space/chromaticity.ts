@@ -1,34 +1,21 @@
-import { ColorSpace } from "../space";
+import { ColorSpace, ColorSpaceConstructorProps } from '../space.js';
 
-class ChromaticitySpace extends ColorSpace {
-	public name: string = 'Chromaticity ColorSpace';
-	public key: string[] = ['a', 'b'];
-
-	constructor() {
-		super();
+export class ChromaticitySpace extends ColorSpace {
+	constructor({ name = 'Chromaticity ColorSpace', keys = ['a', 'b'], ...props }: ColorSpaceConstructorProps) {
+		super({ name, keys, ...props });
 	}
 
-	public register(nameList: string[]): void;
-	public register(name: string): void;
-	public register(arg1: string | string[]): void {
-		const strings = typeof arg1 === 'string'? [arg1] : arg1;
-		
-		super.register(strings);
-		for (const name of strings) {
-			ChromaticitySpace.named[name] = this;
-		}
-	}
+	/**
+	 * Static
+	 */
+	public static named = {} as ChromaticitySpaceNamedMap & Record<string, ChromaticitySpace>;
 }
 
-
-export interface ChromaticitySpaceNamedMap { }
+export interface ChromaticitySpaceNamedMap {}
 export type ChromaticitySpaceName = keyof ChromaticitySpaceNamedMap | (string & Record<never, never>);
 
 declare module '../space' {
 	interface ColorSpaceNamedMap extends ChromaticitySpaceNamedMap {}
 }
 
-type ChromaticitySpaceNamedMapType = ChromaticitySpaceNamedMap & { [k: string]: ChromaticitySpace };
-export const chromaticitySpaces = ChromaticitySpace.named as ChromaticitySpaceNamedMapType;
-
-export { ChromaticitySpace };
+export const chromaticitySpaces = ChromaticitySpace.named;

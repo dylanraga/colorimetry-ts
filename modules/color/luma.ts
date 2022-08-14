@@ -2,20 +2,20 @@
  * Color luma module
  */
 
-import { Color } from "../color";
-import { RGBSpace } from "../../colorimetry";
+import { Color } from '../color.js';
+import { RGBLinearSpace } from '../space/rgb-linear.js';
+import { RGBLINEARSPACE_SRGB } from '../space/rgb-linear/predefined.js';
 
-function getLuma(color: Color, rgbSpace: RGBSpace) {
-	const [yr, yg, yb] = rgbSpace.gamut.mXYZ[1];
+function getLuma(color: Color, rgbSpace: RGBLinearSpace) {
+	const [yr, yg, yb] = rgbSpace.gamut.getMatrixRGBToXYZ()[1];
 	const [r, g, b] = color.get(rgbSpace);
-	const luma = r*yr + g*yg + b*yb;
+	const luma = r * yr + g * yg + b * yb;
 	return luma;
 }
 
-function _getLuma(this: Color, rgbSpace: Parameters<typeof getLuma>['1'] = RGBSpace.defaultSpace) {
+function _getLuma(this: Color, rgbSpace: RGBLinearSpace = RGBLINEARSPACE_SRGB) {
 	return getLuma(this, rgbSpace);
 }
-
 
 declare module '../color' {
 	interface Color {

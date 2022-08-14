@@ -2,17 +2,18 @@
  * Defaults
  */
 
+/*
 import { ColorSpace } from "./space";
 
 import { XYZSpace } from "./space/xyz";
 import { XYZSPACE_D65 } from "./space/xyz.standard";
 XYZSpace.defaultSpace = XYZSPACE_D65;
-Object.defineProperty(ColorSpace.named, "XYZ", { get: () => XYZSpace.defaultSpace });
+XYZSpace.register(XYZSpace.defaultSpace, 'XYZ');
 
 import { RGBSpace } from "./space/rgb";
 import { RGBSPACE_SRGB } from './space/rgb.standard';
 RGBSpace.defaultSpace = RGBSPACE_SRGB;
-Object.defineProperty(ColorSpace.named, "RGB", { get: () => RGBSpace.defaultSpace });
+RGBSpace.register(RGBSpace.defaultSpace, 'RGB');
 
 declare module './space' {
 	interface ColorSpaceNamedMap {
@@ -20,3 +21,4 @@ declare module './space' {
 		RGB: typeof RGBSpace.defaultSpace;
 	}
 }
+*/

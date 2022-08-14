@@ -1,43 +1,43 @@
-/*===========================*/
-/* Tone Response Curve Class */
-/*===========================*/
+import { Registerable, RegisterableConstructorProps } from './registerable.js';
 
-class ToneResponse<Options = ToneResponseDefaultOptions> {
-	public static named: { [k: string]: ToneResponse<any> } = {};
-
-	constructor(
-		public eotf: TransferFunction<Options>,
-		public invEotf: TransferFunction<Options>
-	) { }
-
-	/*
-	 *	Member methods
-	 */
-
-	public options(newOptions: Options): ToneResponse<Options> {
-		return new ToneResponse((V,o) => this.eotf(V, {...newOptions, ...o}), (L,o) => this.invEotf(L, {...newOptions, ...o}));
-	}
-
-	public register(nameList: string[]): void;
-	public register(name: string): void;
-	public register(arg1: string | string[]): void {
-		const strings = typeof arg1 === 'string'? [arg1] : arg1;
-		
-		for (const name of strings) {
-			ToneResponse.named[name] = this;
-		}
-	}
-
+interface ToneResponseConstructorProps<P = unknown> extends RegisterableConstructorProps {
+	eotf: ElectroOpticalTransferFunction<P>;
+	invEotf: ElectroOpticalInverseTransferFunction<P>;
 }
 
+export class ToneResponse<P = unknown> extends Registerable {
+	public readonly eotf: ElectroOpticalTransferFunction<P>;
+	public readonly invEotf: ElectroOpticalInverseTransferFunction<P>;
 
-type TransferFunction<Options> = (u: number, options?: Options) => number;
-interface ToneResponseDefaultOptions { whiteLevel?: number, blackLevel?: number };
+	constructor({ name = 'Unnamed ToneResponse', eotf, invEotf, ...props }: ToneResponseConstructorProps<P>) {
+		super({ name, ...props });
+		this.eotf = eotf;
+		this.invEotf = invEotf;
+	}
 
-export interface ToneResponseNamedMap { };
+	public props(
+		newTransferProps: Partial<P>,
+		newClassProps?: Partial<ToneResponseConstructorProps<P>>
+	): ToneResponse<P> {
+		return new ToneResponse<P>({
+			name: `${this.name} (copy)`,
+			eotf: (V, p) => this.eotf(V, { ...newTransferProps, ...p }),
+			invEotf: (L, p) => this.invEotf(L, { ...newTransferProps, ...p }),
+			...newClassProps,
+		});
+	}
+
+	/**
+	 * Static
+	 */
+	public static named = {} as ToneResponseNamedMap & Record<string, ToneResponse<unknown>>;
+}
+
+type ElectroOpticalTransferFunction<P = unknown> = (signalValue: number, props?: Partial<P>) => number;
+
+type ElectroOpticalInverseTransferFunction<P = unknown> = (luminanceValue: number, props?: Partial<P>) => number;
+
+//export interface ToneResponseNamedMap { };
 export type ToneResponseName = keyof ToneResponseNamedMap | (string & Record<never, never>);
-type ToneResponseNamedMapType = ToneResponseNamedMap & { [k: string]: ToneResponse<any> };
 
-export const curves = ToneResponse.named as ToneResponseNamedMapType;
-
-export { ToneResponse };
+export const curves = ToneResponse.named;

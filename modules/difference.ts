@@ -2,61 +2,77 @@
 /* Color Difference methods */
 /*==========================*/
 
-import { Color } from "./color";
-import { DE_ITP } from "./difference/deitp";
+import { Color } from './color.js';
+import { DE_ITP } from './difference/deitp.js';
 
-export type DEMethod<Options = {}> = (colorA: Color, colorB: Color, options: Options) => number;
+export type ColorDifferenceMethod<P = Record<string, unknown>> = (colorA: Color, colorB: Color, props: P) => number;
+
+type ColorDifferenceMethodName = keyof ColorDifferenceMethodNamedMap | (string & Record<never, never>);
+type ColorDifferenceMethodProps<T> = T extends ColorDifferenceMethod<infer P> ? P : Record<string, unknown>;
+type ColorDifferenceMethodTypeMethod<T> = T extends ColorDifferenceMethod
+	? T
+	: T extends string
+	? T extends keyof ColorDifferenceMethodNamedMap
+		? ColorDifferenceMethodNamedMap[T]
+		: unknown
+	: unknown;
+type ColorDifferenceMethodType = ColorDifferenceMethod | ColorDifferenceMethodName;
 
 /**
- * Calculates Delta E between two Colors depending on method
+ * Calculates DeltaE between two Colors depending on the method
  */
-function getDifference(colorA: Color, colorB: Color, options: {[k: string]: any} = {}) {
-	const { method = DE_ITP } = options;
-	return method(colorA, colorB, options);
+function getDifference<T extends ColorDifferenceMethodType>(
+	colorA: Color,
+	colorB: Color,
+	method = DE_ITP as T,
+	props = {} as ColorDifferenceMethodProps<ColorDifferenceMethodTypeMethod<T>>
+) {
+	const _method = typeof method === 'string' ? deMethods[method] : (method as ColorDifferenceMethod);
+	return _method(colorA, colorB, props);
 }
 
-/**
- * Member method for getDifference
- */
-function _getDifference(this: Color, colorB: Color, options: Parameters<typeof getDifference>['2'] = {}) {
-	getDifference(this, colorB, options);
+function _getDifference<T extends ColorDifferenceMethodType>(
+	this: Color,
+	colorB: Color,
+	method = DE_ITP as T,
+	props = {} as ColorDifferenceMethodProps<ColorDifferenceMethodTypeMethod<T>>
+) {
+	getDifference(this, colorB, method, props);
 }
 
 declare module './color' {
 	interface ColorConstructor {
-		dE: ReturnType<typeof getDifference>;
+		dE: typeof getDifference;
 	}
 	interface Color {
-		dE: ReturnType<typeof _getDifference>;
-	}	
+		dE: typeof _getDifference;
+	}
 }
 
 Object.defineProperty(Color, 'dE', getDifference);
 Object.defineProperty(Color.prototype, 'dE', _getDifference);
 
-
-
-
-
-
-export const DE_UV: DEMethod = (colorA, colorB, options = {}) => {
+/*
+export const DE_UV: DEMethod = (colorA, colorB) => {
 	const [u1, v1]: number[] = colorA.get('uv');
 	const [u2, v2]: number[] = colorB.get('uv');
 
-	const du = u1-u2;
-	const dv = v1-v2;
+	const du = u1 - u2;
+	const dv = v1 - v2;
 
-	const dEuv: number = Math.sqrt( du*du + dv*dv );
+	const dEuv: number = Math.sqrt(du * du + dv * dv);
 	return dEuv;
 };
 
-export const DE_XY: DEMethod = (colorA, colorB, options = {}) => {
+export const DE_XY: DEMethod = (colorA, colorB) => {
 	const [x1, y1]: number[] = colorA.get('xy');
 	const [x2, y2]: number[] = colorB.get('xy');
 
-	const dx = x1-x2;
-	const dy = y1-y2;
+	const dx = x1 - x2;
+	const dy = y1 - y2;
 
-	const dEuv: number = Math.sqrt( dx*dx + dy*dy );
+	const dEuv: number = Math.sqrt(dx * dx + dy * dy);
 	return dEuv;
 };
+*/
+export const deMethods = {} as ColorDifferenceMethodNamedMap & Record<string, ColorDifferenceMethod>;

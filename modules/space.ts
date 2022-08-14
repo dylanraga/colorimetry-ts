@@ -1,88 +1,177 @@
-import { bfsPath } from "./common/util";
+import { bfsPath } from './common/util.js';
+import { Registerable, RegisterableConstructorProps } from './registerable.js';
 
-type ColorSpaceConversionFunction<Props = {}> = (values: number[], props: Props) => number[];
-
-interface ColorSpaceConversion {
-	space: ColorSpace;
-	fn: ColorSpaceConversionFunction<any>
+export interface ColorSpaceConstructorProps extends RegisterableConstructorProps {
+	keys?: string[];
+	conversions?: ColorSpaceConversion[];
+	convertingProps?: ColorSpaceConvertingProps;
+	precision?: number;
 }
 
-abstract class ColorSpace {
-	public name: string = 'Unnamed ColorSpace';
-	public keys: string[] = [];
-	public conversions: ColorSpaceConversion[] = [];
-	public static defaultSpace: ColorSpace;
-	public static named: { [k: string]: ColorSpace } = {};
+export abstract class ColorSpace extends Registerable {
+	public readonly keys: string[];
+	public readonly precision;
+	public readonly convertingProps?: ColorSpaceConvertingProps;
+	private readonly conversionMap = new Map<ColorSpace, ColorSpaceConversionDescription>();
 
-	public static getSpaceByName(spaceName: ColorSpaceName) {
-		const spaceString = (spaceName as string).toUpperCase();
-		if (this.named.hasOwnProperty(spaceString))
-			return this.named[spaceString];
-		else
-			throw new ReferenceError(`ColorSpace '${spaceString}' does not exist`);
+	constructor({
+		name = 'Unnamed ColorSpace',
+		keys = ['a', 'b', 'c'],
+		conversions = [],
+		convertingProps = {},
+		precision = 15,
+		...props
+	}: ColorSpaceConstructorProps) {
+		super({ name, ...props });
+		this.keys = keys;
+		this.precision = precision;
+		this.convertingProps = convertingProps;
+		for (const csc of conversions) {
+			this.addConversion(csc);
+		}
 	}
 
-	private getExistingConversionBySpace(dstSpace: ColorSpace | (() => ColorSpace)) {
-		return this.conversions.find(s => s.space === dstSpace);
+	public addConversion({ space: spaceB, toFn, fromFn }: ColorSpaceConversion) {
+		if (typeof spaceB === 'string') spaceB = ColorSpace.getSpaceById(spaceB);
+		this.conversionMap.set(spaceB, { path: [this, spaceB], fn: toFn });
+		spaceB.conversionMap.set(this, { path: [spaceB, this], fn: fromFn });
 	}
-
-	public addConversion<Props = {}>(spaceB: ColorSpace, toFn: ColorSpaceConversionFunction<Props>, fromFn: ColorSpaceConversionFunction<Props>) {
-		this.conversions.push({
-			space: spaceB,
-			fn: toFn
-		});
-
-		spaceB.conversions.push({
-			space: this,
-			fn: fromFn
-		});
+	public hasConversionToSpace(dstSpace: ColorSpace | ColorSpaceName) {
+		if (typeof dstSpace === 'string') dstSpace = ColorSpace.getSpaceById(dstSpace);
+		return this.conversionMap.has(dstSpace);
 	}
 
 	/**
-	 * Gets color space conversion function to transform current `ColorSpace` data into `dstSpace`.
+	 * Gets color space conversion function to transform current `ColorSpace` values into `dstSpace`.
 	 * Retrieves conversion from pre-defined `conversions` property, else find a path via BFS
 	 * and add it to its `conversions` if a path exists.
-	 * @param dstSpace Destination color space
-	 * @returns Function composition to transform source space into new color space
+	 * @param dstSpace Destination `ColorSpace` or `ColorSpaceName`
+	 * @returns Function composition transforming source space into the destination color space
 	 */
-	public getConversionBySpace(dstSpace: ColorSpace): ColorSpaceConversionFunction {
-		let conversion = this.getExistingConversionBySpace(dstSpace)?.fn;
+	public getConversionBySpace(dstSpace: ColorSpace | ColorSpaceName): ColorSpaceConvertingFunction {
+		if (typeof dstSpace === 'string') dstSpace = ColorSpace.getSpaceById(dstSpace);
+		return ColorSpace.getConversion(this, dstSpace);
+	}
 
+	/**
+	 * Static
+	 */
+	public static named = {} as Record<string, ColorSpace>;
+
+	/**
+	 * Returns a named `ColorSpace` by its registered id
+	 * @param spaceId Registered id of the `ColorSpace`
+	 */
+	public static getSpaceById(spaceId: ColorSpaceName) {
+		const spaceString = (spaceId as string).toLowerCase();
+		if (Object.hasOwn(this.named, spaceString)) return this.named[spaceString];
+		else throw new ReferenceError(`ColorSpace '${spaceString}' does not exist`);
+	}
+
+	/**
+	 * Gets color space conversion function to transform current `ColorSpace` values into `dstSpace`.
+	 * Retrieves conversion from pre-defined `conversions` property, else find a path via BFS
+	 * and add it to its `conversions` if a path exists.
+	 * @param srcSpace Source `ColorSpace` or `ColorSpaceName`
+	 * @param dstSpace Destination `ColorSpace` or `ColorSpaceName`
+	 * @returns Function composition transforming source space into the destination color space
+	 */
+	public static getConversion(srcSpace: ColorSpace | ColorSpaceName, dstSpace: ColorSpace | ColorSpaceName) {
+		const _srcSpace = typeof srcSpace === 'string' ? ColorSpace.getSpaceById(srcSpace) : srcSpace;
+		const _dstSpace = typeof dstSpace === 'string' ? ColorSpace.getSpaceById(dstSpace) : dstSpace;
+
+		let conversion = _srcSpace.conversionMap.get(_dstSpace)?.fn;
+
+		//let precisionMin = _dstSpace.precision > _srcSpace.precision ? _srcSpace.precision : _dstSpace.precision;
 		if (!conversion) {
-			let path = bfsPath(this, dstSpace, curr => curr.conversions.map(s => s.space) );
-			if (path) {
-				const fnList: Array<ColorSpaceConversionFunction> = [];
-				for (let i = 0; i < path.length-1; i++) {
-					const fn = path[i].getExistingConversionBySpace(path[i+1])!.fn;
-					fnList.push(fn);
-				}
-				const fnComp: ColorSpaceConversionFunction = (data, o) =>
-					fnList.reduce((a, b) => b!(a, o), data);
+			const path = bfsPath(_srcSpace, _dstSpace, (curr) =>
+				// Consider only direct paths (path length 2 => [spaceA, spaceB])
+				[...curr.conversionMap.keys()].filter((s) => curr.conversionMap.get(s)?.path.length == 2)
+			);
+			if (!path) throw new Error(`No conversion path found from ${this.name} to ${_dstSpace.name}`);
 
-				this.conversions.push({ space: dstSpace, fn: fnComp });
-				conversion = fnComp;
-				//console.log(`Added path to map: [${path.map(u => u.name).join(' => ')}]`);
-			} else throw new Error(`No conversion path found from ${this.name} to ${dstSpace.name}`);
+			const fnList: Array<ColorSpaceConvertingFunction> = [];
+			for (let i = 0; i < path.length - 1; i++) {
+				fnList.push(path[i].getConversionBySpace(path[i + 1]));
+				//if (path[i].precision < precisionMin) precisionMin = path[i].precision;
+			}
+
+			conversion = composeFnList(fnList, {
+				rgbWhiteLevel: _srcSpace.convertingProps?.rgbWhiteLevel,
+				rgbBlackLevel: _srcSpace.convertingProps?.rgbBlackLevel,
+			});
+			_srcSpace.conversionMap.set(_dstSpace, { path, fn: conversion });
+
+			// Add conversions for every color space along the path towards destination
+			for (let i = 0; i < path.length - 2; i++) {
+				path[i].conversionMap.set(_dstSpace, {
+					path,
+					fn: composeFnList(fnList.slice(i), {
+						rgbWhiteLevel: _srcSpace.convertingProps?.rgbWhiteLevel,
+						rgbBlackLevel: _srcSpace.convertingProps?.rgbBlackLevel,
+					}),
+				});
+			}
+			//console.log(`Added path to map: [${path.map((u) => u.name).join(' → ')}]`);
 		}
+
+		//const conversionWithPrecision: ColorSpaceConvertingFunction = (values, props) =>
+		//	(conversion as ColorSpaceConvertingFunction)(values, props).map((u) => Number(u.toFixed(precisionMin)));
+
 		return conversion;
 	}
-
-	public register(nameList: string[]): void;
-	public register(name: string): void;
-	public register(arg1: string | string[]): void {
-		const strings = typeof arg1 === 'string'? [arg1] : arg1;
-		
-		for (const name of strings) {
-			ColorSpace.named[name] = this;
-		}
-	}
-
 }
 
+function composeFnList(
+	fnList: ColorSpaceConvertingFunction[],
+	{ ...defaultProps }: ColorSpaceConvertingProps = {}
+): ColorSpaceConvertingFunction {
+	return (values, { ...props } = {}) => fnList.reduce((a, b) => b(a, { ...defaultProps, ...props }), values);
+}
 
-export interface ColorSpaceNamedMap { }
+interface ColorSpaceConversionDescription {
+	path: ColorSpace[];
+	fn: ColorSpaceConvertingFunction;
+}
+
+export interface ColorSpaceConversion {
+	space: ColorSpace | ColorSpaceName;
+	toFn: ColorSpaceConvertingFunction;
+	fromFn: ColorSpaceConvertingFunction;
+}
+
+export interface ColorSpaceConvertingProps {
+	rgbWhiteLevel?: number;
+	rgbBlackLevel?: number;
+	refWhiteLevel?: number;
+	refBlackLevel?: number;
+}
+
+export type ColorSpaceConvertingFunction = (values: number[], props?: ColorSpaceConvertingProps) => number[];
+
+/*
+export type SomeColorSpaceConversion = <R>(cb: <T extends AnyObj>(c: ColorSpaceConversion<T>) => R) => R;
+
+export const wrappedColorSpaceConversion =
+	<T extends AnyObj>(c: ColorSpaceConversion<T>): SomeColorSpaceConversion =>
+	(cb) =>
+		cb(c);
+*/
+
+export interface ColorSpaceNamedMap {}
 export type ColorSpaceName = keyof ColorSpaceNamedMap | (string & Record<never, never>);
 
-export const spaces = ColorSpace.named as { [P in keyof ColorSpaceNamedMap]: ColorSpaceNamedMap[P] };
+export const spaces = ColorSpace.named as ColorSpaceNamedMap & Record<string, ColorSpace>;
 
-export { ColorSpace };
+/*
+export type ColorSpaceTypeColorSpace<T> = T extends ColorSpace
+	? T
+	: T extends string
+	? Uppercase<T> extends keyof ColorSpaceNamedMap
+		? ColorSpaceNamedMap[Uppercase<T>]
+		: ColorSpace
+	: unknown;
+export type ColorSpaceProps<T> = T extends ColorSpace<infer R> ? R : unknown;
+//export type ColorSpaceNameProps<T extends string> = Uppercase<T> extends keyof ColorSpaceNamedMap? ColorSpaceProps<ColorSpaceNamedMap[Uppercase<T>]> : unknown;
+export type ColorSpaceTypeProps<T> = ColorSpaceProps<ColorSpaceTypeColorSpace<T>>;
+*/

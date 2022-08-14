@@ -1,18 +1,16 @@
 /**
  * Color luminance module
  */
-
-import { Color } from "../color";
-import { XYZSpace } from "../../colorimetry";
+import { Color } from '../color.js';
+import { XYZSPACE_D65 } from '../space/xyz/predefined.js';
 
 function getLuminance(color: Color) {
-	return color.get(XYZSpace.defaultSpace)[1];
+	return color.get(XYZSPACE_D65)[1];
 }
 
 function _getLuminance(this: Color) {
 	return getLuminance(this);
 }
-
 
 declare module '../color' {
 	interface Color {

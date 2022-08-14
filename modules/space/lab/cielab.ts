@@ -1,68 +1,55 @@
 /**
- * CIELAB conversion functions.
+ * CIELAB definitions and conversions
  * ----------------------------
  * Use illuminant D50 since CIELAB was intended for reflective surfaces, not emissive/transmissive displays.
  * Currently using "wrong" Von Kries/XYZ scaling per spec; consider implementing manual Bradford CAT option in the future
  */
+import { ILLUMINANT_D50 } from '../../illuminants/predefined.js';
+import { TRC_LSTAR } from '../../trc/lstar.js';
+import { LabSpace } from '../lab.js';
+import { XYZSPACE_D65_NORMALIZED } from '../xyz/predefined.js';
 
-import { LabSpace } from '../lab';
-import { illuminants } from '../../illuminants';
-import { XYZSPACE_D65 } from '../xyz.standard';
-
-interface xy { x: number, y: number }
-
-const LABSPACE_CIELAB = new LabSpace();
-LABSPACE_CIELAB.name = 'CIELab';
-LABSPACE_CIELAB.keys = ['L', 'a', 'b'];
-
-LABSPACE_CIELAB.addConversion<{ whiteLevel: number, white: xy }>(XYZSPACE_D65,
-	(Lab: number[], { white, whiteLevel }) => {
-		let XYZ = CIELAB_to_XYZ(Lab, { whiteLevel, white });
-		return XYZ;
+export const LABSPACE_CIELAB = new LabSpace({
+	id: 'lab',
+	name: 'CIELab 1931',
+	keys: ['L', 'a', 'b'],
+	conversions: [
+		{
+			space: XYZSPACE_D65_NORMALIZED.cat(ILLUMINANT_D50, 'xyz'),
+			toFn: CIELab_to_XnYnZn,
+			fromFn: XnYnZn_to_CIELab,
+		},
+	],
+	convertingProps: {
+		rgbWhiteLevel: 100,
+		rgbBlackLevel: 0,
 	},
-	(XYZ: number[], { white, whiteLevel }) => {
-		let Lab = XYZ_to_CIELAB(XYZ, { whiteLevel, white });
-		return Lab;
-	}
-);
-LABSPACE_CIELAB.register('LAB');
+});
 
 declare module '../lab' {
 	interface LabSpaceNamedMap {
-		LAB: LabSpace;
+		lab: typeof LABSPACE_CIELAB;
 	}
 }
 
 /**
  * CIELAB <-> XYZ conversion functions
  */
-const ϵ = 216/24389;
-const κ = 24389/27;
+export function XnYnZn_to_CIELab([Xn, Yn, Zn]: number[]) {
+	const f = (x: number) => (100 * TRC_LSTAR.invEotf(x) + 16) / 116;
+	const L = 116 * f(Yn) - 16;
+	const a = 500 * (f(Xn) - f(Yn));
+	const b = 200 * (f(Yn) - f(Zn));
 
-function XYZ_to_CIELAB([X, Y, Z]: number[], { whiteLevel = 100, white = illuminants.D50 }: { whiteLevel: number, white: xy}): number[] {
-	let [Xn, Zn] = [white.x*whiteLevel/white.y, (1-white.x-white.y)*whiteLevel/white.y];
-	let d = 6/29;
-	let f = (x: number) => (x > d*d*d)? x**(1/3) : x/(3*d*d) + (4/29);
-	//let L = 100 * ToneResponse.LSTAR.oetf(Y);
-	let L = 116 * f(Y/whiteLevel) - 16;
-	let a = 500 * (f(X/Xn) - f(Y/whiteLevel));
-	let b = 200 * (f(Y/whiteLevel) - f(Z/Zn));
 	return [L, a, b];
 }
 
-function CIELAB_to_XYZ([L, a, b]: number[], { whiteLevel = 100, white = illuminants.D50 }: { whiteLevel: number, white: xy}): number[] {
-	let [Xn, Zn] = [white.x*whiteLevel/white.y, (1-white.x-white.y)*whiteLevel/white.y];
-	
-	let d = 6/29
-	let f = (x: number) => (x > d)? x*x*x : 3*d*d*(x - 4/29);
-	let Lp = (L+16) / 116;
+export function CIELab_to_XnYnZn([L, a, b]: number[]) {
+	const fInv = (x: number) => TRC_LSTAR.eotf((116 * x - 16) / 100);
+	const Lp = (L + 16) / 116;
+	const Xn = fInv(Lp + a / 500);
+	const Yn = fInv(Lp);
+	const Zn = fInv(Lp - b / 200);
 
-	let X = Xn * f(Lp + a/500);
-	let Y = whiteLevel * f(Lp);
-	let Z = Zn * f(Lp - b/200);
-
-	return [X, Y, Z];
+	return [Xn, Yn, Zn];
 }
-
-
-export { LABSPACE_CIELAB, XYZ_to_CIELAB, CIELAB_to_XYZ };

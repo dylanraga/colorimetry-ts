@@ -1,61 +1,55 @@
-import { illuminants } from "../../illuminants";
-import { curves } from "../../trc";
-import { uv_to_XYZ, XYZ_to_uv, xy_to_uv } from "../chromaticity/uv";
-import { LabSpace } from "../lab";
-import { XYZSPACE_D65 } from "../xyz.standard";
+/**
+ * CIELuv definitions and conversions
+ */
+import { ILLUMINANT_D65 } from '../../illuminants/predefined.js';
+import { TRC_LSTAR } from '../../trc/lstar.js';
+import { uv_to_XnYnZn, XYZ_to_uv, xy_to_uv } from '../chromaticity/uv.js';
+import { LabSpace } from '../lab.js';
+import { XYZSPACE_D65_NORMALIZED } from '../xyz/predefined.js';
 
-interface xy { x: number, y: number }
-
-/* CIELUV */
-export const LABSPACE_CIELUV = new LabSpace();
-LABSPACE_CIELUV.name = 'CIELUV';
-LABSPACE_CIELUV.keys = ['L', 'U', 'V'];
-
-LABSPACE_CIELUV.addConversion<{ whiteLevel: number, white: xy }>(XYZSPACE_D65,
-	//CIELUV -> XYZ
-	(LUV: number[], { whiteLevel, white }) => {
-		let XYZ = LUV_to_XYZ(LUV, { whiteLevel, white });
-		return XYZ;
+export const LABSPACE_CIELUV = new LabSpace({
+	id: 'luv',
+	name: 'CIELuv 1976',
+	keys: ['L', 'u', 'v'],
+	conversions: [
+		{
+			space: XYZSPACE_D65_NORMALIZED,
+			toFn: CIELuv_to_XnYnZn,
+			fromFn: XnYnZn_to_CIELuv,
+		},
+	],
+	convertingProps: {
+		rgbWhiteLevel: 100,
+		rgbBlackLevel: 0,
 	},
-	//XYZ -> CIELUV
-	(XYZ: number[], { whiteLevel, white }) => {
-		let LUV = XYZ_to_LUV(XYZ, { whiteLevel, white });
-		return LUV;
-	}
-);
-
-LABSPACE_CIELUV.register('LUV');
+});
 
 declare module '../lab' {
 	interface LabSpaceNamedMap {
-		LUV: LabSpace;
+		luv: typeof LABSPACE_CIELUV;
 	}
 }
-
 
 /*
  * CIELUV/u'v' <-> XYZ conversions
  */
+const CIELUV_REFERENCE_ILLUMINANT = ILLUMINANT_D65;
+const [ur, vr] = xy_to_uv([CIELUV_REFERENCE_ILLUMINANT.x, CIELUV_REFERENCE_ILLUMINANT.y]);
 
-function XYZ_to_LUV([X, Y, Z]: number[], { whiteLevel = 100, white = illuminants.D65 }: { whiteLevel: number, white: xy}): number[] {
-	let [u, v] = XYZ_to_uv([X, Y, Z]);
-	let [un, vn] = xy_to_uv([white.x, white.y]);
-	let L = curves.LSTAR.invEotf(Y, { whiteLevel });
-	let U = 13*L * (u-un);
-	let V = 13*L * (v-vn);
-
+export function XnYnZn_to_CIELuv(XnYnZn: number[]) {
+	const [u, v] = XYZ_to_uv(XnYnZn);
+	const L = 100 * TRC_LSTAR.invEotf(XnYnZn[1]);
+	const U = 13 * L * (u - ur);
+	const V = 13 * L * (v - vr);
 
 	return [L, U, V];
 }
 
-function LUV_to_XYZ([L, U, V]: number[], { whiteLevel = 100, white = illuminants.D65 }: { whiteLevel: number, white: xy}): number[] {
-	let Y = curves.LSTAR.eotf(L, { whiteLevel });
-	let [un, vn] = xy_to_uv([white.x, white.y]);
-	let u = U/(13*L) + un;
-	let v = V/(13*L) + vn;
-	let [X,, Z] = uv_to_XYZ([u, v], { Y });
+export function CIELuv_to_XnYnZn([L, U, V]: number[]) {
+	const u = U / (13 * L) + ur;
+	const v = V / (13 * L) + vr;
+	const Yn = TRC_LSTAR.eotf(L / 100);
+	const [Xn, , Zn] = uv_to_XnYnZn([u, v], { refWhiteLevel: Yn });
 
-	return [X, Y, Z];
+	return [Xn, Yn, Zn];
 }
-
-export { LUV_to_XYZ, XYZ_to_LUV };

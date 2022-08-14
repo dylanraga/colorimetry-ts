@@ -1,7 +1,7 @@
-import { DEMethod } from "../difference";
-import { LABSPACE_ITP } from "../space/lab/ictcp";
+import { ColorDifferenceMethod } from '../difference.js';
+import { LABSPACE_ITP } from '../space/lab/ictcp.js';
 
-export const DE_ITP: DEMethod<{
+export const DE_ITP: ColorDifferenceMethod<{
 	excludeLuminance?: boolean;
 	scalar?: 240 | 720 | 1440;
 }> = (colorA, colorB, options = {}) => {
@@ -9,10 +9,16 @@ export const DE_ITP: DEMethod<{
 	const [I1, T1, P1]: number[] = colorA.get(LABSPACE_ITP);
 	const [I2, T2, P2]: number[] = colorB.get(LABSPACE_ITP);
 
-	const dI = I1-I2;
-	const dT = T1-T2;
-	const dP = P1-P2;
-	
-	const dEITP = scalar * Math.sqrt( (!excludeLuminance? dI*dI : 0) + dT*dT + dP*dP );
+	const dI = I1 - I2;
+	const dT = T1 - T2;
+	const dP = P1 - P2;
+
+	const dEITP = scalar * Math.sqrt((!excludeLuminance ? dI * dI : 0) + dT * dT + dP * dP);
 	return dEITP;
+};
+
+declare module '../difference' {
+	interface ColorDifferenceMethodNamedMap {
+		deitp: typeof DE_ITP;
+	}
 }
