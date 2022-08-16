@@ -4,24 +4,24 @@ import { Yxy, Yxy_to_XYZ } from './space/lab/cieyxy.js';
 
 export type ChromaticAdaptationMethodName = 'xyz' | 'vonkries' | 'bradford' | 'cat02' | 'cat16';
 
-//Von Kries
+// Von Kries
 export const mVonKries = [
 	[0.40024, 0.7076, -0.08081],
 	[-0.2263, 1.16532, 0.0457],
 	[0.0, 0.0, 0.91822],
 ];
 
-//Bradford
+// Bradford
 export const mBradford = [
 	[0.8951, 0.2664, -0.1614],
 	[-0.7502, 1.7135, 0.0367],
 	[0.0389, -0.0685, 1.0296],
 ];
 
-//CAT02
+// CAT02
 //----
 
-//CAT16
+// CAT16
 //----
 
 const catMethodMtxMap: Record<string, number[][]> = {

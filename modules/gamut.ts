@@ -69,9 +69,9 @@ export class ColorGamut extends Registerable {
 				blue: { ...this.primaries.blue },
 				black: { ...this.primaries.black },
 			},
+			...newProps,
 		});
 
-		Object.assign(newGamut, { ...newProps });
 		return newGamut;
 	}
 

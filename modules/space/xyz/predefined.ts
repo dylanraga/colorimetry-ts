@@ -14,39 +14,19 @@ export const XYZSPACE_D65_NORMALIZED = new XYZSpace({
 	name: 'XYZ Normalized D65',
 	keys: ['Xn', 'Yn', 'Zn'],
 	illuminant: ILLUMINANT_D65,
-	refWhiteLevel: XYZSPACE_D65.refWhiteLevel,
-	refBlackLevel: XYZSPACE_D65.refBlackLevel,
 	conversions: [
 		{
 			space: XYZSPACE_D65,
 			// Normalized XYZ -> Absolute XYZ
-			toFn: function (
-				this: XYZSpace,
-				[Xn, Yn, Zn],
-				{
-					rgbWhiteLevel,
-					rgbBlackLevel,
-					refWhiteLevel = rgbWhiteLevel ?? XYZSPACE_D65.refWhiteLevel,
-					refBlackLevel = rgbBlackLevel ?? XYZSPACE_D65.refBlackLevel,
-				} = {}
-			) {
-				const Y = (refWhiteLevel - refBlackLevel) * Yn + refBlackLevel;
+			toFn: function (this: XYZSpace, [Xn, Yn, Zn], { rgbWhiteLevel = 1, rgbBlackLevel = 0 } = {}) {
+				const Y = (rgbWhiteLevel - rgbBlackLevel) * Yn + rgbBlackLevel;
 				const X = (Y * Xn) / Yn;
 				const Z = (Y * Zn) / Yn;
 				return [X, Y, Z];
 			},
 			// Absolute XYZ -> Normalized XYZ
-			fromFn: function (
-				this: XYZSpace,
-				[X, Y, Z],
-				{
-					rgbWhiteLevel,
-					rgbBlackLevel,
-					refWhiteLevel = rgbWhiteLevel ?? XYZSPACE_D65.refWhiteLevel,
-					refBlackLevel = rgbBlackLevel ?? XYZSPACE_D65.refBlackLevel,
-				} = {}
-			) {
-				const Yn = (Y - refBlackLevel) / (refWhiteLevel - refBlackLevel);
+			fromFn: function (this: XYZSpace, [X, Y, Z], { rgbWhiteLevel = 1, rgbBlackLevel = 0 } = {}) {
+				const Yn = (Y - rgbBlackLevel) / (rgbWhiteLevel - rgbBlackLevel);
 				const Xn = (X * Yn) / Y;
 				const Zn = (Z * Yn) / Y;
 				return [Xn, Yn, Zn];

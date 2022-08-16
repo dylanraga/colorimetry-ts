@@ -21,8 +21,8 @@ export class ToneResponse<P = unknown> extends Registerable {
 	): ToneResponse<P> {
 		return new ToneResponse<P>({
 			name: `${this.name} (copy)`,
-			eotf: (V, p) => this.eotf(V, { ...newTransferProps, ...p }),
-			invEotf: (L, p) => this.invEotf(L, { ...newTransferProps, ...p }),
+			eotf: (V, props = {}) => this.eotf(V, Object.assign({ ...newTransferProps }, props)),
+			invEotf: (L, props = {}) => this.invEotf(L, Object.assign({ ...newTransferProps }, props)),
 			...newClassProps,
 		});
 	}
@@ -35,7 +35,10 @@ export class ToneResponse<P = unknown> extends Registerable {
 
 type ElectroOpticalTransferFunction<P = unknown> = (signalValue: number, props?: Partial<P>) => number;
 
-type ElectroOpticalInverseTransferFunction<P = unknown> = (luminanceValue: number, props?: Partial<P>) => number;
+type ElectroOpticalInverseTransferFunction<P = unknown> = (
+	luminanceValue: number,
+	props?: Partial<P>
+) => number;
 
 //export interface ToneResponseNamedMap { };
 export type ToneResponseName = keyof ToneResponseNamedMap | (string & Record<never, never>);

@@ -190,7 +190,7 @@ export function mmult3333(
 /**
  * Quantizes float value to n bits
  */
-export const quantizeToBits = (v: number, bitDepth = 8) => roundHTE((Math.pow(2, bitDepth) - 1) * v);
+export const quantizeToBits = (v: number, bitDepth = 8) => roundHTE(v * ((2 << (bitDepth - 1)) - 1));
 
 export const rad2deg = (x: number) => x * (180 / Math.PI);
 export const deg2rad = (x: number) => x * (Math.PI / 180);

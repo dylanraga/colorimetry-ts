@@ -10,27 +10,19 @@ export interface XYZ {
 
 interface XYZSpaceConstructorProps extends ColorSpaceConstructorProps {
 	illuminant: xy;
-	refWhiteLevel?: number;
-	refBlackLevel?: number;
 }
 
 class XYZSpace extends ColorSpace {
 	public readonly illuminant: xy;
-	public readonly refWhiteLevel;
-	public readonly refBlackLevel;
 
 	constructor({
 		name = 'XYZ ColorSpace',
 		keys = ['X', 'Y', 'Z'],
 		illuminant,
-		refWhiteLevel = 100,
-		refBlackLevel = 0,
 		...props
 	}: XYZSpaceConstructorProps) {
 		super({ name, keys, ...props });
 		this.illuminant = illuminant;
-		this.refWhiteLevel = refWhiteLevel;
-		this.refBlackLevel = refBlackLevel;
 	}
 
 	public cat(dstIlluminant: xy, method: ChromaticAdaptationMethodName = 'bradford') {
@@ -42,8 +34,6 @@ class XYZSpace extends ColorSpace {
 		const dstSpace = new XYZSpace({
 			name: `XYZ ColorSpace (CAT ${dstx} ${dsty})`,
 			illuminant: dstIlluminant,
-			refWhiteLevel: this.refWhiteLevel,
-			refBlackLevel: this.refBlackLevel,
 			conversions: [
 				{
 					space: this,
