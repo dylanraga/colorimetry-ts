@@ -92,4 +92,4 @@ export interface ColorGamutPrimaries {
 //export interface ColorGamutNamedMap {}
 export type ColorGamutName = keyof ColorGamutNamedMap | (string & Record<never, never>);
 
-export const gamuts = ColorGamut.named as ColorGamutNamedMap;
+export const gamuts = ColorGamut.named as ColorGamutNamedMap & Record<string, ColorGamut>;

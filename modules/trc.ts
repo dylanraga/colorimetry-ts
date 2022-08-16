@@ -43,4 +43,4 @@ type ElectroOpticalInverseTransferFunction<P = unknown> = (
 //export interface ToneResponseNamedMap { };
 export type ToneResponseName = keyof ToneResponseNamedMap | (string & Record<never, never>);
 
-export const curves = ToneResponse.named as ToneResponseNamedMap;
+export const curves = ToneResponse.named;
