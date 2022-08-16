@@ -81,7 +81,7 @@ export class ColorGamut extends Registerable {
 	public static named = {} as ColorGamutNamedMap & Record<string, ColorGamut>;
 }
 
-interface ColorGamutPrimaries {
+export interface ColorGamutPrimaries {
 	white: xy;
 	red: xy;
 	green: xy;

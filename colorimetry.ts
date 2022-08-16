@@ -2,7 +2,7 @@
 /* Author: Dylan Raga */
 /*====================*/
 
-export { ColorGamut, gamuts } from './modules/gamut.js';
+export { ColorGamut, ColorGamutPrimaries, gamuts } from './modules/gamut.js';
 import './modules/gamut/predefined.js';
 
 export { ToneResponse, curves } from './modules/trc.js';
