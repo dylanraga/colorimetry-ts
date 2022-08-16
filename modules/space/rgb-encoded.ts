@@ -51,7 +51,13 @@ export class RGBEncodedSpace extends ColorSpace {
 			rgbLinearSpace.addConversion({
 				space: this,
 				// RGBLinear -> RGBEncoded
-				toFn: (RGBLinear, { rgbWhiteLevel = 1, rgbBlackLevel = 0 } = {}) =>
+				toFn: (
+					RGBLinear,
+					{
+						rgbWhiteLevel = this.convertingProps?.rgbWhiteLevel ?? 1,
+						rgbBlackLevel = this.convertingProps?.rgbBlackLevel ?? 0,
+					} = {}
+				) =>
 					RGBLinear_to_RGBEncoded(RGBLinear, {
 						trc: this.trc,
 						rgbWhiteLevel,
@@ -59,7 +65,13 @@ export class RGBEncodedSpace extends ColorSpace {
 						bpc: this.bpc,
 					}),
 				// RGBEncoded -> RGBLinear
-				fromFn: (RGBEncoded, { rgbWhiteLevel = 1, rgbBlackLevel = 0 } = {}) =>
+				fromFn: (
+					RGBEncoded,
+					{
+						rgbWhiteLevel = this.convertingProps?.rgbWhiteLevel ?? 1,
+						rgbBlackLevel = this.convertingProps?.rgbBlackLevel ?? 0,
+					} = {}
+				) =>
 					RGBEncoded_to_RGBLinear(RGBEncoded, {
 						trc: this.trc,
 						rgbWhiteLevel,
