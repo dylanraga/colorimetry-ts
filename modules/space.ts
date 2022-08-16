@@ -82,11 +82,11 @@ export abstract class ColorSpace extends Registerable {
 
 		let conversion = _srcSpace.conversionMap.get(_dstSpace)?.fn;
 
-		//let precisionMin = _dstSpace.precision > _srcSpace.precision ? _srcSpace.precision : _dstSpace.precision;
+		//et precisionMin = _dstSpace.precision > _srcSpace.precision ? _srcSpace.precision : _dstSpace.precision;
 		if (!conversion) {
 			const path = bfsPath(_srcSpace, _dstSpace, (curr) =>
 				// Consider only direct paths (path length 2 => [spaceA, spaceB])
-				[...curr.conversionMap.keys()].filter((s) => curr.conversionMap.get(s)?.path.length == 2)
+				[...curr.conversionMap.keys()].filter((s) => curr.conversionMap.get(s)?.path.length === 2)
 			);
 			if (!path) throw new Error(`No conversion path found from ${this.name} to ${_dstSpace.name}`);
 
@@ -124,9 +124,16 @@ export abstract class ColorSpace extends Registerable {
 
 function composeFnList(
 	fnList: ColorSpaceConvertingFunction[],
-	{ ...defaultProps }: ColorSpaceConvertingProps = {}
+	defaultProps: ColorSpaceConvertingProps = {}
 ): ColorSpaceConvertingFunction {
-	return (values, { ...props } = {}) => fnList.reduce((a, b) => b(a, { ...defaultProps, ...props }), values);
+	return (values, props = {}) => {
+		let val = values;
+		const p = Object.assign({ ...defaultProps }, props);
+		for (let i = 0; i < fnList.length; i++) {
+			val = fnList[i](val, p);
+		}
+		return val;
+	};
 }
 
 interface ColorSpaceConversionDescription {

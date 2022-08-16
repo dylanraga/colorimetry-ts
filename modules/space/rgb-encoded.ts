@@ -6,7 +6,8 @@ import { RGBLinearSpace } from './rgb-linear.js';
 
 interface RGBEncodedSpaceConstructorProps extends ColorSpaceConstructorProps {
 	trc: ToneResponse | ToneResponseName;
-	gamut?: ColorGamut | ColorGamutName;
+	gamut: ColorGamut | ColorGamutName;
+	bpc?: 0 | 8 | 10 | 12;
 	whiteLevel?: number;
 	blackLevel?: number;
 	peakLuminance?: number;
@@ -14,12 +15,15 @@ interface RGBEncodedSpaceConstructorProps extends ColorSpaceConstructorProps {
 
 export class RGBEncodedSpace extends ColorSpace {
 	public readonly trc: ToneResponse;
+	public readonly gamut: ColorGamut;
+	public readonly bpc: number;
 
 	constructor({
 		name = 'RGB Encoded ColorSpace',
 		keys = ['r', 'g', 'b'],
 		trc,
 		gamut,
+		bpc = 0,
 		whiteLevel = 100,
 		blackLevel = 0,
 		...props
@@ -30,38 +34,37 @@ export class RGBEncodedSpace extends ColorSpace {
 		if (typeof gamut === 'string') gamut = gamuts[gamut];
 
 		this.trc = trc.props({ whiteLevel, blackLevel });
+		this.gamut = gamut;
+		this.bpc = bpc;
 
 		// Creates a corresponding linear RGB Space
-		if (gamut) {
-			this.toLinear(gamut);
-		}
+		this.toLinear();
 	}
 
 	/**
 	 * Returns a linear RGB Space of the current encoded RGB Space
 	 */
-	public toLinear(gamut: ColorGamut | ColorGamutName) {
-		if (typeof gamut === 'string') gamut = gamuts[gamut];
-		const rgbLinearSpace = RGBLinearSpace.getSpaceByGamut(gamut);
+	public toLinear() {
+		const rgbLinearSpace = RGBLinearSpace.getSpaceByGamut(this.gamut);
 
 		if (!rgbLinearSpace.hasConversionToSpace(this)) {
 			rgbLinearSpace.addConversion({
 				space: this,
 				// RGBLinear -> RGBEncoded
-				toFn: (RGBLinear, { rgbWhiteLevel, rgbBlackLevel } = {}) =>
+				toFn: (RGBLinear, { rgbWhiteLevel = 1, rgbBlackLevel = 0 } = {}) =>
 					RGBLinear_to_RGBEncoded(RGBLinear, {
-						trc:
-							rgbWhiteLevel || rgbBlackLevel
-								? this.trc.props({ whiteLevel: rgbWhiteLevel, blackLevel: rgbBlackLevel })
-								: this.trc,
+						trc: this.trc,
+						rgbWhiteLevel,
+						rgbBlackLevel,
+						bpc: this.bpc,
 					}),
 				// RGBEncoded -> RGBLinear
-				fromFn: (RGBEncoded, { rgbWhiteLevel, rgbBlackLevel } = {}) =>
+				fromFn: (RGBEncoded, { rgbWhiteLevel = 1, rgbBlackLevel = 0 } = {}) =>
 					RGBEncoded_to_RGBLinear(RGBEncoded, {
-						trc:
-							rgbWhiteLevel || rgbBlackLevel
-								? this.trc.props({ whiteLevel: rgbWhiteLevel, blackLevel: rgbBlackLevel })
-								: this.trc,
+						trc: this.trc,
+						rgbWhiteLevel,
+						rgbBlackLevel,
+						bpc: this.bpc,
 					}),
 			});
 		}
@@ -70,15 +73,19 @@ export class RGBEncodedSpace extends ColorSpace {
 	}
 
 	public toDigital(bpc: 8 | 10 | 12) {
+		if (this.bpc > 0) throw new Error(`ColorSpace '${this.name}' is already digital`);
+
 		const newSpace = new RGBEncodedSpace({
 			name: `${this.name} (${bpc}-bit)`,
 			trc: this.trc,
+			gamut: this.gamut,
+			bpc: bpc,
 			whiteLevel: this.convertingProps?.rgbWhiteLevel,
 			blackLevel: this.convertingProps?.rgbBlackLevel,
 			conversions: [
 				{
 					space: this,
-					toFn: (RGBQuantized) => RGBQuantized.map((u) => u / (2 ** bpc - 1)),
+					toFn: (RGBQuantized) => RGBQuantized.map((u) => u / (2 >> (bpc - 1 - 1))),
 					fromFn: (RGBEncoded) => RGBEncoded.map((u) => quantizeToBits(u, bpc)),
 				},
 			],
@@ -94,12 +101,38 @@ export class RGBEncodedSpace extends ColorSpace {
 	public static named = {} as RGBEncodedSpaceNamedMap & Record<string, RGBEncodedSpace>;
 }
 
-function RGBLinear_to_RGBEncoded(RGBLinear: number[], { trc }: { trc: ToneResponse }) {
-	return RGBLinear.map((u) => trc.invEotf(u));
+function RGBLinear_to_RGBEncoded(
+	RGBLinear: number[],
+	{
+		trc,
+		rgbWhiteLevel = 1,
+		rgbBlackLevel = 0,
+		bpc = 0,
+	}: { trc: ToneResponse; rgbWhiteLevel: number; rgbBlackLevel: number; bpc: number }
+) {
+	let rgbEncoded = RGBLinear.map((u) =>
+		trc.invEotf(u, { whiteLevel: rgbWhiteLevel, blackLevel: rgbBlackLevel })
+	);
+
+	if (bpc > 0) {
+		rgbEncoded = rgbEncoded.map((u) => quantizeToBits(u, bpc));
+	}
+
+	return rgbEncoded;
 }
 
-function RGBEncoded_to_RGBLinear(RGBEncoded: number[], { trc }: { trc: ToneResponse }) {
-	return RGBEncoded.map((u) => trc.eotf(u));
+function RGBEncoded_to_RGBLinear(
+	RGBEncoded: number[],
+	{
+		trc,
+		rgbWhiteLevel = 1,
+		rgbBlackLevel = 0,
+		bpc = 0,
+	}: { trc: ToneResponse; rgbWhiteLevel: number; rgbBlackLevel: number; bpc: number }
+) {
+	return RGBEncoded.map((u) =>
+		trc.eotf(bpc > 0 ? u / (2 << (bpc - 1 - 1)) : u, { whiteLevel: rgbWhiteLevel, blackLevel: rgbBlackLevel })
+	);
 }
 
 export interface RGBEncodedSpaceNamedMap {}
