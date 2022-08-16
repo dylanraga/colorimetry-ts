@@ -2,43 +2,54 @@
 /* Author: Dylan Raga */
 /*====================*/
 
-export { ColorGamut, ColorGamutPrimaries, gamuts } from './modules/gamut.js';
+import { ColorGamut, ColorGamutPrimaries, gamuts } from './modules/gamut.js';
 import './modules/gamut/predefined.js';
+export { ColorGamut, ColorGamutPrimaries, gamuts };
 
-export { ToneResponse, curves } from './modules/trc.js';
+import { ToneResponse, curves } from './modules/trc.js';
 import './modules/trc/predefined.js';
+export { ToneResponse, curves };
 
-export { illuminants } from './modules/illuminants/predefined.js';
+import { illuminants } from './modules/illuminants/predefined.js';
+export { illuminants };
 
-export { xyzCat } from './modules/cat.js';
+import { xyzCat } from './modules/cat.js';
+export { xyzCat };
 
-export { XYZSpace, xyzSpaces } from './modules/space/xyz.js';
+import { XYZSpace, xyzSpaces } from './modules/space/xyz.js';
 import './modules/space/xyz/predefined.js';
+export { XYZSpace, xyzSpaces };
 
-export { RGBLinearSpace } from './modules/space/rgb-linear.js';
+import { RGBLinearSpace, rgbLinearSpaces } from './modules/space/rgb-linear.js';
 import './modules/space/rgb-linear/predefined.js';
+export { RGBLinearSpace, rgbLinearSpaces };
 
-export { RGBEncodedSpace } from './modules/space/rgb-encoded.js';
+import { RGBEncodedSpace, rgbSpaces } from './modules/space/rgb-encoded.js';
 import './modules/space/rgb-encoded/predefined.js';
+export { RGBEncodedSpace, rgbSpaces };
 
-export { ChromaticitySpace, chromaticitySpaces } from './modules/space/chromaticity.js';
+import { ChromaticitySpace, chromaticitySpaces } from './modules/space/chromaticity.js';
 import './modules/space/chromaticity/predefined.js';
+export { ChromaticitySpace, chromaticitySpaces };
 
-export { LabSpace, labSpaces } from './modules/space/lab.js';
+import { LabSpace, labSpaces } from './modules/space/lab.js';
 import './modules/space/lab/predefined.js';
+export { LabSpace, labSpaces };
 
-export { ColorSpace, ColorSpaceName, spaces } from './modules/space.js';
+import { ColorSpace, ColorSpaceName, spaces } from './modules/space.js';
+export { ColorSpace, ColorSpaceName, spaces };
 
-import { Color as ColorClass, ColorConstructor } from './modules/color.js';
+import { Color } from './modules/color.js';
 import './modules/difference.js';
 import './modules/difference/predefined.js';
 import './modules/color/luminance.js';
 import './modules/color/luma.js';
 import './modules/color/cct.js';
-export const Color = ColorClass as ColorConstructor;
+export { Color };
 
 //import * as cctData from './modules/common/locus_10nm.json';
-export { cctData } from './modules/common/locus_10nm.js';
+import { cctData } from './modules/common/locus_10nm.js';
+export { cctData };
 
 import './modules/defaults.js';
 

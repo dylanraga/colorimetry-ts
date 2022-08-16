@@ -16,10 +16,13 @@ export interface ColorConstructor {
 		//props?: Partial<ColorSpaceTypeProps<S>>
 		props?: Record<string, unknown>
 	): Color;
+
 	readonly prototype: Color;
 }
 
-export class Color {
+export interface Color extends ColorClass {}
+
+class ColorClass {
 	public space: ColorSpace;
 	public values: number[];
 
@@ -50,3 +53,5 @@ export class Color {
 		return newValues;
 	}
 }
+
+export const Color = ColorClass as ColorConstructor;
