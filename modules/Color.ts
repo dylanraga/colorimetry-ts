@@ -28,7 +28,7 @@ export class Color {
 		values: number[]
 		//props?: Partial<ColorSpaceTypeProps<S>>
 	) {
-		this.space = typeof space === 'string' ? ColorSpace.getSpaceById(space) : space;
+		this.space = typeof space === 'string' ? ColorSpace.getSpaceById(space) : (space as ColorSpace);
 		this.values = values;
 	}
 

@@ -32,13 +32,14 @@ export abstract class ColorSpace extends Registerable {
 	}
 
 	public addConversion({ space: spaceB, toFn, fromFn }: ColorSpaceConversion) {
-		if (typeof spaceB === 'string') spaceB = ColorSpace.getSpaceById(spaceB);
-		this.conversionMap.set(spaceB, { path: [this, spaceB], fn: toFn });
-		spaceB.conversionMap.set(this, { path: [spaceB, this], fn: fromFn });
+		const _spaceB = typeof spaceB === 'string' ? ColorSpace.getSpaceById(spaceB) : (spaceB as ColorSpace);
+		this.conversionMap.set(_spaceB, { path: [this, _spaceB], fn: toFn });
+		_spaceB.conversionMap.set(this, { path: [_spaceB, this], fn: fromFn });
 	}
 	public hasConversionToSpace(dstSpace: ColorSpace | ColorSpaceName) {
-		if (typeof dstSpace === 'string') dstSpace = ColorSpace.getSpaceById(dstSpace);
-		return this.conversionMap.has(dstSpace);
+		const _dstSpace =
+			typeof dstSpace === 'string' ? ColorSpace.getSpaceById(dstSpace) : (dstSpace as ColorSpace);
+		return this.conversionMap.has(_dstSpace);
 	}
 
 	/**
@@ -77,8 +78,10 @@ export abstract class ColorSpace extends Registerable {
 	 * @returns Function composition transforming source space into the destination color space
 	 */
 	public static getConversion(srcSpace: ColorSpace | ColorSpaceName, dstSpace: ColorSpace | ColorSpaceName) {
-		const _srcSpace = typeof srcSpace === 'string' ? ColorSpace.getSpaceById(srcSpace) : srcSpace;
-		const _dstSpace = typeof dstSpace === 'string' ? ColorSpace.getSpaceById(dstSpace) : dstSpace;
+		const _srcSpace =
+			typeof srcSpace === 'string' ? ColorSpace.getSpaceById(srcSpace) : (srcSpace as ColorSpace);
+		const _dstSpace =
+			typeof dstSpace === 'string' ? ColorSpace.getSpaceById(dstSpace) : (dstSpace as ColorSpace);
 
 		let conversion = _srcSpace.conversionMap.get(_dstSpace)?.fn;
 

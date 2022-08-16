@@ -30,7 +30,7 @@ export class ToneResponse<P = unknown> extends Registerable {
 	/**
 	 * Static
 	 */
-	public static named = {} as ToneResponseNamedMap & Record<string, ToneResponse<unknown>>;
+	public static named = {} as Record<string, ToneResponse<unknown>>;
 }
 
 type ElectroOpticalTransferFunction<P = unknown> = (signalValue: number, props?: Partial<P>) => number;
@@ -40,7 +40,7 @@ type ElectroOpticalInverseTransferFunction<P = unknown> = (
 	props?: Partial<P>
 ) => number;
 
-//export interface ToneResponseNamedMap { };
+export interface ToneResponseNamedMap {}
 export type ToneResponseName = keyof ToneResponseNamedMap | (string & Record<never, never>);
 
-export const curves = ToneResponse.named;
+export const curves = ToneResponse.named as ToneResponseNamedMap & Record<string, ToneResponse<unknown>>;

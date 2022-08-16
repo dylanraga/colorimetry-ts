@@ -121,22 +121,22 @@ const COLORGAMUT_PROPHOTO = new ColorGamut({
 
 declare module '../gamut' {
 	interface ColorGamutNamedMap {
-		srgb: ColorGamut;
-		p3_d65: ColorGamut;
-		p3_aces: ColorGamut;
-		p3_dci: ColorGamut;
-		bt2020: ColorGamut;
-		adobe: ColorGamut;
-		ace_sp0: ColorGamut;
-		aces_p1: ColorGamut;
-		prophoto: ColorGamut;
+		srgb: typeof COLORGAMUT_SRGB;
+		p3_d65: typeof COLORGAMUT_P3D65;
+		p3_aces: typeof COLORGAMUT_P3ACES;
+		p3_dci: typeof COLORGAMUT_P3DCI;
+		bt2020: typeof COLORGAMUT_BT2020;
+		adobe: typeof COLORGAMUT_ADOBERGB;
+		ace_sp0: typeof COLORGAMUT_ACESP0;
+		aces_p1: typeof COLORGAMUT_ACESP1;
+		prophoto: typeof COLORGAMUT_PROPHOTO;
 		/*
 		 * Aliases
 		 */
-		bt709: ColorGamut;
-		rec709: ColorGamut;
-		p3_d60: ColorGamut;
-		rec2020: ColorGamut;
-		romm: ColorGamut;
+		bt709: typeof COLORGAMUT_SRGB;
+		rec709: typeof COLORGAMUT_SRGB;
+		p3_d60: typeof COLORGAMUT_P3ACES;
+		rec2020: typeof COLORGAMUT_BT2020;
+		romm: typeof COLORGAMUT_PROPHOTO;
 	}
 }
