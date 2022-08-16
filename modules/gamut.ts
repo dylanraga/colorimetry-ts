@@ -78,7 +78,7 @@ export class ColorGamut extends Registerable {
 	/**
 	 * Static
 	 */
-	public static named = {} as Record<string, ColorGamut>;
+	public static named = {} as ColorGamutNamedMap & Record<string, ColorGamut>;
 }
 
 export interface ColorGamutPrimaries {
@@ -92,4 +92,4 @@ export interface ColorGamutPrimaries {
 export interface ColorGamutNamedMap {}
 export type ColorGamutName = keyof ColorGamutNamedMap | (string & Record<never, never>);
 
-export const gamuts = ColorGamut.named as ColorGamutNamedMap & Record<string, ColorGamut>;
+export const gamuts = ColorGamut.named as ColorGamutNamedMap;
