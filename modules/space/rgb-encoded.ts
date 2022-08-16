@@ -73,19 +73,17 @@ export class RGBEncodedSpace extends ColorSpace {
 	}
 
 	public toDigital(bpc: 8 | 10 | 12) {
-		if (this.bpc > 0) throw new Error(`ColorSpace '${this.name}' is already digital`);
-
 		const newSpace = new RGBEncodedSpace({
 			name: `${this.name} (${bpc}-bit)`,
 			trc: this.trc,
 			gamut: this.gamut,
-			bpc: bpc,
+			bpc,
 			whiteLevel: this.convertingProps?.rgbWhiteLevel,
 			blackLevel: this.convertingProps?.rgbBlackLevel,
 			conversions: [
 				{
 					space: this,
-					toFn: (RGBQuantized) => RGBQuantized.map((u) => u / (2 >> (bpc - 1 - 1))),
+					toFn: (RGBQuantized) => RGBQuantized.map((u) => u / (2 ** bpc - 1)),
 					fromFn: (RGBEncoded) => RGBEncoded.map((u) => quantizeToBits(u, bpc)),
 				},
 			],
@@ -131,7 +129,10 @@ function RGBEncoded_to_RGBLinear(
 	}: { trc: ToneResponse; rgbWhiteLevel: number; rgbBlackLevel: number; bpc: number }
 ) {
 	return RGBEncoded.map((u) =>
-		trc.eotf(bpc > 0 ? u / (2 << (bpc - 1 - 1)) : u, { whiteLevel: rgbWhiteLevel, blackLevel: rgbBlackLevel })
+		trc.eotf(bpc > 0 ? u / ((2 << (bpc - 1)) - 1) : u, {
+			whiteLevel: rgbWhiteLevel,
+			blackLevel: rgbBlackLevel,
+		})
 	);
 }
 

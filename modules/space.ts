@@ -126,6 +126,7 @@ function composeFnList(
 	fnList: ColorSpaceConvertingFunction[],
 	defaultProps: ColorSpaceConvertingProps = {}
 ): ColorSpaceConvertingFunction {
+	/*
 	return (values, props = {}) => {
 		let val = values;
 		const p = Object.assign({ ...defaultProps }, props);
@@ -134,6 +135,10 @@ function composeFnList(
 		}
 		return val;
 	};
+	*/
+
+	return (values, props = {}) =>
+		fnList.reduce((a, b) => b(a, Object.assign({ ...defaultProps }, props)), values);
 }
 
 interface ColorSpaceConversionDescription {
