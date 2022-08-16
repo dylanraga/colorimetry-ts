@@ -38,7 +38,7 @@ import './modules/color/cct.js';
 export const Color = ColorClass as ColorConstructor;
 
 //import * as cctData from './modules/common/locus_10nm.json';
-//export { cctData };
+export { cctData } from './modules/common/locus_10nm.js';
 
 import './modules/defaults.js';
 
