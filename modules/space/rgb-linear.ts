@@ -1,5 +1,5 @@
 import { mmult3331 as mmult } from '../common/util.js';
-import { ColorGamut, ColorGamutName, gamuts } from '../gamut.js';
+import { ColorGamut, ColorGamutName, ColorGamutNamedMap, gamuts } from '../gamut.js';
 import { ColorSpace, ColorSpaceConstructorProps } from '../space.js';
 import { XYZSPACE_D65 } from './xyz/predefined.js';
 
@@ -17,7 +17,7 @@ export class RGBLinearSpace extends ColorSpace {
 		...props
 	}: RGBLinearSpaceConstructorProps) {
 		super({ name, keys, ...props });
-		this.gamut = typeof gamut === 'string' ? gamuts[gamut] : gamut;
+		this.gamut = typeof gamut === 'string' ? gamuts[gamut as keyof ColorGamutNamedMap] : gamut;
 
 		const xyzConversionSpace = XYZSPACE_D65.cat(this.gamut.primaries.white);
 		this.addConversion({
@@ -38,7 +38,7 @@ export class RGBLinearSpace extends ColorSpace {
 	 * @param gamut ColorGamut
 	 */
 	public static getSpaceByGamut(gamut: ColorGamut | ColorGamutName) {
-		if (typeof gamut === 'string') gamut = gamuts[gamut];
+		if (typeof gamut === 'string') gamut = gamuts[gamut as keyof ColorGamutNamedMap];
 
 		let space = Object.values(this.named).find((s) => s.gamut === gamut);
 		if (!space) {

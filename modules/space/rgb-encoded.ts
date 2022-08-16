@@ -1,7 +1,7 @@
 import { quantizeToBits } from '../common/util.js';
-import { ColorGamut, ColorGamutName, gamuts } from '../gamut.js';
+import { ColorGamut, ColorGamutName, ColorGamutNamedMap, gamuts } from '../gamut.js';
 import { ColorSpace, ColorSpaceConstructorProps } from '../space.js';
-import { curves, ToneResponse, ToneResponseName } from '../trc.js';
+import { curves, ToneResponse, ToneResponseName, ToneResponseNamedMap } from '../trc.js';
 import { RGBLinearSpace } from './rgb-linear.js';
 
 interface RGBEncodedSpaceConstructorProps extends ColorSpaceConstructorProps {
@@ -30,8 +30,8 @@ export class RGBEncodedSpace extends ColorSpace {
 	}: RGBEncodedSpaceConstructorProps) {
 		const convertingProps = { rgbWhiteLevel: whiteLevel, rgbBlackLevel: blackLevel };
 		super({ name, keys, convertingProps, ...props });
-		if (typeof trc === 'string') trc = curves[trc];
-		if (typeof gamut === 'string') gamut = gamuts[gamut];
+		if (typeof trc === 'string') trc = curves[trc as keyof ToneResponseNamedMap];
+		if (typeof gamut === 'string') gamut = gamuts[gamut as keyof ColorGamutNamedMap];
 
 		this.trc = trc.props({ whiteLevel, blackLevel });
 		this.gamut = gamut;
