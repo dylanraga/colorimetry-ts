@@ -1,4 +1,4 @@
-import { ColorDifferenceMethod } from '../difference.js';
+import { ColorDifferenceMethod, deMethods } from '../difference.js';
 import { LABSPACE_ITP } from '../space/lab/ictcp.js';
 
 export const DE_ITP: ColorDifferenceMethod<{
@@ -22,3 +22,5 @@ declare module '../difference' {
 		deitp: typeof DE_ITP;
 	}
 }
+
+deMethods.deitp = DE_ITP;

@@ -1,4 +1,4 @@
-import { ColorDifferenceMethod } from '../difference.js';
+import { ColorDifferenceMethod, deMethods } from '../difference.js';
 import { LABSPACE_CIELAB } from '../space/lab/cielab.js';
 
 export const DE_CIE2000: ColorDifferenceMethod<{
@@ -30,7 +30,11 @@ export const DE_CIE2000: ColorDifferenceMethod<{
 	const dhp = Math.abs(h1p - h2p) <= 180 ? h2p - h1p : h2p <= h1p ? h2p - h1p + 360 : h2p - h1p - 360;
 	const dHp = 2 * Math.sqrt(C1p * C2p) * Math.sin((dhp / 2) * r2d);
 	const Hbp =
-		Math.abs(h1p - h2p) <= 180 ? (h1p + h2p) / 2 : h1p + h2p < 360 ? (h1p + h2p + 360) / 2 : (h1p + h2p - 360) / 2;
+		Math.abs(h1p - h2p) <= 180
+			? (h1p + h2p) / 2
+			: h1p + h2p < 360
+			? (h1p + h2p + 360) / 2
+			: (h1p + h2p - 360) / 2;
 	const T =
 		1 -
 		0.17 * Math.cos(Hbp - 30) +
@@ -54,3 +58,5 @@ declare module '../difference' {
 		ciede2000: typeof DE_CIE2000;
 	}
 }
+
+deMethods.ciede2000 = DE_CIE2000;

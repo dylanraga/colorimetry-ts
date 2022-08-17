@@ -1,2 +1,2 @@
-import './ciede2000.js';
 import './deitp.js';
+import './ciede2000.js';

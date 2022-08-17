@@ -40,8 +40,8 @@ import { ColorSpace, ColorSpaceName, spaces } from './modules/space.js';
 export { ColorSpace, ColorSpaceName, spaces };
 
 import { Color } from './modules/color.js';
-import './modules/difference.js';
 import './modules/difference/predefined.js';
+import './modules/difference.js';
 import './modules/color/luminance.js';
 import './modules/color/luma.js';
 import './modules/color/cct.js';
