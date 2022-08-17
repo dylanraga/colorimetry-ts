@@ -98,10 +98,9 @@ export abstract class ColorSpace extends Registerable {
 				fnList.push(path[i].getConversionBySpace(path[i + 1]));
 				//if (path[i].precision < precisionMin) precisionMin = path[i].precision;
 			}
-
 			conversion = composeFnList(fnList, {
-				rgbWhiteLevel: _srcSpace.convertingProps?.rgbWhiteLevel,
-				rgbBlackLevel: _srcSpace.convertingProps?.rgbBlackLevel,
+				rgbWhiteLevel: _srcSpace.convertingProps?.rgbWhiteLevel ?? _dstSpace.convertingProps?.rgbWhiteLevel,
+				rgbBlackLevel: _srcSpace.convertingProps?.rgbBlackLevel ?? _dstSpace.convertingProps?.rgbBlackLevel,
 			});
 			_srcSpace.conversionMap.set(_dstSpace, { path, fn: conversion });
 
@@ -110,8 +109,8 @@ export abstract class ColorSpace extends Registerable {
 				path[i].conversionMap.set(_dstSpace, {
 					path,
 					fn: composeFnList(fnList.slice(i), {
-						rgbWhiteLevel: _srcSpace.convertingProps?.rgbWhiteLevel,
-						rgbBlackLevel: _srcSpace.convertingProps?.rgbBlackLevel,
+						rgbWhiteLevel: path[i].convertingProps?.rgbWhiteLevel ?? _dstSpace.convertingProps?.rgbWhiteLevel,
+						rgbBlackLevel: path[i].convertingProps?.rgbBlackLevel ?? _dstSpace.convertingProps?.rgbBlackLevel,
 					}),
 				});
 			}
