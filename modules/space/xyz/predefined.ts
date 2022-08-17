@@ -18,15 +18,15 @@ export const XYZSPACE_D65_NORMALIZED = new XYZSpace({
 		{
 			space: XYZSPACE_D65,
 			// Normalized XYZ -> Absolute XYZ
-			toFn: function (this: XYZSpace, [Xn, Yn, Zn], { rgbWhiteLevel = 1, rgbBlackLevel = 0 } = {}) {
-				const Y = (rgbWhiteLevel - rgbBlackLevel) * Yn + rgbBlackLevel;
+			toFn: function (this: XYZSpace, [Xn, Yn, Zn], { rgbWhiteLuminance = 1, rgbBlackLuminance = 0 } = {}) {
+				const Y = (rgbWhiteLuminance - rgbBlackLuminance) * Yn + rgbBlackLuminance;
 				const X = (Y * Xn) / Yn;
 				const Z = (Y * Zn) / Yn;
 				return [X, Y, Z];
 			},
 			// Absolute XYZ -> Normalized XYZ
-			fromFn: function (this: XYZSpace, [X, Y, Z], { rgbWhiteLevel = 1, rgbBlackLevel = 0 } = {}) {
-				const Yn = (Y - rgbBlackLevel) / (rgbWhiteLevel - rgbBlackLevel);
+			fromFn: function (this: XYZSpace, [X, Y, Z], { rgbWhiteLuminance = 1, rgbBlackLuminance = 0 } = {}) {
+				const Yn = (Y - rgbBlackLuminance) / (rgbWhiteLuminance - rgbBlackLuminance);
 				const Xn = (X * Yn) / Y;
 				const Zn = (Z * Yn) / Y;
 				return [Xn, Yn, Zn];

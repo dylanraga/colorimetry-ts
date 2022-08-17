@@ -99,8 +99,10 @@ export abstract class ColorSpace extends Registerable {
 				//if (path[i].precision < precisionMin) precisionMin = path[i].precision;
 			}
 			conversion = composeFnList(fnList, {
-				rgbWhiteLevel: _srcSpace.convertingProps?.rgbWhiteLevel ?? _dstSpace.convertingProps?.rgbWhiteLevel,
-				rgbBlackLevel: _srcSpace.convertingProps?.rgbBlackLevel ?? _dstSpace.convertingProps?.rgbBlackLevel,
+				rgbWhiteLuminance:
+					_srcSpace.convertingProps?.rgbWhiteLuminance ?? _dstSpace.convertingProps?.rgbWhiteLuminance,
+				rgbBlackLuminance:
+					_srcSpace.convertingProps?.rgbBlackLuminance ?? _dstSpace.convertingProps?.rgbBlackLuminance,
 			});
 			_srcSpace.conversionMap.set(_dstSpace, { path, fn: conversion });
 
@@ -109,8 +111,10 @@ export abstract class ColorSpace extends Registerable {
 				path[i].conversionMap.set(_dstSpace, {
 					path,
 					fn: composeFnList(fnList.slice(i), {
-						rgbWhiteLevel: path[i].convertingProps?.rgbWhiteLevel ?? _dstSpace.convertingProps?.rgbWhiteLevel,
-						rgbBlackLevel: path[i].convertingProps?.rgbBlackLevel ?? _dstSpace.convertingProps?.rgbBlackLevel,
+						rgbWhiteLuminance:
+							path[i].convertingProps?.rgbWhiteLuminance ?? _dstSpace.convertingProps?.rgbWhiteLuminance,
+						rgbBlackLuminance:
+							path[i].convertingProps?.rgbBlackLuminance ?? _dstSpace.convertingProps?.rgbBlackLuminance,
 					}),
 				});
 			}
@@ -155,10 +159,10 @@ export interface ColorSpaceConversion {
 }
 
 export interface ColorSpaceConvertingProps {
-	rgbWhiteLevel?: number;
-	rgbBlackLevel?: number;
-	refWhiteLevel?: number;
-	refBlackLevel?: number;
+	rgbWhiteLuminance?: number;
+	rgbBlackLuminance?: number;
+	refWhiteLuminance?: number;
+	refBlackLuminance?: number;
 }
 
 export type ColorSpaceConvertingFunction = (values: number[], props?: ColorSpaceConvertingProps) => number[];

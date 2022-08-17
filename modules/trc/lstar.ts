@@ -9,23 +9,23 @@ const κ = 24389 / 27;
 const ϵ = 216 / 24389;
 const d = 6 / 29;
 
-const WHITE_LEVEL = 1;
-const BLACK_LEVEL = 0;
+const WHITE_LUMINANCE = 1;
+const BLACK_LUMINANCE = 0;
 
 export const TRC_LSTAR = new ToneResponse<{
-	whiteLevel: number;
-	blackLevel: number;
+	whiteLuminance: number;
+	blackLuminance: number;
 }>({
 	id: 'lstar',
 	name: 'L*',
-	eotf: (V, { whiteLevel = WHITE_LEVEL, blackLevel = BLACK_LEVEL } = {}) => {
+	eotf: (V, { whiteLuminance = WHITE_LUMINANCE, blackLuminance = BLACK_LUMINANCE } = {}) => {
 		const f = (x: number) => (x > d ? ((x + 16) / 116) ** 3 : x / κ);
-		const L = (whiteLevel - blackLevel) * evenFn(f)(100 * V) + blackLevel;
+		const L = (whiteLuminance - blackLuminance) * evenFn(f)(100 * V) + blackLuminance;
 		return L;
 	},
-	invEotf: (L, { whiteLevel = WHITE_LEVEL, blackLevel = BLACK_LEVEL } = {}) => {
+	invEotf: (L, { whiteLuminance = WHITE_LUMINANCE, blackLuminance = BLACK_LUMINANCE } = {}) => {
 		const f = (x: number) => (x > ϵ ? 116 * Math.cbrt(x) - 16 : κ * x);
-		const V = evenFn(f)((L - blackLevel) / (whiteLevel - blackLevel)) / 100;
+		const V = evenFn(f)((L - blackLuminance) / (whiteLuminance - blackLuminance)) / 100;
 		return V;
 	},
 });

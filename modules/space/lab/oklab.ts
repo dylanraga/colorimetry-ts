@@ -18,8 +18,8 @@ export const LABSPACE_OKLAB = new LabSpace({
 	],
 	precision: 3,
 	convertingProps: {
-		rgbWhiteLevel: 1,
-		rgbBlackLevel: 0,
+		rgbWhiteLuminance: 1,
+		rgbBlackLuminance: 0,
 	},
 });
 

@@ -4,27 +4,30 @@
 import { evenFn } from '../common/util.js';
 import { ToneResponse } from '../trc.js';
 
-const WHITE_LEVEL = 1;
-const BLACK_LEVEL = 0;
+const WHITE_LUMINANCE = 1;
+const BLACK_LUMINANCE = 0;
 const GAMMA = 2.2;
 
 export const TRC_GAMMA = new ToneResponse<{
-	whiteLevel: number;
-	blackLevel: number;
+	whiteLuminance: number;
+	blackLuminance: number;
 	gamma: number;
 }>({
 	id: 'gamma',
 	name: 'Gamma Power',
-	eotf: (V, { whiteLevel = WHITE_LEVEL, blackLevel = BLACK_LEVEL, gamma = GAMMA } = {}) => {
+	eotf: (V, { whiteLuminance = WHITE_LUMINANCE, blackLuminance = BLACK_LUMINANCE, gamma = GAMMA } = {}) => {
 		const f = (x: number) => x ** gamma;
 
-		const L = (whiteLevel - blackLevel) * evenFn(f)(V) + blackLevel;
+		const L = (whiteLuminance - blackLuminance) * evenFn(f)(V) + blackLuminance;
 		return L;
 	},
-	invEotf: (L, { whiteLevel = WHITE_LEVEL, blackLevel = BLACK_LEVEL, gamma = GAMMA } = {}) => {
+	invEotf: (
+		L,
+		{ whiteLuminance = WHITE_LUMINANCE, blackLuminance = BLACK_LUMINANCE, gamma = GAMMA } = {}
+	) => {
 		const f = (x: number) => x ** (1 / gamma);
 
-		const V = evenFn(f)((L - blackLevel) / (whiteLevel - blackLevel));
+		const V = evenFn(f)((L - blackLuminance) / (whiteLuminance - blackLuminance));
 		return V;
 	},
 });

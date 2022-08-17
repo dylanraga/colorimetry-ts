@@ -10,8 +10,8 @@ export const RGBSPACE_SRGB = new RGBEncodedSpace({
 	name: 'sRGB',
 	gamut: gamuts.srgb,
 	trc: curves.srgb,
-	whiteLevel: 80,
-	blackLevel: 0.2,
+	whiteLuminance: 80,
+	blackLuminance: 0.2,
 });
 export const RGBSPACE_SRGB_8 = RGBSPACE_SRGB.toDigital(8).register('srgb_8');
 
@@ -22,8 +22,8 @@ export const RGBSPACE_REC709 = new RGBEncodedSpace({
 	alias: ['bt709'],
 	gamut: gamuts.srgb,
 	trc: curves.bt1886,
-	whiteLevel: 100,
-	blackLevel: 0,
+	whiteLuminance: 100,
+	blackLuminance: 0,
 });
 
 // Apple Inc. Display P3
@@ -33,8 +33,8 @@ export const RGBSPACE_DISPLAYP3 = new RGBEncodedSpace({
 	alias: ['p3', 'p3_d65'],
 	gamut: gamuts.p3_d65,
 	trc: curves.srgb,
-	whiteLevel: 80,
-	blackLevel: 0.2,
+	whiteLuminance: 80,
+	blackLuminance: 0.2,
 });
 
 // Digital Cinema Initiative P3
@@ -44,8 +44,8 @@ export const RGBSPACE_DCIP3 = new RGBEncodedSpace({
 	alias: ['dci_p3'],
 	gamut: gamuts.p3_dci,
 	trc: curves.gamma_26,
-	whiteLevel: 48,
-	blackLevel: 0.005,
+	whiteLuminance: 48,
+	blackLuminance: 0.005,
 });
 
 // Adobe RGB (1998) IEC 61966-2-5:2007
@@ -55,8 +55,8 @@ export const RGBSPACE_ADOBERGB = new RGBEncodedSpace({
 	alias: ['argb', 'a98'],
 	gamut: gamuts.adobe,
 	trc: curves.gamma.props({ gamma: 563 / 256 }),
-	whiteLevel: 160,
-	blackLevel: 0.5557,
+	whiteLuminance: 160,
+	blackLuminance: 0.5557,
 });
 
 // BT.2020 gamut with BT.1886 transfer
@@ -66,8 +66,8 @@ export const RGBSPACE_REC2020 = new RGBEncodedSpace({
 	alias: ['bt2020'],
 	gamut: gamuts.bt2020,
 	trc: curves.bt1886,
-	whiteLevel: 100,
-	blackLevel: 0,
+	whiteLuminance: 100,
+	blackLuminance: 0,
 });
 
 // BT.2100: BT.2020 with ST.2084 transfer
@@ -78,8 +78,8 @@ export const RGBSPACE_BT2100_PQ = new RGBEncodedSpace({
 	gamut: gamuts.bt2020,
 	trc: curves.st2084,
 	peakLuminance: 10000,
-	whiteLevel: TRC_ST2084.eotf(0.58),
-	blackLevel: 0.0001,
+	whiteLuminance: TRC_ST2084.eotf(0.58),
+	blackLuminance: 0.0001,
 });
 
 // BT.2100: BT.2020 with HLG transfer
@@ -90,8 +90,8 @@ export const RGBSPACE_BT2100_HLG = new RGBEncodedSpace({
 	gamut: gamuts.bt2020,
 	trc: curves.hlg,
 	peakLuminance: 1000,
-	whiteLevel: TRC_HLG.eotf(0.75),
-	blackLevel: 0,
+	whiteLuminance: TRC_HLG.eotf(0.75),
+	blackLuminance: 0,
 });
 
 // Kodak ProPhoto RGB
@@ -101,8 +101,8 @@ export const RGBSPACE_PROPHOTO = new RGBEncodedSpace({
 	alias: ['romm'],
 	gamut: gamuts.prophoto,
 	trc: curves.romm,
-	whiteLevel: 160,
-	blackLevel: 0.1,
+	whiteLuminance: 160,
+	blackLuminance: 0.1,
 });
 
 // ACEScc

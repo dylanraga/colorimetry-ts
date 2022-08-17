@@ -13,7 +13,8 @@ export const CHROMATICITY_UV = new ChromaticitySpace({
 	conversions: [
 		{
 			space: XYZSPACE_D65_NORMALIZED,
-			toFn: (uv, { refWhiteLevel } = {}) => uv_to_XnYnZn(uv, { refWhiteLevel: refWhiteLevel as number }),
+			toFn: (uv, { refWhiteLuminance } = {}) =>
+				uv_to_XnYnZn(uv, { refWhiteLuminance: refWhiteLuminance as number }),
 			fromFn: XYZ_to_uv,
 		},
 		{
@@ -38,12 +39,12 @@ export function XYZ_to_uv([X, Y, Z]: number[]) {
 	return [u, v];
 }
 
-export function uv_to_XnYnZn([u, v]: number[], { refWhiteLevel = 1 } = {}) {
+export function uv_to_XnYnZn([u, v]: number[], { refWhiteLuminance = 1 } = {}) {
 	const denom = 4 * v;
-	const Xn = (refWhiteLevel * (9 * u)) / denom;
-	const Zn = (refWhiteLevel * (12 - 3 * u - 20 * v)) / denom;
+	const Xn = (refWhiteLuminance * (9 * u)) / denom;
+	const Zn = (refWhiteLuminance * (12 - 3 * u - 20 * v)) / denom;
 
-	return [Xn, refWhiteLevel, Zn];
+	return [Xn, refWhiteLuminance, Zn];
 }
 
 export function xy_to_uv([x, y]: number[]): number[] {

@@ -21,8 +21,8 @@ export const LABSPACE_CIELAB = new LabSpace({
 		},
 	],
 	convertingProps: {
-		rgbWhiteLevel: 100,
-		rgbBlackLevel: 0,
+		rgbWhiteLuminance: 100,
+		rgbBlackLuminance: 0,
 	},
 });
 

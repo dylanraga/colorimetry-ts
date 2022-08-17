@@ -11,7 +11,8 @@ export const CHROMATICITY_XY = new ChromaticitySpace({
 	conversions: [
 		{
 			space: XYZSPACE_D65_NORMALIZED,
-			toFn: (xy, { refWhiteLevel = 1 } = {}) => xy_to_XnYnZn(xy, { refWhiteLevel: refWhiteLevel as number }),
+			toFn: (xy, { refWhiteLuminance = 1 } = {}) =>
+				xy_to_XnYnZn(xy, { refWhiteLuminance: refWhiteLuminance as number }),
 			fromFn: XYZ_to_xy,
 		},
 	],
@@ -31,11 +32,11 @@ export function XYZ_to_xy([X, Y, Z]: number[]) {
 	return [x, y];
 }
 
-export function xy_to_XnYnZn([x, y]: number[], { refWhiteLevel = 1 } = {}) {
-	const Xn = (refWhiteLevel * x) / y;
-	const Zn = (refWhiteLevel * (1 - x - y)) / y;
+export function xy_to_XnYnZn([x, y]: number[], { refWhiteLuminance = 1 } = {}) {
+	const Xn = (refWhiteLuminance * x) / y;
+	const Zn = (refWhiteLuminance * (1 - x - y)) / y;
 
-	return [Xn, refWhiteLevel, Zn];
+	return [Xn, refWhiteLuminance, Zn];
 }
 
 export interface xy {

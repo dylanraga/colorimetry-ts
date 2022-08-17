@@ -19,8 +19,8 @@ export const LABSPACE_CIELUV = new LabSpace({
 		},
 	],
 	convertingProps: {
-		rgbWhiteLevel: 100,
-		rgbBlackLevel: 0,
+		rgbWhiteLuminance: 100,
+		rgbBlackLuminance: 0,
 	},
 });
 
@@ -49,7 +49,7 @@ export function CIELuv_to_XnYnZn([L, U, V]: number[]) {
 	const u = U / (13 * L) + ur;
 	const v = V / (13 * L) + vr;
 	const Yn = TRC_LSTAR.eotf(L / 100);
-	const [Xn, , Zn] = uv_to_XnYnZn([u, v], { refWhiteLevel: Yn });
+	const [Xn, , Zn] = uv_to_XnYnZn([u, v], { refWhiteLuminance: Yn });
 
 	return [Xn, Yn, Zn];
 }

@@ -8,8 +8,8 @@ interface RGBEncodedSpaceConstructorProps extends ColorSpaceConstructorProps {
 	trc: ToneResponse | ToneResponseName;
 	gamut: ColorGamut | ColorGamutName;
 	bpc?: 0 | 8 | 10 | 12;
-	whiteLevel?: number;
-	blackLevel?: number;
+	whiteLuminance?: number;
+	blackLuminance?: number;
 	peakLuminance?: number;
 }
 
@@ -24,16 +24,16 @@ export class RGBEncodedSpace extends ColorSpace {
 		trc,
 		gamut,
 		bpc = 0,
-		whiteLevel = 100,
-		blackLevel = 0,
+		whiteLuminance = 100,
+		blackLuminance = 0,
 		...props
 	}: RGBEncodedSpaceConstructorProps) {
-		const convertingProps = { rgbWhiteLevel: whiteLevel, rgbBlackLevel: blackLevel };
+		const convertingProps = { rgbWhiteLuminance: whiteLuminance, rgbBlackLuminance: blackLuminance };
 		super({ name, keys, convertingProps, ...props });
 		if (typeof trc === 'string') trc = curves[trc as keyof ToneResponseNamedMap];
 		if (typeof gamut === 'string') gamut = gamuts[gamut as keyof ColorGamutNamedMap];
 
-		this.trc = trc.props({ whiteLevel, blackLevel });
+		this.trc = trc.props({ whiteLuminance, blackLuminance });
 		this.gamut = gamut;
 		this.bpc = bpc;
 
@@ -54,28 +54,28 @@ export class RGBEncodedSpace extends ColorSpace {
 				toFn: (
 					RGBLinear,
 					{
-						rgbWhiteLevel = this.convertingProps?.rgbWhiteLevel ?? 1,
-						rgbBlackLevel = this.convertingProps?.rgbBlackLevel ?? 0,
+						rgbWhiteLuminance = this.convertingProps?.rgbWhiteLuminance ?? 1,
+						rgbBlackLuminance = this.convertingProps?.rgbBlackLuminance ?? 0,
 					} = {}
 				) =>
 					RGBLinear_to_RGBEncoded(RGBLinear, {
 						trc: this.trc,
-						rgbWhiteLevel,
-						rgbBlackLevel,
+						rgbWhiteLuminance,
+						rgbBlackLuminance,
 						bpc: this.bpc,
 					}),
 				// RGBEncoded -> RGBLinear
 				fromFn: (
 					RGBEncoded,
 					{
-						rgbWhiteLevel = this.convertingProps?.rgbWhiteLevel ?? 1,
-						rgbBlackLevel = this.convertingProps?.rgbBlackLevel ?? 0,
+						rgbWhiteLuminance = this.convertingProps?.rgbWhiteLuminance ?? 1,
+						rgbBlackLuminance = this.convertingProps?.rgbBlackLuminance ?? 0,
 					} = {}
 				) =>
 					RGBEncoded_to_RGBLinear(RGBEncoded, {
 						trc: this.trc,
-						rgbWhiteLevel,
-						rgbBlackLevel,
+						rgbWhiteLuminance,
+						rgbBlackLuminance,
 						bpc: this.bpc,
 					}),
 			});
@@ -90,8 +90,8 @@ export class RGBEncodedSpace extends ColorSpace {
 			trc: this.trc,
 			gamut: this.gamut,
 			bpc,
-			whiteLevel: this.convertingProps?.rgbWhiteLevel,
-			blackLevel: this.convertingProps?.rgbBlackLevel,
+			whiteLuminance: this.convertingProps?.rgbWhiteLuminance,
+			blackLuminance: this.convertingProps?.rgbBlackLuminance,
 			conversions: [
 				{
 					space: this,
@@ -115,13 +115,13 @@ function RGBLinear_to_RGBEncoded(
 	RGBLinear: number[],
 	{
 		trc,
-		rgbWhiteLevel = 1,
-		rgbBlackLevel = 0,
+		rgbWhiteLuminance = 1,
+		rgbBlackLuminance = 0,
 		bpc = 0,
-	}: { trc: ToneResponse; rgbWhiteLevel: number; rgbBlackLevel: number; bpc: number }
+	}: { trc: ToneResponse; rgbWhiteLuminance: number; rgbBlackLuminance: number; bpc: number }
 ) {
 	let rgbEncoded = RGBLinear.map((u) =>
-		trc.invEotf(u, { whiteLevel: rgbWhiteLevel, blackLevel: rgbBlackLevel })
+		trc.invEotf(u, { whiteLuminance: rgbWhiteLuminance, blackLuminance: rgbBlackLuminance })
 	);
 
 	if (bpc > 0) {
@@ -135,15 +135,15 @@ function RGBEncoded_to_RGBLinear(
 	RGBEncoded: number[],
 	{
 		trc,
-		rgbWhiteLevel = 1,
-		rgbBlackLevel = 0,
+		rgbWhiteLuminance = 1,
+		rgbBlackLuminance = 0,
 		bpc = 0,
-	}: { trc: ToneResponse; rgbWhiteLevel: number; rgbBlackLevel: number; bpc: number }
+	}: { trc: ToneResponse; rgbWhiteLuminance: number; rgbBlackLuminance: number; bpc: number }
 ) {
 	return RGBEncoded.map((u) =>
 		trc.eotf(bpc > 0 ? u / ((2 << (bpc - 1)) - 1) : u, {
-			whiteLevel: rgbWhiteLevel,
-			blackLevel: rgbBlackLevel,
+			whiteLuminance: rgbWhiteLuminance,
+			blackLuminance: rgbBlackLuminance,
 		})
 	);
 }
