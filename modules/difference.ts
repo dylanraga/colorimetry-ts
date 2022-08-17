@@ -5,7 +5,11 @@
 import { Color } from './color.js';
 import { DE_ITP } from './difference/deitp.js';
 
-export type ColorDifferenceMethod<P = Record<string, unknown>> = (colorA: Color, colorB: Color, props: P) => number;
+export type ColorDifferenceMethod<P = Record<string, unknown>> = (
+	colorA: Color,
+	colorB: Color,
+	props: P
+) => number;
 
 type ColorDifferenceMethodName = keyof ColorDifferenceMethodNamedMap | (string & Record<never, never>);
 type ColorDifferenceMethodProps<T> = T extends ColorDifferenceMethod<infer P> ? P : Record<string, unknown>;
@@ -37,7 +41,7 @@ function _getDifference<T extends ColorDifferenceMethodType>(
 	method = DE_ITP as T,
 	props = {} as ColorDifferenceMethodProps<ColorDifferenceMethodTypeMethod<T>>
 ) {
-	getDifference(this, colorB, method, props);
+	return getDifference(this, colorB, method, props);
 }
 
 declare module './color' {
@@ -49,8 +53,8 @@ declare module './color' {
 	}
 }
 
-Object.defineProperty(Color, 'dE', getDifference);
-Object.defineProperty(Color.prototype, 'dE', _getDifference);
+Color.dE = getDifference;
+Color.prototype.dE = _getDifference;
 
 /*
 export const DE_UV: DEMethod = (colorA, colorB) => {
