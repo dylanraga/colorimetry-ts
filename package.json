@@ -1,6 +1,6 @@
 {
 	"name": "colorimetry-ts",
-	"version": "0.4.12",
+	"version": "0.4.13",
 	"description": "Functions related to the colorimetric representation and manipulation using Typescript",
 	"main": "build/colorimetry.js",
 	"types": "build/colorimetry.d.ts",
