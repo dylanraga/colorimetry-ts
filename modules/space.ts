@@ -163,6 +163,7 @@ export interface ColorSpaceConvertingProps {
 	rgbBlackLuminance?: number;
 	refWhiteLuminance?: number;
 	refBlackLuminance?: number;
+	inGamut?: boolean;
 }
 
 export type ColorSpaceConvertingFunction = (values: number[], props?: ColorSpaceConvertingProps) => number[];

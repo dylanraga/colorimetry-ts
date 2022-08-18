@@ -1,3 +1,4 @@
+import { clampInGamut } from './rgb-linear/clamp-gamut.js';
 import { quantizeToBits } from '../common/util.js';
 import { ColorGamut, ColorGamutName, ColorGamutNamedMap, gamuts } from '../gamut.js';
 import { ColorSpace, ColorSpaceConstructorProps } from '../space.js';
@@ -56,14 +57,20 @@ export class RGBEncodedSpace extends ColorSpace {
 					{
 						rgbWhiteLuminance = this.convertingProps?.rgbWhiteLuminance ?? 1,
 						rgbBlackLuminance = this.convertingProps?.rgbBlackLuminance ?? 0,
+						inGamut = false,
 					} = {}
 				) =>
-					RGBLinear_to_RGBEncoded(RGBLinear, {
-						trc: this.trc,
-						rgbWhiteLuminance,
-						rgbBlackLuminance,
-						bpc: this.bpc,
-					}),
+					RGBLinear_to_RGBEncoded(
+						inGamut
+							? clampInGamut(RGBLinear, rgbLinearSpace, rgbWhiteLuminance, rgbBlackLuminance)
+							: RGBLinear,
+						{
+							rgbWhiteLuminance,
+							rgbBlackLuminance,
+							trc: this.trc,
+							bpc: this.bpc,
+						}
+					),
 				// RGBEncoded -> RGBLinear
 				fromFn: (
 					RGBEncoded,
@@ -118,7 +125,12 @@ function RGBLinear_to_RGBEncoded(
 		rgbWhiteLuminance = 1,
 		rgbBlackLuminance = 0,
 		bpc = 0,
-	}: { trc: ToneResponse; rgbWhiteLuminance: number; rgbBlackLuminance: number; bpc: number }
+	}: {
+		trc: ToneResponse;
+		rgbWhiteLuminance: number;
+		rgbBlackLuminance: number;
+		bpc: number;
+	}
 ) {
 	let rgbEncoded = RGBLinear.map((u) =>
 		trc.invEotf(u, { whiteLuminance: rgbWhiteLuminance, blackLuminance: rgbBlackLuminance })

@@ -28,8 +28,8 @@ export const ILLUMINANT_D55: xy = {
 // Actual: x 0.312711595379167 y 0.329008404427849
 // as derived from SPD specified in `ISO 11664-2:2007`
 export const ILLUMINANT_D65: xy = {
-	x: 0.31271,
-	y: 0.32901,
+	x: 0.312711595379167,
+	y: 0.329008404427849,
 };
 
 // D75

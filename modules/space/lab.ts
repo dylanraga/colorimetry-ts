@@ -1,4 +1,4 @@
-import { ColorSpace, ColorSpaceConstructorProps } from '../space.js';
+import { ColorSpace, ColorSpaceConstructorProps, spaces } from '../space.js';
 import { Lab_to_LCh, LChSpace, LCh_to_Lab } from './lch.js';
 
 export class LabSpace extends ColorSpace {
@@ -10,16 +10,22 @@ export class LabSpace extends ColorSpace {
 	 * Returns the cylindrical LCh form of the current Lab space
 	 */
 	public toLCh() {
-		const lchSpace = new LChSpace({
-			name: `LCh ColorSpace (${this.name})`,
-			conversions: [
-				{
-					space: this,
-					toFn: LCh_to_Lab,
-					fromFn: Lab_to_LCh,
-				},
-			],
-		});
+		const lchId = this.id ? `${this.id}_lch` : undefined;
+		let lchSpace = lchId ? spaces[lchId] : undefined;
+
+		if (!lchSpace) {
+			lchSpace = new LChSpace({
+				id: lchId,
+				name: `LCh ColorSpace (${this.name})`,
+				conversions: [
+					{
+						space: this,
+						toFn: LCh_to_Lab,
+						fromFn: Lab_to_LCh,
+					},
+				],
+			});
+		}
 
 		return lchSpace;
 	}
