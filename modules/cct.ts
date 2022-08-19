@@ -26,7 +26,8 @@ const kix = (i: number, t: number) =>
 // u, v is in reference to 1960 UCS u, v rather than 1976 u', v'
 export function uv_to_Duv([u, v]: number[]) {
 	const L_FP = Math.sqrt((u - 0.292) * (u - 0.292) + (v - 0.24) * (v - 0.24));
-	const a = Math.atan2(v - 0.24, u - 0.292);
+	const ap = Math.atan2(v - 0.24, u - 0.292);
+	const a = ap < 0 ? ap + Math.PI : ap;
 	const L_BB = kix(0, a);
 	const Duv = L_FP - L_BB;
 
@@ -35,7 +36,8 @@ export function uv_to_Duv([u, v]: number[]) {
 
 export function uv_to_CCT([u, v]: number[]) {
 	const L_FP = Math.sqrt((u - 0.292) * (u - 0.292) + (v - 0.24) * (v - 0.24));
-	const a = Math.atan2(v - 0.24, u - 0.292);
+	const ap = Math.atan2(v - 0.24, u - 0.292);
+	const a = ap < 0 ? ap + Math.PI : ap;
 	const L_BB = kix(0, a);
 	const Duv = L_FP - L_BB;
 

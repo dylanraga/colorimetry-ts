@@ -51,6 +51,9 @@ export { Color };
 import { cctData } from './modules/common/locus_10nm.js';
 export { cctData };
 
+import { cmfs1931Data } from './modules/misc/cmfs-cie1931xyz-2deg.js';
+export { cmfs1931Data };
+
 import './modules/defaults.js';
 
 export { mmult3331, mmult3333, minv, mmult, quantizeToBits, roundHTE } from './modules/common/util.js';

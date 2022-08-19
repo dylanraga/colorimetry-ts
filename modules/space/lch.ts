@@ -32,7 +32,8 @@ export class LChSpace extends ColorSpace {
 }
 
 export function Lab_to_LCh([L, a, b]: number[]) {
-	return [L, (a * a + b * b) ** (1 / 2), rad2deg(Math.atan2(b, a))];
+	const hp = rad2deg(Math.atan2(b, a));
+	return [L, (a * a + b * b) ** (1 / 2), hp < 0 ? hp + 360 : hp];
 }
 
 export function LCh_to_Lab([L, C, h]: number[]) {
