@@ -42,4 +42,13 @@ export abstract class Registerable {
 			parent.named[id] = registerable;
 		}
 	}
+
+	public static get(id: string) {
+		const registerable = this.named[id];
+		if (registerable === undefined) {
+			throw new ReferenceError(`${this.name} id '${id}' does not exist`);
+		}
+
+		return registerable;
+	}
 }

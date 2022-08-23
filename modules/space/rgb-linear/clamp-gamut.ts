@@ -35,7 +35,7 @@ export function clampInGamut(
 	const rgbLch = new Color(rgbSpace, rgb).get(lchSpace);
 
 	let dEFromClipped = Color.dE(new Color(lchSpace, rgbLch), new Color(rgbSpace, rgbClamped));
-	console.log('currRgb', rgb, rgbClamped, dEFromClipped);
+	//console.log('currRgb', rgb, rgbClamped, dEFromClipped);
 	while (dEFromClipped > tolerance) {
 		// Give up on significantly higher or lower lightness clampings
 		if (rgbLch[1] < jnd) {
@@ -52,7 +52,7 @@ export function clampInGamut(
 		}
 		rgbClamped = currRgb.map((u) => clamp(u, blackLuminance, whiteLuminance));
 		dEFromClipped = Color.dE(currLchColor, new Color(rgbSpace, rgbClamped));
-		console.log('currRgb', currRgb, rgbClamped, dEFromClipped);
+		//console.log('currRgb', currRgb, rgbClamped, dEFromClipped);
 	}
 
 	return rgbClamped;
