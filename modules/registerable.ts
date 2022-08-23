@@ -43,8 +43,8 @@ export abstract class Registerable {
 		}
 	}
 
-	public static get<T extends Registerable>(id: string) {
-		const registerable = this.named[id] as T;
+	public static get<T extends typeof Registerable>(this: T, id: string): InstanceType<T> {
+		const registerable = this.named[id] as InstanceType<T>;
 		if (registerable === undefined) {
 			throw new ReferenceError(`${this.name} id '${id}' does not exist`);
 		}
