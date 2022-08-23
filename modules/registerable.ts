@@ -43,8 +43,8 @@ export abstract class Registerable {
 		}
 	}
 
-	public static get(id: string) {
-		const registerable = this.named[id];
+	public static get<T extends Registerable>(id: string) {
+		const registerable = this.named[id] as T;
 		if (registerable === undefined) {
 			throw new ReferenceError(`${this.name} id '${id}' does not exist`);
 		}
