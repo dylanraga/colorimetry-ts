@@ -28,7 +28,10 @@ import { RGBEncodedSpace, rgbSpaces } from './modules/space/rgb-encoded.js';
 import './modules/space/rgb-encoded/predefined.js';
 export { RGBEncodedSpace, rgbSpaces };
 
-import { ChromaticitySpace, chromaticitySpaces } from './modules/space/chromaticity.js';
+import {
+	ChromaticitySpace,
+	chromaticitySpaces,
+} from './modules/space/chromaticity.js';
 import './modules/space/chromaticity/predefined.js';
 export { ChromaticitySpace, chromaticitySpaces };
 
@@ -51,9 +54,19 @@ export { Color };
 import { cctData } from './modules/common/locus_10nm.js';
 export { cctData };
 
+import { daylightLocusData } from './modules/common/daylightlocus_10nm.js';
+export { daylightLocusData };
+
 import { cmfs1931Data } from './modules/misc/cmfs-cie1931xyz-2deg.js';
 export { cmfs1931Data };
 
 import './modules/defaults.js';
 
-export { mmult3331, mmult3333, minv, mmult, quantizeToBits, roundHTE } from './modules/common/util.js';
+export {
+	mmult3331,
+	mmult3333,
+	minv,
+	mmult,
+	quantizeToBits,
+	roundHTE,
+} from './modules/common/util.js';

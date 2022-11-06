@@ -25,7 +25,10 @@ class XYZSpace extends ColorSpace {
 		this.illuminant = illuminant;
 	}
 
-	public cat(dstIlluminant: xy, method: ChromaticAdaptationMethodName = 'bradford') {
+	public cat(
+		dstIlluminant: xy,
+		method: ChromaticAdaptationMethodName = 'bradford'
+	) {
 		const { x: srcx, y: srcy } = this.illuminant;
 		const { x: dstx, y: dsty } = dstIlluminant;
 
@@ -37,8 +40,20 @@ class XYZSpace extends ColorSpace {
 			conversions: [
 				{
 					space: this,
-					toFn: (dstXYZ) => xyzCat(dstXYZ, { x: dstx, y: dsty, Y: 1 }, { x: srcx, y: srcy, Y: 1 }, method),
-					fromFn: (srcXYZ) => xyzCat(srcXYZ, { x: srcx, y: srcy, Y: 1 }, { x: dstx, y: dsty, Y: 1 }, method),
+					toFn: (dstXYZ) =>
+						xyzCat(
+							dstXYZ,
+							{ x: dstx, y: dsty, Y: 1 },
+							{ x: srcx, y: srcy, Y: 1 },
+							method
+						),
+					fromFn: (srcXYZ) =>
+						xyzCat(
+							srcXYZ,
+							{ x: srcx, y: srcy, Y: 1 },
+							{ x: dstx, y: dsty, Y: 1 },
+							method
+						),
 				},
 			],
 		});
@@ -53,7 +68,9 @@ class XYZSpace extends ColorSpace {
 }
 
 export interface XYZSpaceNamedMap {}
-export type XYZSpaceName = keyof XYZSpaceNamedMap | (string & Record<never, never>);
+export type XYZSpaceName =
+	| keyof XYZSpaceNamedMap
+	| (string & Record<never, never>);
 
 declare module '../space' {
 	interface ColorSpaceNamedMap extends XYZSpaceNamedMap {}
