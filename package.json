@@ -8,7 +8,7 @@
 	"scripts": {
 		"build": "tsc",
 		"prepublish": "npm run build",
-		"test": "cls && ts-node ./test"
+		"test": "cls && ts-node ./test/index.ts"
 	},
 	"repository": {
 		"type": "git",

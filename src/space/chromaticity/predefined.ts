@@ -1,2 +1,2 @@
-import './uv.js';
-import './xy.js';
+export { uv } from "./uv.js";
+export { xy } from "./xy.js";
