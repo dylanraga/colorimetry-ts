@@ -2,49 +2,54 @@
 /* Author: Dylan Raga */
 /*====================*/
 
-import { ColorGamut, ColorGamutPrimaries, gamuts } from "./src/gamut.js";
-import "./src/gamut/predefined.js";
-export { ColorGamut, ColorGamutPrimaries, gamuts };
+// import { ColorGamut, ColorGamutPrimaries, gamuts } from "./src/gamut.ts.bak";
+// import { ColorGamutPrimaries } from "./src/gamut.js";
+// import "./src/gamuts/index.js";
 
-import * as curves from "./src/trc/index.js";
+import * as gamuts from "./src/gamuts/index.js";
+export { gamuts };
+
+import * as curves from "./src/curves/index.js";
 export { curves };
 
-import * as illuminants from "./src/illuminant/predefined.js";
+import * as illuminants from "./src/illuminants/index.js";
 export { illuminants };
 
-import { xyzCat } from "./src/cat.js";
-export { xyzCat };
+import * as spaces from "./src/spaces/index.js";
+export { spaces };
 
-import { XYZSpace, xyzSpaces } from "./src/space/xyz.js";
-import "./src/space/xyz/predefined.js";
-export { XYZSpace, xyzSpaces };
+// import { xyzCat } from "./src/cat.js";
+// export { xyzCat };
 
-import { RGBLinearSpace, rgbLinearSpaces } from "./src/space/rgb-linear.js";
-import "./src/space/rgb-linear/predefined.js";
-export { RGBLinearSpace, rgbLinearSpaces };
+// import { XYZSpace, xyzSpaces } from "./src/spaces/xyz.ts";
+// import "./src/spaces/xyz/predefined.js";
+// export { XYZSpace, xyzSpaces };
 
-import { RGBEncodedSpace, rgbSpaces } from "./src/space/rgb-encoded.js";
-import "./src/space/rgb-encoded/predefined.js";
-export { RGBEncodedSpace, rgbSpaces };
+// import { RGBLinearSpace, rgbLinearSpaces } from "./src/spaces/rgb-linear.js";
+// import "./src/spaces/rgb-linear/predefined.js";
+// export { RGBLinearSpace, rgbLinearSpaces };
 
-import { ChromaticitySpace } from "./src/space/chromaticity.js";
-import * as chromaticitySpaces from "./src/space/chromaticity/predefined.js";
-export { ChromaticitySpace, chromaticitySpaces };
+// import { RGBEncodedSpace, rgbSpaces } from "./src/spaces/rgb-encoded.js";
+// import "./src/spaces/rgb-encoded/predefined.js";
+// export { RGBEncodedSpace, rgbSpaces };
 
-import { LabSpace, labSpaces } from "./src/space/lab.js";
-import "./src/space/lab/predefined.js";
-export { LabSpace, labSpaces };
+// import { ChromaticitySpace } from "./src/spaces/chromaticity.js";
+// import * as chromaticitySpaces from "./src/spaces/chromaticity/predefined.js";
+// export { ChromaticitySpace, chromaticitySpaces };
 
-import { ColorSpace, ColorSpaceName, spaces } from "./src/space.js";
-export { ColorSpace, ColorSpaceName, spaces };
+// import { LabSpace, labSpaces } from "./src/spaces/lab.js";
+// import "./src/spaces/lab/predefined.js";
+// export { LabSpace, labSpaces };
 
-import { Color } from "./src/color.js";
-import "./src/difference/predefined.js";
-import "./src/difference.js";
+import { Color, color } from "./src/color.js";
+import * as diffs from "./src/diffs/index.js";
+export { diffs };
+import { colorDiff } from "./src/diff.js";
 import "./src/color/luminance.js";
-import "./src/color/luma.js";
+// import "./src/color/luma.js";
 import "./src/color/cct.js";
-export { Color };
+import "./src/color/clamp-gamut.js";
+export { Color, color, colorDiff };
 
 //import * as cctData from './src/common/locus_10nm.json';
 import { cctData } from "./src/misc/locus_10nm.js";

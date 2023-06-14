@@ -2,6 +2,8 @@
 /* Utility functions */
 /*===================*/
 
+// import { TransferFunction } from "../curves/trc.js";
+
 export function arrayEquals(a: number[], b: number[]) {
   return a.length === b.length && a.every((v, i) => v === b[i]);
 }
@@ -202,7 +204,7 @@ export const deg2rad = (x: number) => x * (Math.PI / 180);
  * @param searchedNode Source of edges as a function of the current node
  * @returns Path array from `start` to `end`
  */
-export function bfsPath<T>(start: T, end: T, edges: (curr: T) => T[]): T[] | undefined {
+export function bfsPath<T>(start: T, end: T, edges: (curr: T) => T[]) {
   let curr = start;
   const queue = [[curr]];
   const visited: T[][] = [[]];
@@ -213,7 +215,7 @@ export function bfsPath<T>(start: T, end: T, edges: (curr: T) => T[]): T[] | und
     curr = path[path.length - 1];
     visited.push(path);
 
-    if (curr === end) return path;
+    if (curr === end && path.length > 1) return path;
 
     if (!curr) continue;
     for (const k of edges(curr)) {
@@ -225,4 +227,11 @@ export function bfsPath<T>(start: T, end: T, edges: (curr: T) => T[]): T[] | und
 
 export function evenFn(fn: (input: number) => number): (input: number) => number {
   return (input) => (input < 0 ? -1 * fn(-input) : fn(input));
+}
+
+export function withProps<F extends (...args: any) => any>(fn: F, props: Parameters<F>[1], propsArgNum = 1) {
+  return ((...args) => {
+    args[propsArgNum] = { ...props, ...args[propsArgNum] };
+    return fn(...args);
+  }) as F;
 }
