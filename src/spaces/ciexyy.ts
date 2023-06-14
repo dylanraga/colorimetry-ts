@@ -20,7 +20,7 @@ export const xyy = new ColorSpace({
 /**
  * CIE1931 Yxy<->XYZ conversion functions
  */
-export function xyyToXyz([Y, x, y]: number[]) {
+export function xyyToXyz([x, y, Y]: number[]) {
   const X = (x * Y) / y;
   const Z = ((1 - x - y) * Y) / y;
 
@@ -32,11 +32,11 @@ export function xyzToXyy([X, Y, Z]: number[]) {
   const x = X / denom;
   const y = Y / denom;
 
-  return [Y, x, y];
+  return [x, y, Y];
 }
 
-export interface Yxy {
-  Y: number;
+export interface xyY {
   x: number;
   y: number;
+  Y: number;
 }
