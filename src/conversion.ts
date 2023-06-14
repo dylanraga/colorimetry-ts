@@ -98,9 +98,17 @@ export function getSpaceConversion(
 
 function composeFnList(fnList: ColorSpaceConversion[]): ColorSpaceConversion {
   // return (values, props = {}) => fnList.reduce((a, b) => b(a, Object.assign({ ...defaultProps }, props)), values);
-  return (values, { srcSpaceContext, dstSpaceContext } = {}) =>
+  return (values, { srcSpaceContext, dstSpaceContext, ...props } = {}) =>
     fnList.reduce(
-      (a, b, i) => b(a, i === 0 ? { ...srcSpaceContext } : i === fnList.length - 1 ? { ...dstSpaceContext } : {}),
+      (a, b, i) =>
+        b(
+          a,
+          i === 0
+            ? { srcSpaceContext, ...srcSpaceContext }
+            : i === fnList.length - 1
+            ? { dstSpaceContext, ...dstSpaceContext }
+            : {}
+        ),
       values
     );
 }
