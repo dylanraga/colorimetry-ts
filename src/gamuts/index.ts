@@ -16,7 +16,7 @@ export const srgb: ColorGamutPrimaries = {
 };
 
 // SMPTE EG 432-1:2010
-export const p3d65: ColorGamutPrimaries = {
+export const p3_d65: ColorGamutPrimaries = {
   id: "p3-d65",
   name: "P3-D65",
   white: { ...illuminants.d65 },
@@ -26,7 +26,7 @@ export const p3d65: ColorGamutPrimaries = {
 };
 
 // DCI-P3 for ACES Cinema
-export const p3aces: ColorGamutPrimaries = {
+export const p3_aces: ColorGamutPrimaries = {
   id: "p3-aces",
   name: "P3-ACES",
   alias: ["p3-d60"],
@@ -37,7 +37,7 @@ export const p3aces: ColorGamutPrimaries = {
 };
 
 // DCI Digital Cinema System Section 8.3.4
-export const p3dci: ColorGamutPrimaries = {
+export const p3_dci: ColorGamutPrimaries = {
   id: "p3-dci",
   name: "DCI-P3",
   alias: ["dci-p3"],
