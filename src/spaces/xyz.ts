@@ -39,8 +39,8 @@ export function xyzNToXyz(
   }
 ) {
   const Y = (whiteLuminance - blackLuminance) * Yn + blackLuminance;
-  const X = Yn !== 0 ? Xn / (Y / Yn) : Xn;
-  const Z = Yn !== 0 ? Zn / (Y / Yn) : Zn;
+  const X = Yn !== 0 ? Xn / (Yn / Y) : Xn;
+  const Z = Yn !== 0 ? Zn / (Yn / Y) : Zn;
   return [X, Y, Z];
 }
 

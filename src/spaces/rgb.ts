@@ -124,7 +124,7 @@ function linearRgbToEncodedRgb(
   }
 ) {
   const V = linearRgb.map((v) => curve.invEotf(v, { whiteLuminance, blackLuminance, peakLuminance }));
-  return bitDepth > 0 ? V.map(quantizeToBits) : V;
+  return bitDepth > 0 ? V.map((v) => quantizeToBits(v, bitDepth)) : V;
 }
 
 function encodedRgbToLinearRgb(
