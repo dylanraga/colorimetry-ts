@@ -57,7 +57,7 @@ export function getSpaceConversion(
   );
   if (!path) throw new Error(`No conversion path found from ${_srcSpace.name} to ${_dstSpace.name}`);
 
-  console.log(path.map((p) => p.name));
+  // console.log(path.map((p) => p.name));
 
   const fnList: Array<ColorSpaceConversion> = [];
   for (let i = 0; i < path.length - 1; i++) {

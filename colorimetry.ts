@@ -2,29 +2,29 @@
 /* Author: Dylan Raga */
 /*====================*/
 
-import { ColorGamutPrimaries } from "./src/gamut.js";
-export { ColorGamutPrimaries };
-
 import * as gamuts from "./src/gamuts/index.js";
 export { gamuts };
 
-import { ToneResponseCurve } from "./src/curves.js";
-export { ToneResponseCurve };
+import { ColorGamutPrimaries } from "./src/gamut.js";
+export { ColorGamutPrimaries };
 
 import * as curves from "./src/curves/index.js";
 export { curves };
 
+import { ToneResponseCurve } from "./src/curves.js";
+export { ToneResponseCurve };
+
 import * as illuminants from "./src/illuminants/index.js";
 export { illuminants };
-
-import { ColorSpace } from "./src/space.js";
-export { ColorSpace };
 
 import * as spaces from "./src/spaces/index.js";
 export { spaces };
 
 import { rgbSpace, linearRgbSpace } from "./src/spaces/rgb.js";
 export { rgbSpace, linearRgbSpace };
+
+import { ColorSpace } from "./src/space.js";
+export { ColorSpace };
 
 // import { xyzCat } from "./src/cat.js";
 // export { xyzCat };
