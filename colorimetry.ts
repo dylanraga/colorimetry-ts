@@ -23,6 +23,9 @@ export { ColorSpace };
 import * as spaces from "./src/spaces/index.js";
 export { spaces };
 
+import { rgbSpace, linearRgbSpace } from "./src/spaces/rgb.js";
+export { rgbSpace, linearRgbSpace };
+
 // import { xyzCat } from "./src/cat.js";
 // export { xyzCat };
 

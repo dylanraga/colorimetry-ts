@@ -1,5 +1,5 @@
 export * from "./rgb/index.js";
-export * from "./xyz.js";
+export { xyz, xyz_n } from "./xyz.js";
 export { lab, lab_d50, lch } from "./cielab.js";
 export { luv } from "./cieluv.js";
 export { xyy } from "./ciexyy.js";
