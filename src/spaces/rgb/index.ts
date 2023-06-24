@@ -48,7 +48,7 @@ export const rec709 = rgbSpace({
 // Apple Inc. Display P3
 export const display_p3 = rgbSpace({
   name: "Display P3",
-  gamut: gamuts.p3d65,
+  gamut: gamuts.p3_d65,
   curve: curves.srgb,
   whiteLuminance: 80,
   blackLuminance: 0.2,
@@ -57,7 +57,7 @@ export const display_p3 = rgbSpace({
 // Digital Cinema Initiative P3
 export const p3_dci = rgbSpace({
   name: "DCI-P3",
-  gamut: gamuts.p3dci,
+  gamut: gamuts.p3_dci,
   curve: curves.gamma2p6,
   whiteLuminance: 48,
   blackLuminance: 0.005,
@@ -66,7 +66,7 @@ export const p3_dci = rgbSpace({
 // Digital Cinema Initiative P3 with D65
 export const p3_d65 = rgbSpace({
   name: "Display P3",
-  gamut: gamuts.p3d65,
+  gamut: gamuts.p3_d65,
   curve: curves.gamma2p2,
   whiteLuminance: 100,
   blackLuminance: 0,
