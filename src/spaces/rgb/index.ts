@@ -9,7 +9,7 @@ export const srgb_linear = linearRgbSpace({
 
 export const p3_d65_linear = linearRgbSpace({
   name: "P3-D65 Linear",
-  gamut: gamuts.p3d65,
+  gamut: gamuts.p3_d65,
 });
 
 export const bt2020_linear = linearRgbSpace({
