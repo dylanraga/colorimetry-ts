@@ -5,8 +5,8 @@
  * Currently using "wrong" Von Kries/XYZ scaling per spec; consider implementing manual Bradford CAT option in the future
  */
 
-import { illuminants } from "../../colorimetry.js";
-import { curves } from "../curves.js";
+import { lstar } from "../curves/lstar.js";
+import { illuminants } from "../illuminants/index.js";
 import { ColorSpace } from "../space.js";
 import { lchSpace } from "./lch.js";
 import { xy, xyToXyz } from "./xy.js";
@@ -42,7 +42,7 @@ export function xyzToCielab(
 ) {
   const [Xr, Yr, Zr] = xyToXyz([refWhite.x, refWhite.y], { whiteLuminance });
 
-  const f = (x: number) => (100 * curves.lstar.invEotf(x) + 16) / 116;
+  const f = (x: number) => (100 * lstar.invEotf(x) + 16) / 116;
   const L = 116 * f(Y / Yr) - 16;
   const a = 500 * (f(X / Xr) - f(Y / Yr));
   const b = 200 * (f(Y / Yr) - f(Z / Zr));
@@ -56,7 +56,7 @@ export function cielabToXyz(
 ) {
   const [Xr, Yr, Zr] = xyToXyz([refWhite.x, refWhite.y], { whiteLuminance });
 
-  const fInv = (x: number) => curves.lstar.eotf((116 * x - 16) / 100);
+  const fInv = (x: number) => lstar.eotf((116 * x - 16) / 100);
   const Lp = (L + 16) / 116;
   const X = Xr * fInv(Lp + a / 500);
   const Y = Yr * fInv(Lp);

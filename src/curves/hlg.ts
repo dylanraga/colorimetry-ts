@@ -2,38 +2,31 @@
  * Hybrid-Log Gamma / Rec.2100 / ARIB STD-B67
  */
 
-import { ToneResponseCurve } from "../curves.js";
+import { ToneResponseCurve } from "./index.js";
 
 const a = 0.17883277;
 const b = 0.28466892;
 const c = 0.559910729529562;
 
-interface HlgTransferProps {
+type HlgTransferProps = {
   peakLuminance: number;
   whiteLuminance: number;
   blackLuminance: number;
   gamma: number;
-}
+};
 
 const defaults: HlgTransferProps = {
-  peakLuminance: 100,
+  peakLuminance: 1000,
   whiteLuminance: 203,
   blackLuminance: 0,
   gamma: 1.2,
 };
 
-export const hlg: ToneResponseCurve<HlgTransferProps> = {
+export const hlgCurve = (gamma: number = defaults.gamma): ToneResponseCurve<HlgTransferProps> => ({
   id: "hlg",
   name: "HLG",
 
-  eotf: (
-    V,
-    {
-      peakLuminance = defaults.peakLuminance,
-      blackLuminance = defaults.blackLuminance,
-      gamma = defaults.gamma,
-    } = defaults
-  ) => {
+  eotf: (V, { peakLuminance = defaults.peakLuminance, blackLuminance = defaults.blackLuminance } = defaults) => {
     const _gamma = gamma + 0.42 * Math.log10(peakLuminance / 1000);
     const beta = Math.sqrt(3 * (blackLuminance / peakLuminance) ** (1 / _gamma));
 
@@ -41,24 +34,21 @@ export const hlg: ToneResponseCurve<HlgTransferProps> = {
     const E = f(Math.max(0, V * (1 - beta) + beta));
     const L = peakLuminance * E ** _gamma;
 
-    return Number(L.toPrecision(8));
+    // return Number(L.toPrecision(8));
+    return L;
   },
 
-  invEotf: (
-    L,
-    {
-      peakLuminance = defaults.peakLuminance,
-      blackLuminance = defaults.blackLuminance,
-      gamma = defaults.gamma,
-    } = defaults
-  ) => {
+  invEotf: (L, { peakLuminance = defaults.peakLuminance, blackLuminance = defaults.blackLuminance } = defaults) => {
     const _gamma = gamma + 0.42 * Math.log10(peakLuminance / 1000);
     const beta = Math.sqrt(3 * (blackLuminance / peakLuminance) ** (1 / _gamma));
 
     const E = (L / peakLuminance) ** (1 / _gamma);
     let V = E > 1 / 12 ? a * Math.log(12 * E - b) + c : Math.sqrt(E * 3);
-    V = Math.max(0, (+V.toPrecision(8) - beta) / (1 - beta));
+    // V = Math.max(0, (+V.toPrecision(8) - beta) / (1 - beta));
+    V = Math.max(0, (V - beta) / (1 - beta));
 
     return V;
   },
-};
+});
+
+export const hlg = hlgCurve(1.2);

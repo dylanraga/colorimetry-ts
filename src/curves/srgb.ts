@@ -3,15 +3,15 @@
  * https://entropymine.com/imageworsener/srgbformula/
  */
 import { evenFn } from "../common/util.js";
-import { ToneResponseCurve } from "../curves.js";
+import { ToneResponseCurve } from "./index.js";
 
 const X1 = 0.0404482362771082;
 const X2 = 0.00313066844250063;
 
-interface SrgbTransferProps {
+type SrgbTransferProps = {
   whiteLuminance: number;
   blackLuminance: number;
-}
+};
 
 const defaults: SrgbTransferProps = {
   whiteLuminance: 1,

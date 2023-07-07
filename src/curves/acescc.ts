@@ -2,7 +2,7 @@
  * ACEScc
  * https://docs.acescentral.com/specifications/acescc/
  */
-import { ToneResponseCurve } from "../curves.js";
+import { ToneResponseCurve } from "./index.js";
 
 export const acescc: ToneResponseCurve = {
   id: "acescc",

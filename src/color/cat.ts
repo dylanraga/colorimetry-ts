@@ -1,9 +1,9 @@
 import { illuminants } from "../../colorimetry.js";
 import { Color } from "../color.js";
 import { minv, mmult3333, mmult3331 } from "../common/util.js";
-import { spaces } from "../space.js";
 import { xyY, xyyToXyz } from "../spaces/ciexyy.js";
 import { xy, xyToXyz } from "../spaces/xy.js";
+import { xyz as xyzSpace } from "../spaces/xyz.js";
 
 export type ChromaticAdaptationMethodName = "xyz" | "vonkries" | "bradford" | "cat02" | "cat16";
 
@@ -72,8 +72,8 @@ function _cat(
     method = "bradford",
   }: { refWhiteSrc?: xy; refWhiteDst: xy; method?: ChromaticAdaptationMethodName }
 ) {
-  const xyz = this.toSpace(spaces.xyz).values;
-  return new Color(spaces.xyz, xyzCat(xyz, { Y: 1, ...refWhiteSrc }, { Y: 1, ...refWhiteDst }, method)).toSpace(
+  const xyz = this.toSpace(xyzSpace).values;
+  return new Color(xyzSpace, xyzCat(xyz, { Y: 1, ...refWhiteSrc }, { Y: 1, ...refWhiteDst }, method)).toSpace(
     this.space
   );
 }

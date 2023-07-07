@@ -1,13 +1,13 @@
 /**
  * ITU-R BT.1886
  */
-import { ToneResponseCurve } from "../curves.js";
+import { ToneResponseCurve } from "./index.js";
 
-interface Bt1886TransferProps {
+type Bt1886TransferProps = {
   whiteLuminance: number;
   blackLuminance: number;
   gamma: number;
-}
+};
 
 const defaults: Bt1886TransferProps = {
   whiteLuminance: 1,

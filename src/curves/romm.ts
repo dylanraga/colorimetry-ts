@@ -2,14 +2,14 @@
  * Kodak ProPhoto / ROMM
  */
 import { evenFn } from "../common/util.js";
-import { ToneResponseCurve } from "../curves.js";
+import { ToneResponseCurve } from "./index.js";
 
 const Et = 1 / 512;
 
-interface RommTransferProps {
+type RommTransferProps = {
   whiteLuminance: number;
   blackLuminance: number;
-}
+};
 
 const defaults: RommTransferProps = {
   whiteLuminance: 1,

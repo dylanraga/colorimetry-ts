@@ -1,6 +1,6 @@
 import { linearRgbSpace, rgbSpace } from "../rgb.js";
-import * as gamuts from "../../gamuts/index.js";
-import * as curves from "../../curves/index.js";
+import { gamuts } from "../../gamuts/index.js";
+import { curves, gammaCurve } from "../../curves/index.js";
 
 export const srgb_linear = linearRgbSpace({
   name: "sRGB Linear",
@@ -76,7 +76,7 @@ export const p3_d65 = rgbSpace({
 export const adobergb = rgbSpace({
   name: "Adobe RGB 1998",
   gamut: gamuts.adobergb,
-  curve: curves.customGamma(563 / 256),
+  curve: gammaCurve(563 / 256),
   whiteLuminance: 160,
   blackLuminance: 0.5557,
 });

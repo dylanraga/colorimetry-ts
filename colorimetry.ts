@@ -2,22 +2,16 @@
 /* Author: Dylan Raga */
 /*====================*/
 
-import * as gamuts from "./src/gamuts/index.js";
-export { gamuts };
-
-import { ColorGamutPrimaries } from "./src/gamut.js";
-export { ColorGamutPrimaries };
-
-import * as curves from "./src/curves/index.js";
-export { curves };
-
-import { ToneResponseCurve } from "./src/curves.js";
-export { ToneResponseCurve };
-
-import * as illuminants from "./src/illuminants/index.js";
+import { illuminants } from "./src/illuminants/index.js";
 export { illuminants };
 
-import * as spaces from "./src/spaces/index.js";
+import { gamuts, ColorGamutPrimaries } from "./src/gamuts/index.js";
+export { gamuts, ColorGamutPrimaries };
+
+import { curves, ToneResponseCurve, gammaCurve, hlgCurve } from "./src/curves/index.js";
+export { curves, ToneResponseCurve, gammaCurve, hlgCurve };
+
+import { spaces } from "./src/spaces/index.js";
 export { spaces };
 
 import { rgbSpace, linearRgbSpace } from "./src/spaces/rgb.js";
@@ -29,28 +23,8 @@ export { ColorSpace };
 // import { xyzCat } from "./src/cat.js";
 // export { xyzCat };
 
-// import { XYZSpace, xyzSpaces } from "./src/spaces/xyz.ts";
-// import "./src/spaces/xyz/predefined.js";
-// export { XYZSpace, xyzSpaces };
-
-// import { RGBLinearSpace, rgbLinearSpaces } from "./src/spaces/rgb-linear.js";
-// import "./src/spaces/rgb-linear/predefined.js";
-// export { RGBLinearSpace, rgbLinearSpaces };
-
-// import { RGBEncodedSpace, rgbSpaces } from "./src/spaces/rgb-encoded.js";
-// import "./src/spaces/rgb-encoded/predefined.js";
-// export { RGBEncodedSpace, rgbSpaces };
-
-// import { ChromaticitySpace } from "./src/spaces/chromaticity.js";
-// import * as chromaticitySpaces from "./src/spaces/chromaticity/predefined.js";
-// export { ChromaticitySpace, chromaticitySpaces };
-
-// import { LabSpace, labSpaces } from "./src/spaces/lab.js";
-// import "./src/spaces/lab/predefined.js";
-// export { LabSpace, labSpaces };
-
 import { Color, color } from "./src/color.js";
-import * as diffs from "./src/diffs/index.js";
+import { diffs } from "./src/diffs/index.js";
 export { diffs };
 import { colorDiff } from "./src/diff.js";
 import "./src/color/luminance.js";

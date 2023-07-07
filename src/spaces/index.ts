@@ -1,10 +1,32 @@
-export * from "./rgb/index.js";
-export { xyz, xyz_n } from "./xyz.js";
-export { lab, lab_d50, lch } from "./cielab.js";
-export { luv } from "./cieluv.js";
-export { xyy } from "./ciexyy.js";
-export { ictcp, itp, itp_lch } from "./ictcp.js";
-export { jzazbz, jzczhz } from "./jzazbz.js";
-export { oklab, oklch } from "./oklab.js";
-export { uv } from "./uv.js";
-export { xy } from "./xy.js";
+import * as rgbSpaces from "./rgb/index.js";
+import { xyz, xyz_n } from "./xyz.js";
+import { lab, lab_d50, lch } from "./cielab.js";
+import { luv } from "./cieluv.js";
+import { xyy } from "./ciexyy.js";
+import { ictcp, itp, itp_lch } from "./ictcp.js";
+import { jzazbz, jzczhz } from "./jzazbz.js";
+import { oklab, oklch } from "./oklab.js";
+import { uv } from "./uv.js";
+import { xy } from "./xy.js";
+
+export const spaces = {
+  ...rgbSpaces,
+  xyz,
+  xyz_n,
+  lab,
+  lab_d50,
+  lch,
+  luv,
+  xyy,
+  ictcp,
+  itp,
+  itp_lch,
+  jzazbz,
+  jzczhz,
+  oklab,
+  oklch,
+  uv,
+  xy,
+};
+
+export { rgbSpace, linearRgbSpace } from "./rgb.js";

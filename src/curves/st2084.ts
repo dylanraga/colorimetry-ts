@@ -2,7 +2,7 @@
  * ST.2084 HDR / Rec.2100
  * TODO: Add tonemap knee w.r.t whiteLuminance & blackLuminance
  */
-import { ToneResponseCurve } from "../curves.js";
+import { ToneResponseCurve } from "./index.js";
 
 const m1 = 0.1593017578125;
 const m2 = 78.84375;
@@ -10,11 +10,11 @@ const c1 = 0.8359375;
 const c2 = 18.8515625;
 const c3 = 18.6875;
 
-interface St2084TransferProps {
+type St2084TransferProps = {
   peakLuminance: number;
   blackLuminance: number;
   m2: number;
-}
+};
 
 const defaults: St2084TransferProps = {
   peakLuminance: 10000,

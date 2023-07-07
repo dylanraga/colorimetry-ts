@@ -1,5 +1,5 @@
 import { ColorDifferenceMethod } from "../diff.js";
-import { spaces } from "../space.js";
+import { lab } from "../spaces/cielab.js";
 
 export const cie2000: ColorDifferenceMethod<{
   kL?: number;
@@ -8,8 +8,8 @@ export const cie2000: ColorDifferenceMethod<{
   excludeLuminance?: boolean;
 }> = (colorA, colorB, props = {}) => {
   const { kL = 1, kC = 1, kH = 1, excludeLuminance = false } = props;
-  const [L1, a1, b1] = colorA.toSpace(spaces.lab).values;
-  const [L2, a2, b2] = colorB.toSpace(spaces.lab).values;
+  const [L1, a1, b1] = colorA.toSpace(lab).values;
+  const [L2, a2, b2] = colorB.toSpace(lab).values;
   const r2d = 180 / Math.PI;
 
   const C1 = Math.sqrt(a1 * a1 + b1 * b1);

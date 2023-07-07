@@ -4,14 +4,14 @@
 
 import { uvToCct } from "../cct.js";
 import { Color } from "../color.js";
-import { spaces } from "../space.js";
+import { uv } from "../spaces/uv.js";
 
 /**
  * Calculates the Correlated Color Temperature of a Color in Kelvin
  * @param color Color to find CCT of
  */
 function getCCT(color: Color) {
-  const [up, vp] = color.toSpace(spaces.uv).values;
+  const [up, vp] = color.toSpace(uv).values;
 
   return uvToCct([up, (2 * vp) / 3]);
 }

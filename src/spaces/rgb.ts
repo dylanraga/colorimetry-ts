@@ -1,7 +1,7 @@
-import { minv, mmult3331, quantizeToBits, roundHTE } from "../common/util.js";
-import { ColorGamutPrimaries } from "../gamut.js";
+import { minv, mmult3331, quantizeToBits } from "../common/util.js";
+import { ToneResponseCurve } from "../curves/index.js";
+import { ColorGamutPrimaries } from "../gamuts/index.js";
 import { ColorSpace } from "../space.js";
-import { ToneResponseCurve } from "../curves.js";
 import { xyz } from "./xyz.js";
 
 const linearRgbSpaceGamutMap = new Map<ColorGamutPrimaries, ColorSpace>();

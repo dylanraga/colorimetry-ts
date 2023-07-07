@@ -3,8 +3,9 @@
 /*=================*/
 
 // import * as spaces from "./spaces/index.js";
-import { ColorSpace, ColorSpaceContext, ColorSpaceFromName, ColorSpaceName, spaces } from "./space.js";
+import { ColorSpace, ColorSpaceContext, ColorSpaceFromName, ColorSpaceName } from "./space.js";
 import { getSpaceConversion } from "./conversion.js";
+import { spaces } from "./spaces/index.js";
 
 // export interface ColorConstructor<T extends ColorSpace> {
 //   /**
@@ -29,10 +30,12 @@ import { getSpaceConversion } from "./conversion.js";
 export class Color<T extends ColorSpace | ColorSpaceName = ColorSpace | ColorSpaceName> {
   public readonly space: ColorSpace;
   public values: number[];
-  public context?: Partial<ColorSpaceContext<T extends ColorSpaceName ? typeof spaces[T] : T>>;
+  public context?: Partial<ColorSpaceContext<ColorSpaceFromName<T>>>;
 
   constructor(space: T, values: number[], context?: Partial<ColorSpaceContext<ColorSpaceFromName<T>>>) {
-    this.space = typeof space === "string" ? spaces[space] : space;
+    if (typeof space === "string" && !(space in spaces)) throw new ReferenceError(`Colorspace ${space} does not exist`);
+
+    this.space = typeof space === "string" ? spaces[space as ColorSpaceName] : space;
     this.values = values;
     this.context = context;
   }
@@ -46,7 +49,10 @@ export class Color<T extends ColorSpace | ColorSpaceName = ColorSpace | ColorSpa
     dstSpace: T,
     dstSpaceContext?: Partial<ColorSpaceContext<ColorSpaceFromName<T>>>
   ) {
-    const _dstSpace: ColorSpace = typeof dstSpace === "string" ? spaces[dstSpace] : dstSpace;
+    if (typeof dstSpace === "string" && !(dstSpace in spaces))
+      throw new ReferenceError(`Colorspace ${dstSpace} does not exist`);
+
+    const _dstSpace: ColorSpace = typeof dstSpace === "string" ? spaces[dstSpace as ColorSpaceName] : dstSpace;
 
     if (this.space === _dstSpace) return new Color(this.space, this.values, dstSpaceContext);
 

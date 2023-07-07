@@ -235,3 +235,5 @@ export function withProps<F extends (...args: any) => any>(fn: F, props: Paramet
     return fn(...args);
   }) as F;
 }
+
+export const lerp = (a: number, b: number, t: number) => (1 - t) * a + t * b;

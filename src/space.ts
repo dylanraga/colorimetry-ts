@@ -1,6 +1,8 @@
 import { ColorSpaceConversion, addSpaceConversion } from "./conversion.js";
-import * as _spaces from "./spaces/index.js";
+import { spaces } from "./spaces/index.js";
 
+export type ColorSpaceName = keyof Omit<typeof spaces, "default">;
+export type ColorSpaceFromName<T> = T extends ColorSpaceName ? typeof spaces[T] : T;
 export type ColorSpaceContext<T> = T extends ColorSpace<infer R> ? R : never;
 
 interface ColorSpaceConstructorProps<T extends object = Record<string, any>> {
@@ -32,7 +34,3 @@ export class ColorSpace<T extends object = Record<string, any>> {
     }
   }
 }
-
-export type ColorSpaceName = keyof typeof _spaces;
-export type ColorSpaceFromName<T> = T extends ColorSpaceName ? typeof _spaces[T] : T;
-export const spaces = _spaces as typeof _spaces & Record<string, ColorSpace>;

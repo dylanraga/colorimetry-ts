@@ -4,7 +4,7 @@
  */
 
 import { minv, mmult3331 } from "../common/util.js";
-import { curves } from "../curves.js";
+import { st2084 } from "../curves/st2084.js";
 import { ColorSpace } from "../space.js";
 import { lchSpace } from "./lch.js";
 import { xyz } from "./xyz.js";
@@ -52,7 +52,7 @@ function xyzToJzazbz([X, Y, Z]: number[]) {
   const Yp = g * Y - (g - 1) * X;
 
   const LMS = mmult3331(mXpYpZp_to_LMS, [Xp, Yp, Z]);
-  const LMSp = LMS.map((u) => curves.st2084.invEotf(u, { m2: 134.034375 }));
+  const LMSp = LMS.map((u) => st2084.invEotf(u, { m2: 134.034375 }));
   const [Iz, az, bz] = mmult3331(mLMS_to_IAB, LMSp);
 
   const Jz = ((1 + d) * Iz) / (1 + d * Iz) - d0;
@@ -65,7 +65,7 @@ function jzazbzToXyz([Jz, az, bz]: number[]) {
   const Iz = Jz_ / (1 + d - d * Jz_);
 
   const LMSp = mmult3331(mIAB_to_LMS, [Iz, az, bz]);
-  const LMS = LMSp.map((u) => curves.st2084.eotf(u, { m2: 134.034375 }));
+  const LMS = LMSp.map((u) => st2084.eotf(u, { m2: 134.034375 }));
   const [Xp, Yp, Zp] = mmult3331(mLMS_to_XpYpZp, LMS);
 
   const X = (1 / b) * (Xp + (b - 1) * Zp);

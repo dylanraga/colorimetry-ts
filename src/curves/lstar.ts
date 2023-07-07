@@ -3,16 +3,16 @@
  * http://www.brucelindbloom.com/index.html?Eqn_Luv_to_XYZ.html
  */
 import { evenFn } from "../common/util.js";
-import { ToneResponseCurve } from "../curves.js";
+import { ToneResponseCurve } from "./index.js";
 
 const κ = 24389 / 27;
 const ϵ = 216 / 24389;
 const d = 6 / 29;
 
-interface LStarTransferProps {
+type LStarTransferProps = {
   whiteLuminance: number;
   blackLuminance: number;
-}
+};
 
 const defaults: LStarTransferProps = {
   whiteLuminance: 1,

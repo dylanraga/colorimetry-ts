@@ -5,20 +5,6 @@
 import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
-// export const CHROMATICITY_XY = new ChromaticitySpace({
-//   id: "xy",
-//   name: "CIExy",
-//   keys: ["x", "y"],
-//   conversions: [
-//     {
-//       space: XYZSPACE_D65_NORMALIZED,
-//       toFn: (xy, { refWhiteLuminance = 1 } = {}) =>
-//         xy_to_XnYnZn(xy, { refWhiteLuminance: refWhiteLuminance as number }),
-//       fromFn: XYZ_to_xy,
-//     },
-//   ],
-// });
-
 export const xy = new ColorSpace({
   name: "CIExy",
   keys: ["x", "y"],

@@ -1,7 +1,7 @@
 import { Color } from "../color.js";
 import { colorDiff } from "../diff.js";
-import { ColorGamutPrimaries } from "../gamut.js";
-import { spaces } from "../space.js";
+import { ColorGamutPrimaries } from "../gamuts/index.js";
+import { itp_lch } from "../spaces/ictcp.js";
 import { linearRgbSpace } from "../spaces/rgb.js";
 
 export function clamp(v: number, min: number, max: number) {
@@ -11,7 +11,7 @@ export function clamp(v: number, min: number, max: number) {
   return v;
 }
 
-const lchSpace = spaces.itp_lch;
+const lchSpace = itp_lch;
 // ΔE_ITP JND = 1/720 = 0.00139
 const jnd = 1 / 720;
 

@@ -3,10 +3,9 @@
 /*==========================*/
 
 import { Color } from "./color.js";
-import * as _diffs from "./diffs/index.js";
-export const diffs = _diffs as typeof _diffs & Record<string, ColorDifferenceMethod>;
+import { diffs } from "./diffs/index.js";
 
-type ColorDifferenceMethodName = keyof typeof _diffs;
+type ColorDifferenceMethodName = keyof typeof diffs;
 export type ColorDifferenceMethod<P = Record<string, any>> = (colorA: Color, colorB: Color, props: P) => number;
 
 type ColorDifferenceMethodProps<T> = T extends ColorDifferenceMethod<infer P> ? P : Record<string, unknown>;
@@ -17,10 +16,14 @@ type ColorDifferenceMethodProps<T> = T extends ColorDifferenceMethod<infer P> ? 
 export function colorDiff<T extends ColorDifferenceMethod | ColorDifferenceMethodName>(
   colorA: Color,
   colorB: Color,
-  method = diffs.itp as T,
+  method: T = diffs.itp as T,
   props = {} as ColorDifferenceMethodProps<T extends ColorDifferenceMethodName ? typeof diffs[T] : T>
 ) {
-  const _method = typeof method === "string" ? diffs[method] : (method as ColorDifferenceMethod);
+  if (typeof method === "string" && !(method in diffs))
+    throw new ReferenceError(`Color difference '${method}' does not exist`);
+
+  const _method: ColorDifferenceMethod =
+    typeof method === "string" ? diffs[method as ColorDifferenceMethodName] : method;
   return _method(colorA, colorB, props);
 }
 

@@ -1,5 +1,6 @@
 import { bfsPath } from "./common/util.js";
-import { spaces, ColorSpace } from "./space.js";
+import { spaces } from "./spaces/index.js";
+import { ColorSpace } from "./space.js";
 
 export const conversionMap = new Map<ColorSpace, Map<ColorSpace, { path: ColorSpace[]; fn: ColorSpaceConversion }>>();
 

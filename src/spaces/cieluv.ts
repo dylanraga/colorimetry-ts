@@ -2,8 +2,8 @@
  * CIELuv definitions and conversions
  */
 
-import { illuminants } from "../../colorimetry.js";
-import { curves } from "../curves.js";
+import { lstar } from "../curves/lstar.js";
+import { illuminants } from "../illuminants/index.js";
 import { ColorSpace } from "../space.js";
 import { uvToXyz, xyToUv, xyzToUv } from "./uv.js";
 import { xy } from "./xy.js";
@@ -31,7 +31,7 @@ export function xyzToCieluv(
 ) {
   const [ur, vr] = xyToUv([refWhite.x, refWhite.y]);
   const [u, v] = xyzToUv([X, Y, Z]);
-  const L = 100 * curves.lstar.invEotf(Y, { whiteLuminance });
+  const L = 100 * lstar.invEotf(Y, { whiteLuminance });
   const U = 13 * L * (u - ur);
   const V = 13 * L * (v - vr);
 
@@ -45,7 +45,7 @@ export function cieluvToXyz(
   const [ur, vr] = xyToUv([refWhite.x, refWhite.y]);
   const u = U / (13 * L) + ur;
   const v = V / (13 * L) + vr;
-  const Yn = curves.lstar.eotf(L / 100, { whiteLuminance });
+  const Yn = lstar.eotf(L / 100, { whiteLuminance });
   const [Xn, , Zn] = uvToXyz([u, v], { whiteLuminance: Yn });
 
   return [Xn, Yn, Zn];

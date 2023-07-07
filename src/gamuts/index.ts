@@ -1,11 +1,19 @@
-/*==========================*/
-/* Standard Color Gamuts    */
-/*==========================*/
-import * as illuminants from "../illuminants/index.js";
-import { ColorGamutPrimaries } from "../gamut.js";
+import { illuminants } from "../illuminants/index.js";
+import { type xy } from "../spaces/xy.js";
+
+export interface ColorGamutPrimaries {
+  readonly id?: string;
+  readonly name?: string;
+  readonly alias?: string[];
+  readonly white: xy;
+  readonly red: xy;
+  readonly green: xy;
+  readonly blue: xy;
+  readonly black?: xy;
+}
 
 // ITU-R BT.709
-export const srgb: ColorGamutPrimaries = {
+const srgb: ColorGamutPrimaries = {
   id: "srgb",
   name: "sRGB",
   alias: ["rec709", "bt709"],
@@ -16,7 +24,7 @@ export const srgb: ColorGamutPrimaries = {
 };
 
 // SMPTE EG 432-1:2010
-export const p3_d65: ColorGamutPrimaries = {
+const p3_d65: ColorGamutPrimaries = {
   id: "p3-d65",
   name: "P3-D65",
   white: { ...illuminants.d65 },
@@ -26,7 +34,7 @@ export const p3_d65: ColorGamutPrimaries = {
 };
 
 // DCI-P3 for ACES Cinema
-export const p3_aces: ColorGamutPrimaries = {
+const p3_aces: ColorGamutPrimaries = {
   id: "p3-aces",
   name: "P3-ACES",
   alias: ["p3-d60"],
@@ -37,7 +45,7 @@ export const p3_aces: ColorGamutPrimaries = {
 };
 
 // DCI Digital Cinema System Section 8.3.4
-export const p3_dci: ColorGamutPrimaries = {
+const p3_dci: ColorGamutPrimaries = {
   id: "p3-dci",
   name: "DCI-P3",
   alias: ["dci-p3"],
@@ -48,7 +56,7 @@ export const p3_dci: ColorGamutPrimaries = {
 };
 
 // Adobe RGB (1998)
-export const adobergb: ColorGamutPrimaries = {
+const adobergb: ColorGamutPrimaries = {
   id: "adobe",
   name: "Adobe RGB (1998)",
   alias: ["argb", "a98"],
@@ -59,7 +67,7 @@ export const adobergb: ColorGamutPrimaries = {
 };
 
 // ITU-R BT.2020
-export const bt2020: ColorGamutPrimaries = {
+const bt2020: ColorGamutPrimaries = {
   id: "bt2020",
   name: "BT.2020",
   alias: ["rec2020"],
@@ -70,7 +78,7 @@ export const bt2020: ColorGamutPrimaries = {
 };
 
 // ACES Cinema Primaries #0
-export const acesp0: ColorGamutPrimaries = {
+const acesp0: ColorGamutPrimaries = {
   id: "aces-p0",
   name: "ACES Primaries #0",
   white: { ...illuminants.aces },
@@ -80,7 +88,7 @@ export const acesp0: ColorGamutPrimaries = {
 };
 
 // ACES Cinema Primaries #1
-export const acesp1: ColorGamutPrimaries = {
+const acesp1: ColorGamutPrimaries = {
   id: "aces-p1",
   name: "ACES Prmaries #1",
   white: { ...illuminants.aces },
@@ -90,7 +98,7 @@ export const acesp1: ColorGamutPrimaries = {
 };
 
 // Kodak ProPhoto / ROMM RGB
-export const prophoto: ColorGamutPrimaries = {
+const prophoto: ColorGamutPrimaries = {
   id: "prophoto",
   name: "ProPhoto RGB",
   white: { ...illuminants.d50 },
@@ -98,3 +106,5 @@ export const prophoto: ColorGamutPrimaries = {
   green: { x: 0.159597, y: 0.840403 },
   blue: { x: 0.036598, y: 0.000105 },
 };
+
+export const gamuts = { srgb, p3_d65, p3_aces, p3_dci, adobergb, bt2020, acesp0, acesp1, prophoto };

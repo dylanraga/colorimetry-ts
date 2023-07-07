@@ -5,7 +5,7 @@
  */
 
 import { minv, mmult3331 } from "../common/util.js";
-import { curves } from "../curves.js";
+import { st2084 } from "../curves/st2084.js";
 import { ColorSpace } from "../space.js";
 import { lchSpace } from "./lch.js";
 import { xyz } from "./xyz.js";
@@ -76,7 +76,7 @@ const mICtCp_to_LMS = minv(mLMS_to_ICtCp);
 
 function xyzToIctcp(XYZ: number[]) {
   const LMS = mmult3331(mXYZ_to_LMS, XYZ);
-  const LMSp = LMS.map((u) => curves.st2084.invEotf(u));
+  const LMSp = LMS.map((u) => st2084.invEotf(u));
   const ICtCp = mmult3331(mLMS_to_ICtCp, LMSp);
 
   return ICtCp;
@@ -84,7 +84,7 @@ function xyzToIctcp(XYZ: number[]) {
 
 function ictcpToXyz(ICtCp: number[]) {
   const LMSp = mmult3331(mICtCp_to_LMS, ICtCp);
-  const LMS = LMSp.map((u) => curves.st2084.eotf(u));
+  const LMS = LMSp.map((u) => st2084.eotf(u));
   const XYZ = mmult3331(mLMS_to_XYZ, LMS);
 
   return XYZ;

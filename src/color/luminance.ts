@@ -2,10 +2,10 @@
  * Color luminance module
  */
 import { Color } from "../color.js";
-import { spaces } from "../space.js";
+import { xyz } from "../spaces/xyz.js";
 
 function getLuminance(color: Color) {
-  return color.toSpace(spaces.xyz).values[1];
+  return color.toSpace(xyz).values[1];
 }
 
 function _getLuminance(this: Color) {
