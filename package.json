@@ -1,6 +1,6 @@
 {
   "name": "colorimetry-ts",
-  "version": "0.4.32",
+  "version": "0.4.33",
   "description": "Colorimetry typescript library",
   "main": "build/colorimetry.js",
   "types": "build/colorimetry.d.ts",
