@@ -1,7 +1,9 @@
 import { Color } from "../color.js";
 import { colorDiff } from "../diff.js";
-import { ColorGamutPrimaries } from "../gamuts/index.js";
+import { ColorGamutPrimaries, gamuts } from "../gamuts/index.js";
 import { itp_lch } from "../spaces/ictcp.js";
+import { jzazbz, jzczhz } from "../spaces/jzazbz.js";
+import { oklch } from "../spaces/oklab.js";
 import { linearRgbSpace } from "../spaces/rgb.js";
 
 export function clamp(v: number, min: number, max: number) {
@@ -22,7 +24,7 @@ const jnd = 1 / 720;
 // -- Otherwise, reduce chroma by sqrt(1/2) * ΔE_ITP and re-compare
 export function clampInGamut(
   color: Color,
-  gamut: ColorGamutPrimaries,
+  gamut: ColorGamutPrimaries = gamuts.srgb,
   whiteLuminance = 1,
   blackLuminance = 0,
   tolerance = 1
@@ -30,15 +32,27 @@ export function clampInGamut(
   const rgbSpace = linearRgbSpace({ gamut });
   const rgb = color.toSpace(rgbSpace).values;
 
-  if (Math.min(...rgb) >= blackLuminance && Math.max(...rgb) <= whiteLuminance) {
+  if (Math.min(...rgb) > 0) {
     return color;
   }
 
-  let rgbClamped = rgb.map((u) => clamp(u, blackLuminance, whiteLuminance));
-
   const rgbLch = new Color(rgbSpace, rgb).toSpace(lchSpace).values;
 
-  let dEFromClipped = colorDiff(new Color(lchSpace, rgbLch), new Color(rgbSpace, rgbClamped));
+  // let currRgb = new Color(lchSpace, rgbLch).toSpace(rgbSpace).values;
+  // while (Math.min(...currRgb) < blackLuminance) {
+  //   rgbLch[1] -= jnd;
+  //   currRgb = new Color(lchSpace, rgbLch).toSpace(rgbSpace).values;
+  //   // console.log("here");
+  // }
+
+  // if (Math.max(...currRgb) > whiteLuminance) {
+  //   currRgb = currRgb.map((v) => (whiteLuminance * v) / Math.max(...currRgb));
+  // }
+  // const clampedColor = new Color(rgbSpace, currRgb).toSpace(color.space);
+
+  let rgbClamped = rgb.map((u) => Math.max(u, 0));
+
+  let dEFromClipped = colorDiff(color, new Color(rgbSpace, rgbClamped));
   //console.log('currRgb', rgb, rgbClamped, dEFromClipped);
   while (dEFromClipped > tolerance) {
     // Give up on significantly higher or lower lightness clampings
@@ -54,7 +68,7 @@ export function clampInGamut(
     //   currLchColor = new Color(lchSpace, rgbLch);
     //   currRgb = currLchColor.toSpace(rgbSpace).values;
     // }
-    rgbClamped = currRgb.map((u) => clamp(u, blackLuminance, whiteLuminance));
+    rgbClamped = currRgb.map((u) => Math.max(u, 0));
     dEFromClipped = colorDiff(currLchColor, new Color(rgbSpace, rgbClamped));
     // console.log("currRgb", currRgb, rgbClamped, dEFromClipped);
   }
