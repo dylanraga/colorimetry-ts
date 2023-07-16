@@ -65,12 +65,25 @@ export class Color<T extends ColorSpace | ColorSpaceName = ColorSpace | ColorSpa
   }
 }
 
-export function color<T extends ColorSpace | ColorSpaceName = ColorSpace | ColorSpaceName>(
+function color<T extends ColorSpace | ColorSpaceName>(
   space: T,
-  values: number[],
+  values: number[] | Color,
+  context?: Partial<ColorSpaceContext<ColorSpaceFromName<T>>>
+): Color;
+function color<T extends ColorSpace | ColorSpaceName>(
+  space: T
+): (values: number[] | Color, context?: Partial<ColorSpaceContext<ColorSpaceFromName<T>>>) => Color;
+function color<T extends ColorSpace | ColorSpaceName>(
+  space: T,
+  values?: number[] | Color,
   context?: Partial<ColorSpaceContext<ColorSpaceFromName<T>>>
 ) {
+  if (values === undefined)
+    return (values: number[] | Color, context: Partial<ColorSpaceContext<ColorSpaceFromName<T>>>) =>
+      color(space, values, context);
+  if (values instanceof Color) return new Color(space, values.toSpace(space).values, context);
   return new Color(space, values, context);
 }
+export { color };
 
 // export const Color = ColorClass as ColorConstructor;
