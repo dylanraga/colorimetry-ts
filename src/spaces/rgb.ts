@@ -4,7 +4,7 @@ import { ColorGamutPrimaries } from "../gamuts/index.js";
 import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
-const linearRgbSpaceGamutMap = new Map<ColorGamutPrimaries, ColorSpace>();
+const linearRgbSpaceGamutCache = new WeakMap<ColorGamutPrimaries, ColorSpace>();
 
 export function linearRgbSpace({
   name = "Linear RGB Color Space",
@@ -13,7 +13,7 @@ export function linearRgbSpace({
   name?: string;
   gamut: ColorGamutPrimaries;
 }) {
-  const existingSpace = linearRgbSpaceGamutMap.get(gamut);
+  const existingSpace = linearRgbSpaceGamutCache.get(gamut);
   if (existingSpace) return existingSpace;
 
   const newSpace = new ColorSpace<{ gamut: ColorGamutPrimaries }>({
@@ -28,7 +28,7 @@ export function linearRgbSpace({
     ],
   });
 
-  linearRgbSpaceGamutMap.set(gamut, newSpace);
+  linearRgbSpaceGamutCache.set(gamut, newSpace);
 
   return newSpace;
 }
@@ -72,7 +72,11 @@ export function rgbSpace({
   return newSpace;
 }
 
+const rgbToXyzMatrixCache = new WeakMap<ColorGamutPrimaries, number[][]>();
 function getRgbToXyzMatrix(gamut: ColorGamutPrimaries) {
+  const existingMatrix = rgbToXyzMatrixCache.get(gamut);
+  if (existingMatrix) return existingMatrix;
+
   const primaries = [gamut.white, gamut.red, gamut.green, gamut.blue];
 
   const [Xw, Xr, Xg, Xb] = primaries.map((u) => u.x / u.y);
@@ -91,12 +95,20 @@ function getRgbToXyzMatrix(gamut: ColorGamutPrimaries) {
     [Sr, Sg, Sb],
     [Sr * Zr, Sg * Zg, Sb * Zb],
   ];
+  rgbToXyzMatrixCache.set(gamut, rgbToXyzMatrix);
 
   return rgbToXyzMatrix;
 }
 
+const xyzToRgbMatrixCache = new WeakMap<ColorGamutPrimaries, number[][]>();
 function getXyzToRgbMatrix(gamut: ColorGamutPrimaries) {
-  return minv(getRgbToXyzMatrix(gamut));
+  const existingMatrix = xyzToRgbMatrixCache.get(gamut);
+  if (existingMatrix) return existingMatrix;
+
+  const newMatrix = minv(getRgbToXyzMatrix(gamut));
+  xyzToRgbMatrixCache.set(gamut, newMatrix);
+
+  return newMatrix;
 }
 
 function xyzToLinearRgb(xyz: number[], { gamut }: { gamut: ColorGamutPrimaries }) {
