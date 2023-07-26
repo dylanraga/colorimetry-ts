@@ -52,14 +52,14 @@ export function clampInGamut(
 
   let rgbClamped = rgb.map((u) => Math.max(u, 0));
 
-  let dEFromClipped = colorDiff(color, new Color(rgbSpace, rgbClamped));
+  let minDiffFromClipped = colorDiff(color, new Color(rgbSpace, rgbClamped));
   //console.log('currRgb', rgb, rgbClamped, dEFromClipped);
-  while (dEFromClipped > tolerance) {
+  while (minDiffFromClipped > tolerance) {
     // Give up on significantly higher or lower lightness clampings
     if (rgbLch[1] < jnd) {
       return new Color(rgbSpace, rgbClamped).toSpace(color.space);
     }
-    rgbLch[1] -= jnd * (Math.SQRT1_2 * dEFromClipped);
+    rgbLch[1] -= jnd * (Math.SQRT1_2 * minDiffFromClipped);
     const currLchColor = new Color(lchSpace, rgbLch);
     const currRgb = currLchColor.toSpace(rgbSpace).values;
     // if in-gamut, push out of gamut
@@ -68,8 +68,13 @@ export function clampInGamut(
     //   currLchColor = new Color(lchSpace, rgbLch);
     //   currRgb = currLchColor.toSpace(rgbSpace).values;
     // }
-    rgbClamped = currRgb.map((u) => Math.max(u, 0));
-    dEFromClipped = colorDiff(currLchColor, new Color(rgbSpace, rgbClamped));
+    const newRgbClamped = currRgb.map((u) => Math.max(u, 0));
+    const diffFromClipped = colorDiff(currLchColor, new Color(rgbSpace, rgbClamped));
+    if (diffFromClipped > minDiffFromClipped) {
+      return new Color(rgbSpace, rgbClamped).toSpace(color.space);
+    }
+    minDiffFromClipped = diffFromClipped;
+    rgbClamped = newRgbClamped;
     // console.log("currRgb", currRgb, rgbClamped, dEFromClipped);
   }
 
