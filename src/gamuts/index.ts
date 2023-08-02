@@ -23,6 +23,16 @@ const srgb: ColorGamutPrimaries = {
   blue: { x: 0.15, y: 0.06 },
 };
 
+// ITU-R BT.601
+const bt601: ColorGamutPrimaries = {
+  id: "bt601",
+  name: "BT.601",
+  white: { ...illuminants.d65 },
+  red: { x: 0.63, y: 0.34 },
+  green: { x: 0.31, y: 0.595 },
+  blue: { x: 0.155, y: 0.07 },
+};
+
 // SMPTE EG 432-1:2010
 const p3_d65: ColorGamutPrimaries = {
   id: "p3-d65",
@@ -107,4 +117,4 @@ const prophoto: ColorGamutPrimaries = {
   blue: { x: 0.036598, y: 0.000105 },
 };
 
-export const gamuts = { srgb, p3_d65, p3_aces, p3_dci, adobergb, bt2020, acesp0, acesp1, prophoto };
+export const gamuts = { srgb, bt601, p3_d65, p3_aces, p3_dci, adobergb, bt2020, acesp0, acesp1, prophoto };

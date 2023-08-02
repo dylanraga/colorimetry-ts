@@ -21,7 +21,7 @@ export const xyz_n = new ColorSpace<{ whiteLuminance: number }>({
 export function xyzToXyzN(
   [X, Y, Z]: number[],
   { whiteLuminance = 100 }: { whiteLuminance?: number } = {
-    whiteLuminance: 1,
+    whiteLuminance: 100,
   }
 ) {
   const Yn = Y / whiteLuminance;
@@ -33,7 +33,7 @@ export function xyzToXyzN(
 export function xyzNToXyz(
   [Xn, Yn, Zn]: number[],
   { whiteLuminance = 100 }: { whiteLuminance?: number } = {
-    whiteLuminance: 1,
+    whiteLuminance: 100,
   }
 ) {
   const Y = whiteLuminance * Yn;
