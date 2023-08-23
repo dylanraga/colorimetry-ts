@@ -4,7 +4,10 @@ import { ColorGamutPrimaries } from "../gamuts/index.js";
 import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
-const linearRgbSpaceGamutCache = new WeakMap<ColorGamutPrimaries, ColorSpace>();
+export type LinearRGBColorSpace = ColorSpace & { gamut: ColorGamutPrimaries };
+export type EncodedRGBColorSpace = ColorSpace & { gamut: ColorGamutPrimaries; curve: ToneResponseCurve };
+
+const linearRgbSpaceGamutCache = new WeakMap<ColorGamutPrimaries, LinearRGBColorSpace>();
 
 export function linearRgbSpace({
   name = "Linear RGB Color Space",
@@ -12,7 +15,7 @@ export function linearRgbSpace({
 }: {
   name?: string;
   gamut: ColorGamutPrimaries;
-}) {
+}): LinearRGBColorSpace {
   const existingSpace = linearRgbSpaceGamutCache.get(gamut);
   if (existingSpace) return existingSpace;
 
@@ -28,9 +31,11 @@ export function linearRgbSpace({
     ],
   });
 
-  linearRgbSpaceGamutCache.set(gamut, newSpace);
+  const newLinearRgbSpace = Object.assign(newSpace, { gamut });
 
-  return newSpace;
+  linearRgbSpaceGamutCache.set(gamut, newLinearRgbSpace);
+
+  return newLinearRgbSpace;
 }
 
 export function rgbSpace({
@@ -47,7 +52,7 @@ export function rgbSpace({
   whiteLuminance: number;
   blackLuminance: number;
   peakLuminance?: number;
-}) {
+}): EncodedRGBColorSpace {
   const newSpace = new ColorSpace<{
     gamut: ColorGamutPrimaries;
     curve: ToneResponseCurve;
@@ -69,11 +74,13 @@ export function rgbSpace({
     ],
   });
 
-  return newSpace;
+  const newRgbSpace = Object.assign(newSpace, { gamut, curve });
+
+  return newRgbSpace;
 }
 
 const rgbToXyzMatrixCache = new WeakMap<ColorGamutPrimaries, number[][]>();
-function getRgbToXyzMatrix(gamut: ColorGamutPrimaries) {
+export function getRgbToXyzMatrix(gamut: ColorGamutPrimaries) {
   const existingMatrix = rgbToXyzMatrixCache.get(gamut);
   if (existingMatrix) return existingMatrix;
 
@@ -101,7 +108,7 @@ function getRgbToXyzMatrix(gamut: ColorGamutPrimaries) {
 }
 
 const xyzToRgbMatrixCache = new WeakMap<ColorGamutPrimaries, number[][]>();
-function getXyzToRgbMatrix(gamut: ColorGamutPrimaries) {
+export function getXyzToRgbMatrix(gamut: ColorGamutPrimaries) {
   const existingMatrix = xyzToRgbMatrixCache.get(gamut);
   if (existingMatrix) return existingMatrix;
 

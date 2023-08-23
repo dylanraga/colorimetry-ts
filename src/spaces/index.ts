@@ -29,4 +29,11 @@ export const spaces = {
   xy,
 };
 
-export { rgbSpace, linearRgbSpace } from "./rgb.js";
+// export {
+//   rgbSpace,
+//   linearRgbSpace,
+//   LinearRGBColorSpace,
+//   EncodedRGBColorSpace,
+//   getRgbToXyzMatrix,
+//   getXyzToRgbMatrix,
+// } from "./rgb.js";

@@ -14,8 +14,15 @@ export { curves, ToneResponseCurve, gammaCurve, hlgCurve };
 import { spaces } from "./src/spaces/index.js";
 export { spaces };
 
-import { rgbSpace, linearRgbSpace } from "./src/spaces/rgb.js";
-export { rgbSpace, linearRgbSpace };
+import {
+  rgbSpace,
+  linearRgbSpace,
+  LinearRGBColorSpace,
+  EncodedRGBColorSpace,
+  getRgbToXyzMatrix,
+  getXyzToRgbMatrix,
+} from "./src/spaces/rgb.js";
+export { rgbSpace, linearRgbSpace, LinearRGBColorSpace, EncodedRGBColorSpace, getRgbToXyzMatrix, getXyzToRgbMatrix };
 
 import { ColorSpace } from "./src/space.js";
 export { ColorSpace };
@@ -28,6 +35,7 @@ import { diffs } from "./src/diffs/index.js";
 export { diffs };
 import { colorDiff } from "./src/diff.js";
 import "./src/color/luminance.js";
+import "./src/color/keyedValues.js";
 // import "./src/color/luma.js";
 import "./src/color/cct.js";
 import "./src/color/clamp-gamut.js";
