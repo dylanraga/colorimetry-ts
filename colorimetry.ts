@@ -55,4 +55,13 @@ export { cmfs1931Data };
 
 import "./src/defaults.js";
 
-export { mmult3331, mmult3333, minv, mmult, quantizeToBits, roundHTE } from "./src/common/util.js";
+export {
+  mmult3331,
+  mmult3333,
+  minv,
+  mmult,
+  quantizeToBits,
+  roundHTE,
+  hexFromArray,
+  arrayEquals,
+} from "./src/common/util.js";

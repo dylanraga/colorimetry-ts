@@ -237,3 +237,12 @@ export function withProps<F extends (...args: any) => any>(fn: F, props: Paramet
 }
 
 export const lerp = (a: number, b: number, t: number) => (1 - t) * a + t * b;
+
+export function hexFromArray(values: number[]): string {
+  if (values.length !== 3) throw new Error("Input array must have exactly three values");
+  return "#" + values.map((v) => v.toString(16).padStart(2, "0")).join("");
+}
+export function arrayFromHex(hex: string) {
+  if (hex.length !== 7 || hex[0] !== "#") throw new Error("Invalid hex string");
+  return [hex.slice(1, 3), hex.slice(3, 5), hex.slice(5, 7)].map((v) => parseInt(v, 16));
+}
