@@ -4,8 +4,15 @@ import { ColorGamutPrimaries } from "../gamuts/index.js";
 import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
-export type LinearRGBColorSpace = ColorSpace & { gamut: ColorGamutPrimaries };
-export type EncodedRGBColorSpace = ColorSpace & { gamut: ColorGamutPrimaries; curve: ToneResponseCurve };
+export type LinearRGBColorSpace = ColorSpace<{ gamut: ColorGamutPrimaries }>;
+export type EncodedRGBColorSpace = ColorSpace<{
+  gamut: ColorGamutPrimaries;
+  curve: ToneResponseCurve;
+  whiteLuminance: number;
+  blackLuminance: number;
+  peakLuminance: number;
+  bitDepth: number;
+}>;
 
 const linearRgbSpaceGamutCache = new WeakMap<ColorGamutPrimaries, LinearRGBColorSpace>();
 
@@ -19,7 +26,7 @@ export function linearRgbSpace({
   const existingSpace = linearRgbSpaceGamutCache.get(gamut);
   if (existingSpace) return existingSpace;
 
-  const newSpace = new ColorSpace<{ gamut: ColorGamutPrimaries }>({
+  const newSpace = new ColorSpace({
     name,
     keys: ["R", "G", "B"],
     conversions: [
@@ -39,7 +46,7 @@ export function linearRgbSpace({
 }
 
 export function rgbSpace({
-  name = "RGB Color Space",
+  name = "Encoded RGB Color Space",
   gamut,
   curve,
   whiteLuminance,
@@ -53,14 +60,7 @@ export function rgbSpace({
   blackLuminance: number;
   peakLuminance?: number;
 }): EncodedRGBColorSpace {
-  const newSpace = new ColorSpace<{
-    gamut: ColorGamutPrimaries;
-    curve: ToneResponseCurve;
-    whiteLuminance: number;
-    blackLuminance: number;
-    peakLuminance: number;
-    bitDepth: number;
-  }>({
+  const newSpace = new ColorSpace({
     name,
     keys: ["r", "g", "b"],
     conversions: [

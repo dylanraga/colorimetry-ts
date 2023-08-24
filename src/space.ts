@@ -1,9 +1,12 @@
+import { EncodedRGBColorSpace } from "../colorimetry.js";
 import { ColorSpaceConversion, addSpaceConversion } from "./conversion.js";
 import { spaces } from "./spaces/index.js";
 
-export type ColorSpaceName = keyof Omit<typeof spaces, "default">;
+export type ColorSpaceName = keyof typeof spaces;
 export type ColorSpaceFromName<T> = T extends ColorSpaceName ? typeof spaces[T] : T;
 export type ColorSpaceContext<T> = T extends ColorSpace<infer R> ? R : never;
+
+type test = ColorSpaceContext<EncodedRGBColorSpace>;
 
 interface ColorSpaceConstructorProps<T extends object = Record<string, any>> {
   readonly name?: string;
