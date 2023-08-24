@@ -1,7 +1,3 @@
-/**
- * Color luma module
- */
-
 import { Color } from "../color.js";
 import { colorDiff } from "../diff.js";
 
