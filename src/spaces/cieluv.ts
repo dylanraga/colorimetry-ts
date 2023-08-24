@@ -11,7 +11,7 @@ import { xyz } from "./xyz.js";
 
 export const luv = new ColorSpace<{ refWhite: xy; whiteLuminance: number }>({
   name: "CIELUV",
-  keys: ["L*", "u*", "v*"],
+  keys: ["L", "u", "v"],
   conversions: [
     {
       spaceB: xyz,

@@ -66,8 +66,8 @@ const p3_dci: ColorGamutPrimaries = {
 };
 
 // Adobe RGB (1998)
-const adobergb: ColorGamutPrimaries = {
-  id: "adobe",
+const a98rgb: ColorGamutPrimaries = {
+  id: "a98-rgb",
   name: "Adobe RGB (1998)",
   alias: ["argb", "a98"],
   white: { ...illuminants.d65 },
@@ -109,7 +109,7 @@ const acesp1: ColorGamutPrimaries = {
 
 // Kodak ProPhoto / ROMM RGB
 const prophoto: ColorGamutPrimaries = {
-  id: "prophoto",
+  id: "prophoto-rgb",
   name: "ProPhoto RGB",
   white: { ...illuminants.d50 },
   red: { x: 0.734699, y: 0.265301 },
@@ -117,4 +117,4 @@ const prophoto: ColorGamutPrimaries = {
   blue: { x: 0.036598, y: 0.000105 },
 };
 
-export const gamuts = { srgb, bt601, p3_d65, p3_aces, p3_dci, adobergb, bt2020, acesp0, acesp1, prophoto };
+export const gamuts = { srgb, bt601, p3_d65, p3_aces, p3_dci, a98rgb, bt2020, acesp0, acesp1, prophoto };

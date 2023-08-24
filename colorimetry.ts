@@ -35,6 +35,7 @@ import { diffs } from "./src/diffs/index.js";
 export { diffs };
 import { colorDiff } from "./src/diff.js";
 import "./src/color/luminance.js";
+import "./src/color/equals.js";
 import "./src/color/keyedValues.js";
 import "./src/color/luma.js";
 import "./src/color/cct.js";

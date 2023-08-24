@@ -75,7 +75,7 @@ export const p3_d65 = rgbSpace({
 // Adobe RGB (1998) IEC 61966-2-5:2007
 export const adobergb = rgbSpace({
   name: "Adobe RGB 1998",
-  gamut: gamuts.adobergb,
+  gamut: gamuts.a98rgb,
   curve: gammaCurve(563 / 256),
   whiteLuminance: 160,
   blackLuminance: 0.5557,

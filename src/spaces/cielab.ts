@@ -20,7 +20,7 @@ export const lch_d50 = lchSpace(lab_d50);
 export function cielabSpace({ refWhite, whiteLuminance }: { refWhite: xy; whiteLuminance: number }) {
   const newSpace = new ColorSpace<{ refWhite: xy; whiteLuminance: number }>({
     name: "CIELAB",
-    keys: ["L*", "a*", "b*"],
+    keys: ["L", "a", "b"],
     conversions: [
       {
         spaceB: xyz,
