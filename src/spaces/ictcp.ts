@@ -7,7 +7,7 @@
 import { minv, mmult3331 } from "../common/util.js";
 import { st2084 } from "../curves/st2084.js";
 import { ColorSpace } from "../space.js";
-import { lchSpace } from "./lch.js";
+import { lchSpaceFromLabSpace } from "./lch.js";
 import { xyz } from "./xyz.js";
 
 export const ictcp = new ColorSpace({
@@ -36,7 +36,7 @@ export const itp = new ColorSpace({
   // precision: 5
 });
 
-export const itp_lch = lchSpace(itp, { name: "Dolby ITP (LCh)" });
+export const itp_lch = lchSpaceFromLabSpace(itp, { name: "Dolby ITP (LCh)" });
 
 /*
 const mEbner = [

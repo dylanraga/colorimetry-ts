@@ -1,7 +1,7 @@
 import { illuminants } from "../../colorimetry.js";
 import { Color } from "../color.js";
 import { minv, mmult3333, mmult3331 } from "../common/util.js";
-import { xyY, xyyToXyz } from "../spaces/ciexyy.js";
+import { Yxy, yxyToXyz } from "../spaces/ciexyy.js";
 import { xy, xyToXyz } from "../spaces/xy.js";
 import { xyz as xyzSpace } from "../spaces/xyz.js";
 
@@ -32,7 +32,7 @@ const catMethodMtxMap: Record<string, number[][]> = {
   bradford: mBradford,
 };
 
-function xyzScale([X, Y, Z]: number[], refWhiteSrc: xyY, refWhiteDst: xyY) {
+function xyzScale([X, Y, Z]: number[], refWhiteSrc: Yxy, refWhiteDst: Yxy) {
   const [Xws, , Zws] = xyToXyz([refWhiteSrc.x, refWhiteSrc.y], { whiteLuminance: refWhiteSrc.Y });
   const [Xwd, , Zwd] = xyToXyz([refWhiteDst.x, refWhiteDst.y], { whiteLuminance: refWhiteDst.Y });
   return [(X * Xwd) / Xws, (Y * refWhiteDst.Y) / refWhiteSrc.Y, (Z * Zwd) / Zws];
@@ -40,8 +40,8 @@ function xyzScale([X, Y, Z]: number[], refWhiteSrc: xyY, refWhiteDst: xyY) {
 
 export function xyzCat(
   xyzSrc: number[],
-  refWhiteSrc: xyY,
-  refWhiteDst: xyY,
+  refWhiteSrc: Yxy,
+  refWhiteDst: Yxy,
   method: ChromaticAdaptationMethodName = "bradford"
 ) {
   if (method === "xyz") {
@@ -50,8 +50,8 @@ export function xyzCat(
 
   const MA = catMethodMtxMap[method];
 
-  const [ρS, γS, βS] = mmult3331(MA, xyyToXyz([refWhiteSrc.x, refWhiteSrc.y, refWhiteSrc.Y]));
-  const [ρD, γD, βD] = mmult3331(MA, xyyToXyz([refWhiteDst.x, refWhiteDst.y, refWhiteDst.Y]));
+  const [ρS, γS, βS] = mmult3331(MA, yxyToXyz([refWhiteSrc.x, refWhiteSrc.y, refWhiteSrc.Y]));
+  const [ρD, γD, βD] = mmult3331(MA, yxyToXyz([refWhiteDst.x, refWhiteDst.y, refWhiteDst.Y]));
 
   const M1 = [
     [ρD / ρS, 0, 0],

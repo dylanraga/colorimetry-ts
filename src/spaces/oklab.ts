@@ -3,7 +3,7 @@
  */
 import { minv, mmult3331 as mmult } from "../common/util.js";
 import { ColorSpace } from "../space.js";
-import { lchSpace } from "./lch.js";
+import { lchSpaceFromLabSpace } from "./lch.js";
 import { xyz, xyzNToXyz, xyzToXyzN } from "./xyz.js";
 
 // export const LABSPACE_OKLAB = new LabSpace({
@@ -23,20 +23,25 @@ import { xyz, xyzNToXyz, xyzToXyzN } from "./xyz.js";
 //   },
 // });
 
-export const oklab = new ColorSpace<{ whiteLuminance: number }>({
-  name: "Oklab",
-  keys: ["L", "a", "b"],
-  conversions: [
-    {
-      spaceB: xyz,
-      aToB: (values, props) => oklabToXyz(values, { whiteLuminance: 100, ...props }),
-      bToA: (values, props) => xyzToOklab(values, { whiteLuminance: 100, ...props }),
-    },
-  ],
-  // precision: 3,
-});
+const oklabContext = { whiteLuminance: 100 } as const;
 
-export const oklch = lchSpace(oklab, { name: "Oklch", keys: ["L", "C", "h"] });
+export const oklab = Object.assign(
+  new ColorSpace({
+    name: "Oklab",
+    keys: ["L", "a", "b"],
+    conversions: [
+      {
+        spaceB: xyz,
+        aToB: (values, newContext) => oklabToXyz(values, Object.assign(oklabContext, newContext)),
+        bToA: (values, newContext) => xyzToOklab(values, Object.assign(oklabContext, newContext)),
+      },
+    ],
+    // precision: 3,
+  }),
+  oklabContext
+);
+
+export const oklch = lchSpaceFromLabSpace(oklab, { name: "Oklch", keys: ["L", "C", "h"] });
 
 /**
  * XYZ <-> Oklab conversion functions

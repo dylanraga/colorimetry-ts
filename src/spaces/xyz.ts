@@ -12,11 +12,14 @@ export interface XYZ {
 
 export const xyz = new ColorSpace({ name: "CIE XYZ", keys: ["X", "Y", "Z"] });
 
-export const xyz_n = new ColorSpace<{ whiteLuminance: number }>({
-  name: "XYZ Normalized",
-  keys: ["Xn", "Yn", "Zn"],
-  conversions: [{ spaceB: xyz, aToB: xyzNToXyz, bToA: xyzToXyzN }],
-});
+export const xyz_n = Object.assign(
+  new ColorSpace({
+    name: "XYZ Normalized",
+    keys: ["Xn", "Yn", "Zn"],
+    conversions: [{ spaceB: xyz, aToB: xyzNToXyz, bToA: xyzToXyzN }],
+  }),
+  { whiteLuminance: 100 }
+);
 
 export function xyzToXyzN(
   [X, Y, Z]: number[],

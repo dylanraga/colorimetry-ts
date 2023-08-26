@@ -1,14 +1,18 @@
 import { deg2rad, rad2deg } from "../common/util.js";
 import { ColorSpace } from "../space.js";
 
-export function lchSpace(labSpace: ColorSpace, props?: { name?: string; keys?: string[] }) {
+export function lchSpaceFromLabSpace<T extends ColorSpace>(labSpace: T, context?: { name?: string; keys?: string[] }) {
   const newSpace = new ColorSpace({
-    name: props?.name ?? labSpace.name + " (LCh)" ?? "LCh Color Space",
-    keys: props?.keys ?? ["L", "C", "h"],
+    name: context?.name ?? labSpace.name + " (LCh)" ?? "LCh Color Space",
+    keys: context?.keys ?? ["L", "C", "h"],
     conversions: [{ spaceB: labSpace, aToB: lchToLab, bToA: labToLch }],
   });
 
-  return newSpace;
+  const { name, keys, ...labSpaceContext } = labSpace;
+
+  Object.assign(newSpace, labSpaceContext);
+
+  return newSpace as T;
 }
 
 function labToLch([L, a, b]: number[]) {

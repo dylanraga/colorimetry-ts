@@ -9,17 +9,22 @@ import { uvToXyz, xyToUv, xyzToUv } from "./uv.js";
 import { xy } from "./xy.js";
 import { xyz } from "./xyz.js";
 
-export const luv = new ColorSpace<{ refWhite: xy; whiteLuminance: number }>({
-  name: "CIELUV",
-  keys: ["L", "u", "v"],
-  conversions: [
-    {
-      spaceB: xyz,
-      aToB: (values, props) => cieluvToXyz(values, { refWhite: illuminants.d65, whiteLuminance: 100, ...props }),
-      bToA: (values, props) => xyzToCieluv(values, { refWhite: illuminants.d65, whiteLuminance: 100, ...props }),
-    },
-  ],
-});
+const luvContext = { refWhite: illuminants.d65, whiteLuminance: 100 } as const;
+
+export const luv = Object.assign(
+  new ColorSpace({
+    name: "CIELUV",
+    keys: ["L", "U", "V"],
+    conversions: [
+      {
+        spaceB: xyz,
+        aToB: (values, newContext) => cieluvToXyz(values, Object.assign(luvContext, newContext)),
+        bToA: (values, newContext) => xyzToCieluv(values, Object.assign(luvContext, newContext)),
+      },
+    ],
+  }),
+  luvContext
+);
 
 /*
  * CIELUV/u'v' <-> XYZ conversions

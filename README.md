@@ -35,7 +35,7 @@ const srgbRed = color("srgb", [255, 0, 0], { bitDepth: 8 });
 const srgbRedInP3 = srgbRed.toSpace("display-p3", { bitDepth: 8 });
 
 console.log(srgbRedInP3.values);
-// >> [ 234, 51, 35 ]
+// output: [ 234, 51, 35 ]
 ```
 
 <sub>_The input/output of RGB values are normalized between 0–1 if no `bitDepth` value is passed to the color's context object argument._</sub>
@@ -50,9 +50,9 @@ const color2 = color("display-p3", [1, 1, 1]);
 const color3 = color("lab", [100, 0, 0]);
 
 console.log(toXyz(color1), toXyz(color2), toXyz(color3));
-// >> [ 76.036, 80.000, 87.125 ],
-// [ 76.036, 80.000, 87.125 ],
-// [ 95.046, 100.00, 108.91 ]
+// output: [ 76.036, 80.000, 87.125 ],
+//         [ 76.036, 80.000, 87.125 ],
+//         [ 95.046, 100.00, 108.91 ]
 ```
 
 Check if two colors are equal/indistinguishable from each other:
@@ -64,11 +64,11 @@ const colorA = color("srgb", [0, 0, 1]);
 const colorB = color("display-p3", [0, 0, 1]);
 
 console.log(colorA.equals(colorB));
-// >> false
+// output: false
 
 // conversions should always be equal
 console.log(srgbRed.equals(srgbRedInP3));
-// >> true
+// output: true
 ```
 
 # Roadmap

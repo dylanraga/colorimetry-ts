@@ -4,15 +4,15 @@ import { ColorGamutPrimaries } from "../gamuts/index.js";
 import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
-export type LinearRGBColorSpace = ColorSpace<{ gamut: ColorGamutPrimaries }>;
-export type EncodedRGBColorSpace = ColorSpace<{
+export type LinearRGBColorSpace = ColorSpace & { gamut: ColorGamutPrimaries };
+export type EncodedRGBColorSpace = ColorSpace & {
   gamut: ColorGamutPrimaries;
   curve: ToneResponseCurve;
   whiteLuminance: number;
   blackLuminance: number;
   peakLuminance: number;
   bitDepth: number;
-}>;
+};
 
 const linearRgbSpaceGamutCache = new WeakMap<ColorGamutPrimaries, LinearRGBColorSpace>();
 
@@ -26,19 +26,21 @@ export function linearRgbSpace({
   const existingSpace = linearRgbSpaceGamutCache.get(gamut);
   if (existingSpace) return existingSpace;
 
+  const context = { gamut } as const;
+
   const newSpace = new ColorSpace({
     name,
     keys: ["R", "G", "B"],
     conversions: [
       {
         spaceB: xyz,
-        aToB: (values, props) => linearRgbToXyz(values, { gamut, ...props }),
-        bToA: (values, props) => xyzToLinearRgb(values, { gamut, ...props }),
+        aToB: (values, newContext) => linearRgbToXyz(values, Object.assign(context, newContext)),
+        bToA: (values, newContext) => xyzToLinearRgb(values, Object.assign(context, newContext)),
       },
     ],
   });
 
-  const newLinearRgbSpace = Object.assign(newSpace, { gamut });
+  const newLinearRgbSpace = Object.assign(newSpace, context);
 
   linearRgbSpaceGamutCache.set(gamut, newLinearRgbSpace);
 
@@ -49,9 +51,10 @@ export function rgbSpace({
   name = "Encoded RGB Color Space",
   gamut,
   curve,
-  whiteLuminance,
-  blackLuminance,
-  peakLuminance,
+  whiteLuminance = 100,
+  blackLuminance = 0,
+  peakLuminance = whiteLuminance,
+  bitDepth = 0,
 }: {
   name?: string;
   gamut: ColorGamutPrimaries;
@@ -59,22 +62,23 @@ export function rgbSpace({
   whiteLuminance: number;
   blackLuminance: number;
   peakLuminance?: number;
+  bitDepth?: number;
 }): EncodedRGBColorSpace {
+  const context = { gamut, curve, whiteLuminance, blackLuminance, peakLuminance, bitDepth } as const;
+
   const newSpace = new ColorSpace({
     name,
     keys: ["r", "g", "b"],
     conversions: [
       {
         spaceB: linearRgbSpace({ gamut }),
-        aToB: (values, props) =>
-          encodedRgbToLinearRgb(values, { gamut, curve, whiteLuminance, blackLuminance, peakLuminance, ...props }),
-        bToA: (values, props) =>
-          linearRgbToEncodedRgb(values, { gamut, curve, whiteLuminance, blackLuminance, peakLuminance, ...props }),
+        aToB: (values, newContext) => encodedRgbToLinearRgb(values, Object.assign(context, newContext)),
+        bToA: (values, newContext) => linearRgbToEncodedRgb(values, Object.assign(context, newContext)),
       },
     ],
   });
 
-  const newRgbSpace = Object.assign(newSpace, { gamut, curve });
+  const newRgbSpace = Object.assign(newSpace, context);
 
   return newRgbSpace;
 }
@@ -139,7 +143,7 @@ function linearRgbToEncodedRgb(
     whiteLuminance: number;
     blackLuminance: number;
     peakLuminance?: number;
-    bitDepth: number;
+    bitDepth?: number;
   }
 ) {
   const V = linearRgb.map((v) => curve.invEotf(v, { whiteLuminance, blackLuminance, peakLuminance }));
@@ -159,7 +163,7 @@ function encodedRgbToLinearRgb(
     whiteLuminance: number;
     blackLuminance: number;
     peakLuminance?: number;
-    bitDepth: number;
+    bitDepth?: number;
   }
 ) {
   const V = bitDepth > 0 ? encodedRgb.map((v) => v / ((2 << (bitDepth - 1)) - 1)) : encodedRgb;

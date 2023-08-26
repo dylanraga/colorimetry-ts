@@ -174,14 +174,17 @@ export function mmult(A: number[] | number[][], B: number[] | number[][]): numbe
  * @param N 3×1  matrix as 1D array
  * @returns 3×1  matrix as 1D array
  */
-export function mmult3331([[Ma, Mb, Mc], [Md, Me, Mf], [Mg, Mh, Mi]]: number[][], [Na, Nb, Nc]: number[]) {
+export function mmult3331(
+  [[Ma, Mb, Mc], [Md, Me, Mf], [Mg, Mh, Mi]]: number[][],
+  [Na, Nb, Nc]: number[]
+): [number, number, number] {
   return [Ma * Na + Mb * Nb + Mc * Nc, Md * Na + Me * Nb + Mf * Nc, Mg * Na + Mh * Nb + Mi * Nc];
 }
 
 export function mmult3333(
   [[Ma, Mb, Mc], [Md, Me, Mf], [Mg, Mh, Mi]]: number[][],
   [[Na, Nb, Nc], [Nd, Ne, Nf], [Ng, Nh, Ni]]: number[][]
-): number[][] {
+): [[number, number, number], [number, number, number], [number, number, number]] {
   return [
     [Ma * Na + Mb * Nd + Mc * Ng, Ma * Nb + Mb * Ne + Mc * Nh, Ma * Nc + Mb * Nf + Mc * Ni],
     [Md * Na + Me * Nd + Mf * Ng, Md * Nb + Me * Ne + Mf * Nh, Md * Nc + Me * Nf + Mf * Ni],
@@ -210,9 +213,9 @@ export function bfsPath<T>(start: T, end: T, edges: (curr: T) => T[]) {
   const visited: T[][] = [[]];
 
   while (queue.length) {
-    const path = queue.shift() as T[];
+    const path = queue.shift()!;
 
-    curr = path[path.length - 1];
+    curr = path.at(-1)!;
     visited.push(path);
 
     if (curr === end && path.length > 1) return path;

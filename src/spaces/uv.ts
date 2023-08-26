@@ -6,22 +6,27 @@ import { ColorSpace } from "../space.js";
 import { xy } from "./xy.js";
 import { xyz } from "./xyz.js";
 
-export const uv = new ColorSpace({
-  name: "CIEu'v'",
-  keys: ["u", "v"],
-  conversions: [
-    {
-      spaceB: xyz,
-      aToB: uvToXyz,
-      bToA: xyzToUv,
-    },
-    {
-      spaceB: xy,
-      aToB: uvToXy,
-      bToA: xyToUv,
-    },
-  ],
-});
+const uvContext = { whiteLuminance: 1 } as const;
+
+export const uv = Object.assign(
+  new ColorSpace({
+    name: "CIEu'v'",
+    keys: ["u", "v"],
+    conversions: [
+      {
+        spaceB: xyz,
+        aToB: (values, newContext) => uvToXyz(values, Object.assign(uvContext, newContext)),
+        bToA: (values) => xyzToUv(values),
+      },
+      {
+        spaceB: xy,
+        aToB: uvToXy,
+        bToA: xyToUv,
+      },
+    ],
+  }),
+  uvContext
+);
 
 export function xyzToUv([X, Y, Z]: number[]) {
   const denom = X + 15 * Y + 3 * Z;
@@ -31,7 +36,7 @@ export function xyzToUv([X, Y, Z]: number[]) {
   return [u, v];
 }
 
-export function uvToXyz([u, v]: number[], { whiteLuminance = 1 }: { whiteLuminance?: number }) {
+export function uvToXyz([u, v]: number[], { whiteLuminance = 1 }: { whiteLuminance?: number } = { whiteLuminance: 1 }) {
   const denom = 4 * v;
   const X = (whiteLuminance * (9 * u)) / denom;
   const Z = (whiteLuminance * (12 - 3 * u - 20 * v)) / denom;

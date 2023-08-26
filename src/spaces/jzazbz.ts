@@ -6,7 +6,7 @@
 import { minv, mmult3331 } from "../common/util.js";
 import { st2084 } from "../curves/st2084.js";
 import { ColorSpace } from "../space.js";
-import { lchSpace } from "./lch.js";
+import { lchSpaceFromLabSpace } from "./lch.js";
 import { xyz } from "./xyz.js";
 
 export const jzazbz = new ColorSpace({
@@ -22,7 +22,7 @@ export const jzazbz = new ColorSpace({
   // precision: 6,
 });
 
-export const jzczhz = lchSpace(jzazbz, { name: "JzCzhz", keys: ["J", "C", "h"] });
+export const jzczhz = lchSpaceFromLabSpace(jzazbz, { name: "JzCzhz", keys: ["J", "C", "h"] });
 
 /*
  * JzAzBz <-> XYZ conversions

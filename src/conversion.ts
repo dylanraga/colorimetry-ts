@@ -5,8 +5,8 @@ import { ColorSpace } from "./space.js";
 export const conversionMap = new Map<ColorSpace, Map<ColorSpace, { path: ColorSpace[]; fn: ColorSpaceConversion }>>();
 
 export function addSpaceConversion(
-  spaceA: ColorSpace<any>,
-  spaceB: ColorSpace<any>,
+  spaceA: ColorSpace,
+  spaceB: ColorSpace,
   aToB: ColorSpaceConversion,
   bToA?: ColorSpaceConversion
 ) {
@@ -114,4 +114,4 @@ function composeFnList(fnList: ColorSpaceConversion[]): ColorSpaceConversion {
     );
 }
 
-export type ColorSpaceConversion = (values: number[], props?: any) => number[];
+export type ColorSpaceConversion = (values: number[], newContext?: { [k: string]: any }) => number[];

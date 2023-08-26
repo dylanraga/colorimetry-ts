@@ -8,29 +8,29 @@
 import { lstar } from "../curves/lstar.js";
 import { illuminants } from "../illuminants/index.js";
 import { ColorSpace } from "../space.js";
-import { lchSpace } from "./lch.js";
+import { lchSpaceFromLabSpace } from "./lch.js";
 import { xy, xyToXyz } from "./xy.js";
 import { xyz } from "./xyz.js";
 
 export const lab = cielabSpace({ refWhite: illuminants.d65, whiteLuminance: 100 });
 export const lab_d50 = cielabSpace({ refWhite: illuminants.d50, whiteLuminance: 100 });
-export const lch = lchSpace(lab);
-export const lch_d50 = lchSpace(lab_d50);
+export const lch = lchSpaceFromLabSpace(lab);
+export const lch_d50 = lchSpaceFromLabSpace(lab_d50);
 
-export function cielabSpace({ refWhite, whiteLuminance }: { refWhite: xy; whiteLuminance: number }) {
-  const newSpace = new ColorSpace<{ refWhite: xy; whiteLuminance: number }>({
+export function cielabSpace(context: { refWhite: xy; whiteLuminance: number }) {
+  const newSpace = new ColorSpace({
     name: "CIELAB",
     keys: ["L", "a", "b"],
     conversions: [
       {
         spaceB: xyz,
-        aToB: (values, props) => cielabToXyz(values, { refWhite, whiteLuminance, ...props }),
-        bToA: (values, props) => xyzToCielab(values, { refWhite, whiteLuminance, ...props }),
+        aToB: (values, newContext) => cielabToXyz(values, Object.assign(context, newContext)),
+        bToA: (values, newContext) => xyzToCielab(values, Object.assign(context, newContext)),
       },
     ],
   });
 
-  return newSpace;
+  return Object.assign(newSpace, context);
 }
 
 /**
