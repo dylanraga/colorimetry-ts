@@ -1,7 +1,7 @@
 import { illuminants } from "../../colorimetry.js";
 import { Color } from "../color.js";
 import { minv, mmult3333, mmult3331 } from "../common/util.js";
-import { Yxy, yxyToXyz } from "../spaces/ciexyy.js";
+import { Yxy, yxyToXyz } from "../spaces/cieyxy.js";
 import { xy, xyToXyz } from "../spaces/xy.js";
 import { xyz as xyzSpace } from "../spaces/xyz.js";
 

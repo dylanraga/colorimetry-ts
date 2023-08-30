@@ -1,6 +1,6 @@
-/**
- * 1931 CIE Yxy definitions and conversions
- */
+//
+// CIE Yxy 1931
+//
 
 import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
@@ -11,8 +11,8 @@ export const yxy = new ColorSpace({
   conversions: [
     {
       spaceB: xyz,
-      aToB: yxyToXyz,
-      bToA: xyzToYxy,
+      aToB: xyzFromYxy,
+      bToA: yxyFromXyz,
     },
   ],
 });
@@ -20,14 +20,14 @@ export const yxy = new ColorSpace({
 /**
  * CIE1931 Yxy<->XYZ conversion functions
  */
-export function yxyToXyz([Y, x, y]: number[]) {
+export function xyzFromYxy([Y, x, y]: [number, number, number]): [number, number, number] {
   const X = (x * Y) / y;
   const Z = ((1 - x - y) * Y) / y;
 
   return [X, Y, Z];
 }
 
-export function xyzToYxy([X, Y, Z]: number[]) {
+export function yxyFromXyz([X, Y, Z]: [number, number, number]): [number, number, number] {
   const denom = X + Y + Z;
   const x = X / denom;
   const y = Y / denom;

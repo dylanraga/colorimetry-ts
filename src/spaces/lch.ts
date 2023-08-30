@@ -15,11 +15,11 @@ export function lchSpaceFromLabSpace<T extends ColorSpace>(labSpace: T, context?
   return newSpace as T;
 }
 
-function labToLch([L, a, b]: number[]) {
+function labToLch([L, a, b]: [number, number, number]): [number, number, number] {
   const hp = rad2deg(Math.atan2(b, a));
   return [L, (a * a + b * b) ** (1 / 2), hp < 0 ? hp + 360 : hp];
 }
 
-function lchToLab([L, C, h]: number[]) {
+function lchToLab([L, C, h]: [number, number, number]): [number, number, number] {
   return [L, C * Math.cos(deg2rad(h)), C * Math.sin(deg2rad(h))];
 }

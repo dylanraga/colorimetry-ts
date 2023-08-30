@@ -1,6 +1,7 @@
-/**
- * Björn Ottosson Oklab definitions and conversions
- */
+//
+// Oklab by Björn Ottosson
+//
+
 import { minv, mmult3331 as mmult } from "../common/util.js";
 import { ColorSpace } from "../space.js";
 import { lchSpaceFromLabSpace } from "./lch.js";
@@ -68,7 +69,10 @@ const M2 = [
 ];
 const M2Inv = minv(M2);
 
-function xyzToOklab(XYZ: number[], { whiteLuminance }: { whiteLuminance: number }) {
+function xyzToOklab(
+  XYZ: [number, number, number],
+  { whiteLuminance }: { whiteLuminance: number }
+): [number, number, number] {
   const XnYnZn = xyzToXyzN(XYZ, { whiteLuminance });
   const LMS = mmult(M1, XnYnZn);
   const LpMpSp = LMS.map(Math.cbrt);
@@ -77,7 +81,10 @@ function xyzToOklab(XYZ: number[], { whiteLuminance }: { whiteLuminance: number 
   return Lab;
 }
 
-function oklabToXyz(Lab: number[], { whiteLuminance }: { whiteLuminance: number }) {
+function oklabToXyz(
+  Lab: [number, number, number],
+  { whiteLuminance }: { whiteLuminance: number }
+): [number, number, number] {
   const LpMpSp = mmult(M2Inv, Lab);
   const LMS = LpMpSp.map((u) => u * u * u);
   const XnYnZn = mmult(M1Inv, LMS);

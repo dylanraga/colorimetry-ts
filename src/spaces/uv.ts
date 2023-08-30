@@ -1,34 +1,32 @@
-/**
- * 1976 CIE u'v' chromaticity definitions and conversions
- */
+//
+// CIE chromaticity Y-u'v' 1976
+// (not to be confused with YUV)
+//
 
 import { ColorSpace } from "../space.js";
 import { xy } from "./xy.js";
 import { xyz } from "./xyz.js";
 
-const uvContext = { whiteLuminance: 1 } as const;
+export const uv76 = new ColorSpace({
+  name: "CIE Y-u'v'",
+  keys: ["Y", "u'", "v'"],
+  conversions: [
+    {
+      spaceB: xyz,
+      aToB: (values) => xyzFromUv(values.slice(1, 3) as [number, number], values[0]),
+      bToA: (values) => [values[1]].concat(uvFromXyz(values)) as [number, number, number],
+    },
+    {
+      spaceB: xy,
+      aToB: (values) =>
+        [values[0]].concat(xyFromUv(values.slice(1, 3) as [number, number])) as [number, number, number],
+      bToA: (values) =>
+        [values[0]].concat(uvFromXy(values.slice(1, 3) as [number, number])) as [number, number, number],
+    },
+  ],
+});
 
-export const uv = Object.assign(
-  new ColorSpace({
-    name: "CIEu'v'",
-    keys: ["u", "v"],
-    conversions: [
-      {
-        spaceB: xyz,
-        aToB: (values, newContext) => uvToXyz(values, Object.assign(uvContext, newContext)),
-        bToA: (values) => xyzToUv(values),
-      },
-      {
-        spaceB: xy,
-        aToB: uvToXy,
-        bToA: xyToUv,
-      },
-    ],
-  }),
-  uvContext
-);
-
-export function xyzToUv([X, Y, Z]: number[]) {
+export function uvFromXyz([X, Y, Z]: [number, number, number]): [number, number] {
   const denom = X + 15 * Y + 3 * Z;
   const u = (4 * X) / denom;
   const v = (9 * Y) / denom;
@@ -36,7 +34,7 @@ export function xyzToUv([X, Y, Z]: number[]) {
   return [u, v];
 }
 
-export function uvToXyz([u, v]: number[], { whiteLuminance = 1 }: { whiteLuminance?: number } = { whiteLuminance: 1 }) {
+export function xyzFromUv([u, v]: [number, number], whiteLuminance = 1): [number, number, number] {
   const denom = 4 * v;
   const X = (whiteLuminance * (9 * u)) / denom;
   const Z = (whiteLuminance * (12 - 3 * u - 20 * v)) / denom;
@@ -44,13 +42,13 @@ export function uvToXyz([u, v]: number[], { whiteLuminance = 1 }: { whiteLuminan
   return [X, whiteLuminance, Z];
 }
 
-export function xyToUv([x, y]: number[]): number[] {
+export function uvFromXy([x, y]: [number, number]): [number, number] {
   const denom = -2 * x + 12 * y + 3;
 
   return [(4 * x) / denom, (9 * y) / denom];
 }
 
-export function uvToXy([u, v]: number[]): number[] {
+export function xyFromUv([u, v]: [number, number]): [number, number] {
   const denom = 6 * u - 16 * v + 12;
 
   return [(9 * u) / denom, (4 * v) / denom];

@@ -1,7 +1,6 @@
-/**
- * JzAzBz definitions and conversions
- * --------------------------------
- */
+//
+// JzAzBz
+//
 
 import { minv, mmult3331 } from "../common/util.js";
 import { st2084 } from "../curves/st2084.js";
@@ -15,8 +14,8 @@ export const jzazbz = new ColorSpace({
   conversions: [
     {
       spaceB: xyz,
-      aToB: jzazbzToXyz,
-      bToA: xyzToJzazbz,
+      aToB: xyzFromJzazbz,
+      bToA: jzazbzFromXyz,
     },
   ],
   // precision: 6,
@@ -47,7 +46,7 @@ const mLMS_to_IAB = [
 const mIAB_to_LMS = minv(mLMS_to_IAB);
 // const jabTrc = curves.st2084.props({ m2: 134.034375 });
 
-function xyzToJzazbz([X, Y, Z]: number[]) {
+export function jzazbzFromXyz([X, Y, Z]: [number, number, number]): [number, number, number] {
   const Xp = b * X - (b - 1) * Z;
   const Yp = g * Y - (g - 1) * X;
 
@@ -60,7 +59,7 @@ function xyzToJzazbz([X, Y, Z]: number[]) {
   return [Jz, az, bz];
 }
 
-function jzazbzToXyz([Jz, az, bz]: number[]) {
+export function xyzFromJzazbz([Jz, az, bz]: [number, number, number]): [number, number, number] {
   const Jz_ = Jz + d0;
   const Iz = Jz_ / (1 + d - d * Jz_);
 

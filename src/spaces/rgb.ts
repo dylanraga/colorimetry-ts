@@ -1,4 +1,4 @@
-import { minv, mmult3331, quantizeToBits } from "../common/util.js";
+import { floatFromQuantized, minv, mmult3331, quantize } from "../common/util.js";
 import { ToneResponseCurve } from "../curves/index.js";
 import { ColorGamutPrimaries } from "../gamuts/index.js";
 import { ColorSpace } from "../space.js";
@@ -34,8 +34,8 @@ export function linearRgbSpace({
     conversions: [
       {
         spaceB: xyz,
-        aToB: (values, newContext) => linearRgbToXyz(values, Object.assign(context, newContext)),
-        bToA: (values, newContext) => xyzToLinearRgb(values, Object.assign(context, newContext)),
+        aToB: (values, newContext) => xyzFromLinearRGB(values, Object.assign(context, newContext)),
+        bToA: (values, newContext) => linearRgbFromXyz(values, Object.assign(context, newContext)),
       },
     ],
   });
@@ -72,8 +72,8 @@ export function rgbSpace({
     conversions: [
       {
         spaceB: linearRgbSpace({ gamut }),
-        aToB: (values, newContext) => encodedRgbToLinearRgb(values, Object.assign(context, newContext)),
-        bToA: (values, newContext) => linearRgbToEncodedRgb(values, Object.assign(context, newContext)),
+        aToB: (values, newContext) => linearRgbFromEncodedRgb(values, Object.assign(context, newContext)),
+        bToA: (values, newContext) => encodedRgbFromLinearRgb(values, Object.assign(context, newContext)),
       },
     ],
   });
@@ -122,16 +122,16 @@ export function getXyzToRgbMatrix(gamut: ColorGamutPrimaries) {
   return newMatrix;
 }
 
-function xyzToLinearRgb(xyz: number[], { gamut }: { gamut: ColorGamutPrimaries }) {
+function linearRgbFromXyz(xyz: number[], { gamut }: { gamut: ColorGamutPrimaries }) {
   return mmult3331(getXyzToRgbMatrix(gamut), xyz);
 }
 
-function linearRgbToXyz(linearRgb: number[], { gamut }: { gamut: ColorGamutPrimaries }) {
+function xyzFromLinearRGB(linearRgb: number[], { gamut }: { gamut: ColorGamutPrimaries }) {
   return mmult3331(getRgbToXyzMatrix(gamut), linearRgb);
 }
 
-function linearRgbToEncodedRgb(
-  linearRgb: number[],
+function encodedRgbFromLinearRgb(
+  linearRgb: [number, number, number],
   {
     curve,
     whiteLuminance,
@@ -145,13 +145,13 @@ function linearRgbToEncodedRgb(
     peakLuminance?: number;
     bitDepth?: number;
   }
-) {
+): [number, number, number] {
   const V = linearRgb.map((v) => curve.invEotf(v, { whiteLuminance, blackLuminance, peakLuminance }));
-  return bitDepth > 0 ? V.map((v) => quantizeToBits(v, bitDepth)) : V;
+  return (bitDepth > 0 ? V.map((v) => quantize(v, bitDepth)) : V) as [number, number, number];
 }
 
-function encodedRgbToLinearRgb(
-  encodedRgb: number[],
+function linearRgbFromEncodedRgb(
+  encodedRgb: [number, number, number],
   {
     curve,
     whiteLuminance,
@@ -165,8 +165,8 @@ function encodedRgbToLinearRgb(
     peakLuminance?: number;
     bitDepth?: number;
   }
-) {
-  const V = bitDepth > 0 ? encodedRgb.map((v) => v / ((2 << (bitDepth - 1)) - 1)) : encodedRgb;
+): [number, number, number] {
+  const V = bitDepth > 0 ? encodedRgb.map((v) => floatFromQuantized(v, bitDepth)) : encodedRgb;
   const L = V.map((v) => curve.eotf(v, { whiteLuminance, blackLuminance, peakLuminance }));
-  return L;
+  return L as [number, number, number];
 }

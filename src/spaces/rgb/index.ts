@@ -34,7 +34,6 @@ export const srgb = rgbSpace({
   whiteLuminance: 80,
   blackLuminance: 0.2,
 });
-// export const RGBSPACE_SRGB_8 = RGBSPACE_SRGB.toDigital(8).register("srgb_8");
 
 // Rec. 709 with BT.1886 transfer
 export const rec709 = rgbSpace({

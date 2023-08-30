@@ -192,22 +192,17 @@ export function mmult3333(
   ];
 }
 
-/**
- * Quantizes float value to n bits
- */
-export const quantizeToBits = (v: number, bitDepth = 8) => roundHTE(v * ((2 << (bitDepth - 1)) - 1));
-
 export const rad2deg = (x: number) => x * (180 / Math.PI);
 export const deg2rad = (x: number) => x * (Math.PI / 180);
 
 /**
- * Breadth-first search, used to find conversion path from one `ColorSpace` to another
+ * Breadth-first search, used to find conversion path between `ColorSpace` objects
  * @param start Beginning node
  * @param end Node to find
- * @param searchedNode Source of edges as a function of the current node
+ * @param nextEdges Next source of edges as a function of the current node
  * @returns Path array from `start` to `end`
  */
-export function bfsPath<T>(start: T, end: T, edges: (curr: T) => T[]) {
+export function bfsPath<T>(start: T, end: T, nextEdges: (curr: T) => T[]) {
   let curr = start;
   const queue = [[curr]];
   const visited: T[][] = [[]];
@@ -221,7 +216,7 @@ export function bfsPath<T>(start: T, end: T, edges: (curr: T) => T[]) {
     if (curr === end && path.length > 1) return path;
 
     if (!curr) continue;
-    for (const k of edges(curr)) {
+    for (const k of nextEdges(curr)) {
       if (!visited.find((v) => v[v.length - 1] === k)) queue.push([...path, k]);
     }
   }
@@ -241,6 +236,8 @@ export function withProps<F extends (...args: any) => any>(fn: F, props: Paramet
 
 export const lerp = (a: number, b: number, t: number) => (1 - t) * a + t * b;
 
+// Hex color strings conversions u16 arrays
+
 export function hexFromArray(values: number[]): string {
   if (values.length !== 3) throw new Error("Input array must have exactly three values");
   return "#" + values.map((v) => v.toString(16).padStart(2, "0")).join("");
@@ -248,4 +245,55 @@ export function hexFromArray(values: number[]): string {
 export function arrayFromHex(hex: string) {
   if (hex.length !== 7 || hex[0] !== "#") throw new Error("Invalid hex string");
   return [hex.slice(1, 3), hex.slice(3, 5), hex.slice(5, 7)].map((v) => parseInt(v, 16));
+}
+
+// Quantization
+
+/**
+ * Quantize float value to `bitDepth` bits
+ */
+export function quantize(
+  float: number,
+  bitDepth = 8,
+  range: "full" | "limited" | "chrominance" = "full",
+  roundHalfToEven = false
+) {
+  const round = roundHalfToEven ? roundHTE : Math.round;
+  const res = 1 << bitDepth;
+  let sigMin, sigMax;
+  switch (range) {
+    case "full":
+      sigMin = 0;
+      sigMax = res - 1;
+      break;
+    case "limited":
+      sigMin = 0.0625 * res;
+      sigMax = 0.91796875 * res;
+      break;
+    case "chrominance":
+      sigMin = 0.0625 * res;
+      sigMax = 0.9375 * res;
+      break;
+  }
+  return round(sigMin + float * sigMax);
+}
+
+export function floatFromQuantized(unorm: number, bitDepth = 8, range: "full" | "limited" | "chrominance" = "full") {
+  const res = 1 << bitDepth;
+  let sigMin, sigMax;
+  switch (range) {
+    case "full":
+      sigMin = 0;
+      sigMax = res - 1;
+      break;
+    case "limited":
+      sigMin = 0.0625 * res;
+      sigMax = 0.91796875 * res;
+      break;
+    case "chrominance":
+      sigMin = 0.0625 * res;
+      sigMax = 0.9375 * res;
+      break;
+  }
+  return (unorm - sigMin) / sigMax;
 }

@@ -114,4 +114,7 @@ function composeFnList(fnList: ColorSpaceConversion[]): ColorSpaceConversion {
     );
 }
 
-export type ColorSpaceConversion = (values: number[], newContext?: { [k: string]: any }) => number[];
+export type ColorSpaceConversion = (
+  values: [number, number, number],
+  newContext?: { [k: string]: any }
+) => [number, number, number];

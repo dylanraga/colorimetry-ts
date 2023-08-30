@@ -1,15 +1,15 @@
-/**
- * CIELAB definitions and conversions
- * ----------------------------
- * Use illuminant D50 since CIELAB was intended for reflective surfaces, not emissive/transmissive displays.
- * Currently using "wrong" Von Kries/XYZ scaling per spec; consider implementing manual Bradford CAT option in the future
- */
+//
+// CIELAB 1976
+// ----------------------------
+// Use illuminant D50 since CIELAB was intended for reflective surfaces, not emissive/transmissive displays.
+// Currently using "wrong" Von Kries/XYZ scaling per spec; consider implementing manual Bradford CAT option in the future
+//
 
 import { lstar } from "../curves/lstar.js";
 import { illuminants } from "../illuminants/index.js";
 import { ColorSpace } from "../space.js";
 import { lchSpaceFromLabSpace } from "./lch.js";
-import { xy, xyToXyz } from "./xy.js";
+import { xy, xyzFromXy } from "./xy.js";
 import { xyz } from "./xyz.js";
 
 export const lab = cielabSpace({ refWhite: illuminants.d65, whiteLuminance: 100 });
@@ -24,8 +24,8 @@ export function cielabSpace(context: { refWhite: xy; whiteLuminance: number }) {
     conversions: [
       {
         spaceB: xyz,
-        aToB: (values, newContext) => cielabToXyz(values, Object.assign(context, newContext)),
-        bToA: (values, newContext) => xyzToCielab(values, Object.assign(context, newContext)),
+        aToB: (values, newContext) => xyzFromCielab(values, Object.assign(context, newContext)),
+        bToA: (values, newContext) => cielabFromXyz(values, Object.assign(context, newContext)),
       },
     ],
   });
@@ -36,11 +36,11 @@ export function cielabSpace(context: { refWhite: xy; whiteLuminance: number }) {
 /**
  * CIELAB <-> XYZ conversion functions
  */
-export function xyzToCielab(
-  [X, Y, Z]: number[],
+export function cielabFromXyz(
+  [X, Y, Z]: [number, number, number],
   { refWhite, whiteLuminance }: { refWhite: xy; whiteLuminance: number }
-) {
-  const [Xr, Yr, Zr] = xyToXyz([refWhite.x, refWhite.y], { whiteLuminance });
+): [number, number, number] {
+  const [Xr, Yr, Zr] = xyzFromXy([refWhite.x, refWhite.y], whiteLuminance);
 
   const f = (x: number) => (100 * lstar.invEotf(x) + 16) / 116;
   const L = 116 * f(Y / Yr) - 16;
@@ -50,11 +50,11 @@ export function xyzToCielab(
   return [L, a, b];
 }
 
-export function cielabToXyz(
-  [L, a, b]: number[],
+export function xyzFromCielab(
+  [L, a, b]: [number, number, number],
   { refWhite, whiteLuminance }: { refWhite: xy; whiteLuminance: number }
-) {
-  const [Xr, Yr, Zr] = xyToXyz([refWhite.x, refWhite.y], { whiteLuminance });
+): [number, number, number] {
+  const [Xr, Yr, Zr] = xyzFromXy([refWhite.x, refWhite.y], whiteLuminance);
 
   const fInv = (x: number) => lstar.eotf((116 * x - 16) / 100);
   const Lp = (L + 16) / 116;

@@ -1,8 +1,9 @@
-/**
- * Dolby ICtCp/ITP definitions and conversions
- * -------------------------------------------
- * Output is significant to 5 digits, limited by precision of von kries and ebner matrices
- */
+//
+// Dolby ICtCp/ITP
+// -------------------------------------------
+// Output is significant to 5 digits, limited by precision of von kries and ebner matrices
+// TODO: props for cross-talk %
+//
 
 import { minv, mmult3331 } from "../common/util.js";
 import { st2084 } from "../curves/st2084.js";
@@ -16,8 +17,8 @@ export const ictcp = new ColorSpace({
   conversions: [
     {
       spaceB: xyz,
-      aToB: ictcpToXyz,
-      bToA: xyzToIctcp,
+      aToB: XyzFromIctcp,
+      bToA: ictcpFromXyz,
     },
   ],
   // precision: 5
@@ -74,7 +75,7 @@ const mLMS_to_ICtCp = [
 ];
 const mICtCp_to_LMS = minv(mLMS_to_ICtCp);
 
-function xyzToIctcp(XYZ: number[]) {
+export function ictcpFromXyz(XYZ: [number, number, number]): [number, number, number] {
   const LMS = mmult3331(mXYZ_to_LMS, XYZ);
   const LMSp = LMS.map((u) => st2084.invEotf(u));
   const ICtCp = mmult3331(mLMS_to_ICtCp, LMSp);
@@ -82,7 +83,7 @@ function xyzToIctcp(XYZ: number[]) {
   return ICtCp;
 }
 
-function ictcpToXyz(ICtCp: number[]) {
+export function XyzFromIctcp(ICtCp: [number, number, number]): [number, number, number] {
   const LMSp = mmult3331(mICtCp_to_LMS, ICtCp);
   const LMS = LMSp.map((u) => st2084.eotf(u));
   const XYZ = mmult3331(mLMS_to_XYZ, LMS);

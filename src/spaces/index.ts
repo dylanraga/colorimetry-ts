@@ -2,11 +2,11 @@ import * as rgbSpaces from "./rgb/index.js";
 import { xyz, xyz_n } from "./xyz.js";
 import { lab, lab_d50, lch } from "./cielab.js";
 import { luv } from "./cieluv.js";
-import { yxy } from "./ciexyy.js";
+import { yxy } from "./cieyxy.js";
 import { ictcp, itp, itp_lch } from "./ictcp.js";
 import { jzazbz, jzczhz } from "./jzazbz.js";
 import { oklab, oklch } from "./oklab.js";
-import { uv } from "./uv.js";
+import { uv76 } from "./uv.js";
 import { xy } from "./xy.js";
 
 export const spaces = {
@@ -25,7 +25,7 @@ export const spaces = {
   jzczhz,
   oklab,
   oklch,
-  uv,
+  uv76,
   xy,
 };
 

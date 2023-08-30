@@ -1,28 +1,23 @@
 /**
- * 1931 CIE xy chromaticity definitions and conversions
+ * CIE chromaticity Y-xy 1931
  */
 
 import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
-const xyContext = { whiteLuminance: 1 } as const;
+export const xy = new ColorSpace({
+  name: "CIE Y-xy",
+  keys: ["Y", "x", "y"],
+  conversions: [
+    {
+      spaceB: xyz,
+      aToB: (values) => xyzFromXy(values.slice(1, 3) as [number, number], values[0]),
+      bToA: (values) => [values[1]].concat(xyFromXyz(values)) as [number, number, number],
+    },
+  ],
+});
 
-export const xy = Object.assign(
-  new ColorSpace({
-    name: "CIExy",
-    keys: ["x", "y"],
-    conversions: [
-      {
-        spaceB: xyz,
-        aToB: (values, newContext) => xyToXyz(values, Object.assign(xyContext, newContext)),
-        bToA: xyzToXy,
-      },
-    ],
-  }),
-  xyContext
-);
-
-export function xyzToXy([X, Y, Z]: number[]) {
+export function xyFromXyz([X, Y, Z]: [number, number, number]): [number, number] {
   const denom = X + Y + Z;
   const x = X / denom;
   const y = Y / denom;
@@ -30,7 +25,7 @@ export function xyzToXy([X, Y, Z]: number[]) {
   return [x, y];
 }
 
-export function xyToXyz([x, y]: number[], { whiteLuminance = 1 }: { whiteLuminance?: number } = { whiteLuminance: 1 }) {
+export function xyzFromXy([x, y]: [number, number], whiteLuminance = 1): [number, number, number] {
   const X = (whiteLuminance * x) / y;
   const Z = (whiteLuminance * (1 - x - y)) / y;
 

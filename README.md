@@ -28,7 +28,7 @@ import { color } from "colorimetry-ts";
 
 ## Examples
 
-Convert `sRGB` red primary to `display-p3` RGB encoding (using 8 bits):
+- Convert `sRGB` red primary to `display-p3` RGB encoding (using 8 bits):
 
 ```js
 const srgbRed = color("srgb", [255, 0, 0], { bitDepth: 8 });
@@ -40,7 +40,7 @@ console.log(srgbRedInP3.values);
 
 <sub>_The input/output of RGB values are normalized between 0–1 if no `bitDepth` value is passed to the color's context object argument._</sub>
 
-Create an `XYZ` color space converter to convert multiple colors:
+- Create an `XYZ` color space converter to convert multiple colors:
 
 ```js
 const toXyz = color("xyz");
@@ -49,13 +49,13 @@ const color1 = color("srgb", [1, 1, 1]);
 const color2 = color("display-p3", [1, 1, 1]);
 const color3 = color("lab", [100, 0, 0]);
 
-console.log(toXyz(color1), toXyz(color2), toXyz(color3));
+console.log(toXyz(color1).values, toXyz(color2).values, toXyz(color3).values);
 // output: [ 76.036, 80.000, 87.125 ],
 //         [ 76.036, 80.000, 87.125 ],
 //         [ 95.046, 100.00, 108.91 ]
 ```
 
-Check if two colors are equal/indistinguishable from each other:
+- Check if two colors are equal/indistinguishable from each other:
 
 ```js
 // srgb and p3 share the same blue primary
@@ -70,6 +70,8 @@ console.log(colorA.equals(colorB));
 console.log(srgbRed.equals(srgbRedInP3));
 // output: true
 ```
+
+Note: Color value conversions using `color()` require [_absolute color spaces_](https://en.wikipedia.org/wiki/Color_space#Absolute_color_space) for both source and destination spaces, as `Color` object values are supposed to be non-ambiguous. For agnostic conversions, import the relevant function, e.g. `ycbcrFromRgb()`.
 
 # Roadmap
 

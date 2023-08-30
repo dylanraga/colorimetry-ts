@@ -1,6 +1,6 @@
-// import { ChromaticAdaptationMethodName, xyzCat } from "../cat.js";
-// import { ColorSpace } from "../space.js";
-// import { xy } from "./chromaticity/xy.js";
+//
+// CIE XYZ 1931
+//
 
 import { ColorSpace } from "../space.js";
 
@@ -26,7 +26,7 @@ export function xyzToXyzN(
   { whiteLuminance = 100 }: { whiteLuminance?: number } = {
     whiteLuminance: 100,
   }
-) {
+): [number, number, number] {
   const Yn = Y / whiteLuminance;
   const Xn = X / whiteLuminance;
   const Zn = Z / whiteLuminance;
@@ -38,7 +38,7 @@ export function xyzNToXyz(
   { whiteLuminance = 100 }: { whiteLuminance?: number } = {
     whiteLuminance: 100,
   }
-) {
+): [number, number, number] {
   const Y = whiteLuminance * Yn;
   const X = whiteLuminance * Xn;
   const Z = whiteLuminance * Zn;
