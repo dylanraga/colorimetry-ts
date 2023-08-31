@@ -27,13 +27,13 @@ import { spaces } from "./spaces/index.js";
 
 // export interface Color<T extends ColorSpace = ColorSpace> extends ColorClass<T> {}
 
-// type ColorValueFormat = '';
+// type ColorValueFormat = 'float' | ;
 
 export interface ColorLike<T extends ColorSpace | ColorSpaceName = ColorSpace> {
   space: T;
   values: [number, number, number];
   context?: Partial<ColorSpaceFromName<T>>;
-  format?:
+  // format?:
 }
 
 export class Color<T extends ColorSpace = ColorSpace> {

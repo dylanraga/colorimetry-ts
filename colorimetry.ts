@@ -41,6 +41,7 @@ import "./src/color/luma.js";
 import "./src/color/cct.js";
 import "./src/color/clamp-gamut.js";
 import "./src/color/cat.js";
+import "./src/color/toJSON.js";
 export { Color, color, colorDiff };
 
 //import * as cctData from './src/common/locus_10nm.json';

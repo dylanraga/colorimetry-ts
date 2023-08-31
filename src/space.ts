@@ -5,6 +5,7 @@ export type ColorSpaceName = keyof typeof spaces;
 export type ColorSpaceFromName<T> = T extends ColorSpaceName ? typeof spaces[T] : T extends ColorSpace ? T : never;
 
 interface ColorSpaceConstructorProps {
+  readonly id?: string;
   readonly name?: string;
   readonly keys: readonly string[];
   readonly conversions?: {
@@ -15,10 +16,12 @@ interface ColorSpaceConstructorProps {
 }
 
 export class ColorSpace {
+  public readonly id?: string;
   public readonly name?: string;
   public readonly keys: readonly string[];
 
-  constructor({ name, keys, conversions = [] }: ColorSpaceConstructorProps) {
+  constructor({ id, name, keys, conversions = [] }: ColorSpaceConstructorProps) {
+    this.id = id;
     this.name = name;
     this.keys = keys;
 
