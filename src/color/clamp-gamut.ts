@@ -50,7 +50,7 @@ export function clampInGamut(
   // }
   // const clampedColor = new Color(rgbSpace, currRgb).toSpace(color.space);
 
-  let rgbClamped = rgb.map((u) => Math.max(u, 0));
+  let rgbClamped = rgb.map((u) => Math.max(u, 0)) as [number, number, number];
 
   let minDiffFromClipped = colorDiff(color, new Color(rgbSpace, rgbClamped));
   //console.log('currRgb', rgb, rgbClamped, dEFromClipped);
@@ -68,7 +68,7 @@ export function clampInGamut(
     //   currLchColor = new Color(lchSpace, rgbLch);
     //   currRgb = currLchColor.toSpace(rgbSpace).values;
     // }
-    const newRgbClamped = currRgb.map((u) => Math.max(u, 0));
+    const newRgbClamped = currRgb.map((u) => Math.max(u, 0)) as [number, number, number];
     const diffFromClipped = colorDiff(currLchColor, new Color(rgbSpace, rgbClamped));
     if (diffFromClipped > minDiffFromClipped) {
       return new Color(rgbSpace, rgbClamped).toSpace(color.space);

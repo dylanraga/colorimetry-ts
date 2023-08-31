@@ -1,7 +1,7 @@
 //
 // CIELAB 1976
 // ----------------------------
-// Use illuminant D50 since CIELAB was intended for reflective surfaces, not emissive/transmissive displays.
+// Use illuminant D50 since CIELAB was intended for reflective surfaces, not emissive displays.
 // Currently using "wrong" Von Kries/XYZ scaling per spec; consider implementing manual Bradford CAT option in the future
 //
 

@@ -1,8 +1,8 @@
 import { illuminants } from "../../colorimetry.js";
 import { Color } from "../color.js";
 import { minv, mmult3333, mmult3331 } from "../common/util.js";
-import { Yxy, yxyToXyz } from "../spaces/cieyxy.js";
-import { xy, xyToXyz } from "../spaces/xy.js";
+import { Yxy, xyzFromYxy } from "../spaces/cieyxy.js";
+import { xy, xyzFromXy } from "../spaces/xy.js";
 import { xyz as xyzSpace } from "../spaces/xyz.js";
 
 export type ChromaticAdaptationMethodName = "xyz" | "vonkries" | "bradford" | "cat02" | "cat16";
@@ -32,26 +32,26 @@ const catMethodMtxMap: Record<string, number[][]> = {
   bradford: mBradford,
 };
 
-function xyzScale([X, Y, Z]: number[], refWhiteSrc: Yxy, refWhiteDst: Yxy) {
-  const [Xws, , Zws] = xyToXyz([refWhiteSrc.x, refWhiteSrc.y], { whiteLuminance: refWhiteSrc.Y });
-  const [Xwd, , Zwd] = xyToXyz([refWhiteDst.x, refWhiteDst.y], { whiteLuminance: refWhiteDst.Y });
+function xyzScale([X, Y, Z]: [number, number, number], refWhiteSrc: Yxy, refWhiteDst: Yxy): [number, number, number] {
+  const [Xws, , Zws] = xyzFromXy([refWhiteSrc.x, refWhiteSrc.y], refWhiteSrc.Y);
+  const [Xwd, , Zwd] = xyzFromXy([refWhiteDst.x, refWhiteDst.y], refWhiteDst.Y);
   return [(X * Xwd) / Xws, (Y * refWhiteDst.Y) / refWhiteSrc.Y, (Z * Zwd) / Zws];
 }
 
 export function xyzCat(
-  xyzSrc: number[],
+  xyzSrc: [number, number, number],
   refWhiteSrc: Yxy,
   refWhiteDst: Yxy,
   method: ChromaticAdaptationMethodName = "bradford"
-) {
+): [number, number, number] {
   if (method === "xyz") {
     return xyzScale(xyzSrc, refWhiteSrc, refWhiteDst);
   }
 
   const MA = catMethodMtxMap[method];
 
-  const [ρS, γS, βS] = mmult3331(MA, yxyToXyz([refWhiteSrc.x, refWhiteSrc.y, refWhiteSrc.Y]));
-  const [ρD, γD, βD] = mmult3331(MA, yxyToXyz([refWhiteDst.x, refWhiteDst.y, refWhiteDst.Y]));
+  const [ρS, γS, βS] = mmult3331(MA, xyzFromYxy([refWhiteSrc.x, refWhiteSrc.y, refWhiteSrc.Y]));
+  const [ρD, γD, βD] = mmult3331(MA, xyzFromYxy([refWhiteDst.x, refWhiteDst.y, refWhiteDst.Y]));
 
   const M1 = [
     [ρD / ρS, 0, 0],

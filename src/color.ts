@@ -27,12 +27,21 @@ import { spaces } from "./spaces/index.js";
 
 // export interface Color<T extends ColorSpace = ColorSpace> extends ColorClass<T> {}
 
+// type ColorValueFormat = '';
+
+export interface ColorLike<T extends ColorSpace | ColorSpaceName = ColorSpace> {
+  space: T;
+  values: [number, number, number];
+  context?: Partial<ColorSpaceFromName<T>>;
+  format?:
+}
+
 export class Color<T extends ColorSpace = ColorSpace> {
   public readonly space: T;
-  public readonly values: number[];
+  public readonly values: [number, number, number];
   public readonly context?: Partial<T>;
 
-  constructor(space: T, values: number[], context?: Partial<T>) {
+  constructor(space: T, values: [number, number, number], context?: Partial<T>) {
     this.space = space;
     this.values = values;
     this.context = context;
@@ -62,26 +71,40 @@ export class Color<T extends ColorSpace = ColorSpace> {
 }
 
 type CurriedColorReturnType<T extends ColorSpace> = {
-  (values: number[], context?: Partial<T>): Color<T>;
+  (values: [number, number, number], context?: Partial<T>): Color<T>;
   (color: Color<any>, context?: Partial<T>): Color<T>;
 };
 
+function color<T extends ColorSpaceName>(color: ColorLike<T>): Color<ColorSpaceFromName<T>>;
+function color<T extends ColorSpace>(color: ColorLike<T>): Color<T>;
+
 function color<T extends ColorSpaceName>(
   spaceId: T,
-  values: number[] | Color<any>,
+  values: [number, number, number] | Color<any>,
   context?: Partial<ColorSpaceFromName<T>>
 ): Color<ColorSpaceFromName<T>>;
 
-function color<T extends ColorSpace>(space: T, values: number[] | Color<any>, context?: Partial<T>): Color<T>;
+function color<T extends ColorSpace>(
+  space: T,
+  values: [number, number, number] | Color<any>,
+  context?: Partial<T>
+): Color<T>;
 
 function color<T extends ColorSpaceName>(spaceId: T): CurriedColorReturnType<ColorSpaceFromName<T>>;
 function color<T extends ColorSpace>(space: T): CurriedColorReturnType<T>;
 
-function color(spaceOrId: ColorSpace | ColorSpaceName, valuesOrColor?: number[] | Color<any>, context?: object) {
-  if (typeof spaceOrId === "string" && !(spaceOrId in spaces)) {
-    throw new ReferenceError(`Colorspace ${spaceOrId} does not exist`);
+function color(
+  spaceOrIdOrColor: ColorSpace | ColorSpaceName | ColorLike,
+  valuesOrColor?: [number, number, number] | Color<any>,
+  context?: object
+) {
+  if (typeof spaceOrIdOrColor === "object" && "space" in spaceOrIdOrColor && "values" in spaceOrIdOrColor) {
+    return color(spaceOrIdOrColor.space, spaceOrIdOrColor.values, spaceOrIdOrColor.context);
   }
-  const space = typeof spaceOrId === "string" ? spaces[spaceOrId as ColorSpaceName] : spaceOrId;
+  if (typeof spaceOrIdOrColor === "string" && !(spaceOrIdOrColor in spaces)) {
+    throw new ReferenceError(`Colorspace ${spaceOrIdOrColor} does not exist`);
+  }
+  const space = typeof spaceOrIdOrColor === "string" ? spaces[spaceOrIdOrColor as ColorSpaceName] : spaceOrIdOrColor;
   const values = valuesOrColor instanceof Color ? valuesOrColor.toSpace(space).values : valuesOrColor;
 
   if (values === undefined) {
@@ -93,5 +116,7 @@ function color(spaceOrId: ColorSpace | ColorSpaceName, valuesOrColor?: number[] 
   return new Color(space, values, context);
 }
 export { color };
+
+const c1 = color({ space: "srgb", values: [1, 1, 1] });
 
 // export const Color = ColorClass as ColorConstructor;
