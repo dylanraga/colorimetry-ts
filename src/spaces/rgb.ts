@@ -1,7 +1,7 @@
-import { floatFromQuantized, minv, mmult3331, quantize } from "../common/util.js";
+import { dequantize, memoize, minv, mmult3331, quantize } from "../common/util.js";
 import { ToneResponseCurve } from "../curves/index.js";
 import { ColorGamutPrimaries } from "../gamuts/index.js";
-import { ColorSpace } from "../space.js";
+import { ColorSpace, contextSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
 export type LinearRGBColorSpace = ColorSpace & { gamut: ColorGamutPrimaries };
@@ -14,74 +14,65 @@ export type EncodedRGBColorSpace = ColorSpace & {
   bitDepth: number;
 };
 
-const linearRgbSpaceGamutCache = new WeakMap<ColorGamutPrimaries, LinearRGBColorSpace>();
+export const linearRgbSpace = memoize(
+  ({ name = "Linear RGB Color Space", gamut }: { name?: string; gamut: ColorGamutPrimaries }) => {
+    const context = { gamut } as const;
 
-export function linearRgbSpace({
-  name = "Linear RGB Color Space",
-  gamut,
-}: {
-  name?: string;
-  gamut: ColorGamutPrimaries;
-}): LinearRGBColorSpace {
-  const existingSpace = linearRgbSpaceGamutCache.get(gamut);
-  if (existingSpace) return existingSpace;
+    const newSpace = new ColorSpace({
+      name,
+      keys: ["R", "G", "B"],
+      conversions: [
+        {
+          spaceB: xyz,
+          aToB: (values, newContext) => xyzFromLinearRGB(values, Object.assign(context, newContext)),
+          bToA: (values, newContext) => linearRgbFromXyz(values, Object.assign(context, newContext)),
+        },
+      ],
+    });
 
-  const context = { gamut } as const;
+    const newLinearRgbSpace = Object.assign(newSpace, context);
 
-  const newSpace = new ColorSpace({
-    name,
-    keys: ["R", "G", "B"],
-    conversions: [
-      {
-        spaceB: xyz,
-        aToB: (values, newContext) => xyzFromLinearRGB(values, Object.assign(context, newContext)),
-        bToA: (values, newContext) => linearRgbFromXyz(values, Object.assign(context, newContext)),
-      },
-    ],
-  });
+    return newLinearRgbSpace;
+  }
+);
 
-  const newLinearRgbSpace = Object.assign(newSpace, context);
+export const rgbSpace = memoize(
+  ({
+    name = "Encoded RGB Color Space",
+    gamut,
+    curve,
+    whiteLuminance = 100,
+    blackLuminance = 0,
+    peakLuminance = whiteLuminance,
+    bitDepth = 0,
+  }: {
+    name?: string;
+    gamut: ColorGamutPrimaries;
+    curve: ToneResponseCurve;
+    whiteLuminance: number;
+    blackLuminance: number;
+    peakLuminance?: number;
+    bitDepth?: number;
+  }) => {
+    const context = { gamut, curve, whiteLuminance, blackLuminance, peakLuminance, bitDepth } as const;
 
-  linearRgbSpaceGamutCache.set(gamut, newLinearRgbSpace);
+    const newSpace = new ColorSpace({
+      name,
+      keys: ["r", "g", "b"],
+      conversions: [
+        {
+          spaceB: linearRgbSpace({ gamut }),
+          aToB: (values, newContext) => linearRgbFromEncodedRgb(values, Object.assign(context, newContext)),
+          bToA: (values, newContext) => encodedRgbFromLinearRgb(values, Object.assign(context, newContext)),
+        },
+      ],
+    });
 
-  return newLinearRgbSpace;
-}
+    const newRgbSpace = Object.assign(newSpace, context);
 
-export function rgbSpace({
-  name = "Encoded RGB Color Space",
-  gamut,
-  curve,
-  whiteLuminance = 100,
-  blackLuminance = 0,
-  peakLuminance = whiteLuminance,
-  bitDepth = 0,
-}: {
-  name?: string;
-  gamut: ColorGamutPrimaries;
-  curve: ToneResponseCurve;
-  whiteLuminance: number;
-  blackLuminance: number;
-  peakLuminance?: number;
-  bitDepth?: number;
-}): EncodedRGBColorSpace {
-  const context = { gamut, curve, whiteLuminance, blackLuminance, peakLuminance, bitDepth } as const;
-
-  const newSpace = new ColorSpace({
-    name,
-    keys: ["r", "g", "b"],
-    conversions: [
-      {
-        spaceB: linearRgbSpace({ gamut }),
-        aToB: (values, newContext) => linearRgbFromEncodedRgb(values, Object.assign(context, newContext)),
-        bToA: (values, newContext) => encodedRgbFromLinearRgb(values, Object.assign(context, newContext)),
-      },
-    ],
-  });
-
-  const newRgbSpace = Object.assign(newSpace, context);
-
-  return newRgbSpace;
-}
+    return newRgbSpace;
+  }
+);
 
 const rgbToXyzMatrixCache = new WeakMap<ColorGamutPrimaries, number[][]>();
 export function getRgbToXyzMatrix(gamut: ColorGamutPrimaries) {
@@ -137,8 +128,8 @@ function encodedRgbFromLinearRgb(
     whiteLuminance,
     blackLuminance,
     peakLuminance,
-    bitDepth = 0,
-  }: {
+  }: // bitDepth = 0,
+  {
     curve: ToneResponseCurve;
     whiteLuminance: number;
     blackLuminance: number;
@@ -147,7 +138,8 @@ function encodedRgbFromLinearRgb(
   }
 ): [number, number, number] {
   const V = linearRgb.map((v) => curve.invEotf(v, { whiteLuminance, blackLuminance, peakLuminance }));
-  return (bitDepth > 0 ? V.map((v) => quantize(v, bitDepth)) : V) as [number, number, number];
+  // return (bitDepth > 0 ? V.map((v) => quantize(v, bitDepth)) : V) as [number, number, number];
+  return V as [number, number, number];
 }
 
 function linearRgbFromEncodedRgb(
@@ -157,8 +149,8 @@ function linearRgbFromEncodedRgb(
     whiteLuminance,
     blackLuminance,
     peakLuminance,
-    bitDepth = 0,
-  }: {
+  }: // bitDepth = 0,
+  {
     curve: ToneResponseCurve;
     whiteLuminance: number;
     blackLuminance: number;
@@ -166,7 +158,8 @@ function linearRgbFromEncodedRgb(
     bitDepth?: number;
   }
 ): [number, number, number] {
-  const V = bitDepth > 0 ? encodedRgb.map((v) => floatFromQuantized(v, bitDepth)) : encodedRgb;
+  // const V = bitDepth > 0 ? encodedRgb.map((v) => dequantize(v, bitDepth)) : encodedRgb;
+  const V = encodedRgb;
   const L = V.map((v) => curve.eotf(v, { whiteLuminance, blackLuminance, peakLuminance }));
   return L as [number, number, number];
 }

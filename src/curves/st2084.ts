@@ -1,6 +1,6 @@
 /**
- * ST.2084 HDR / Rec.2100
- * TODO: Add tonemap knee w.r.t whiteLuminance & blackLuminance
+ * ST.2084 / Dolby Perceptual Quantizer
+ * TODO: Add EETF BT.2390
  */
 import { ToneResponseCurve } from "./index.js";
 

@@ -5,13 +5,13 @@ import { ColorSpace } from "../space.js";
 import { spaces } from "./index.js";
 import { EncodedRGBColorSpace, getRgbToXyzMatrix, rgbSpace } from "./rgb.js";
 
-export const ypbpr = ycbcrSpaceFromRgbSpace(
+export const ycbcr = ycbcrSpace(
   rgbSpace({ gamut: gamuts.bt601, curve: curves.bt1886, whiteLuminance: 100, blackLuminance: 0 })
 );
 
-export const ypbpr709 = ycbcrSpaceFromRgbSpace(spaces.rec709);
+export const ycbcr709 = ycbcrSpace(spaces.rec709);
 
-export function ycbcrSpaceFromRgbSpace(rgbSpace: EncodedRGBColorSpace) {
+export function ycbcrSpace(rgbSpace: EncodedRGBColorSpace) {
   const { name, keys, ...rgbProps } = rgbSpace;
   return Object.assign(
     new ColorSpace({

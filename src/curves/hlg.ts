@@ -1,5 +1,5 @@
 /**
- * Hybrid-Log Gamma / Rec.2100 / ARIB STD-B67
+ * Hybrid-Log Gamma / ARIB STD-B67
  */
 
 import { ToneResponseCurve } from "./index.js";

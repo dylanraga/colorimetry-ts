@@ -33,7 +33,6 @@ export interface ColorLike<T extends ColorSpace | ColorSpaceName = ColorSpace> {
   space: T;
   values: [number, number, number];
   context?: Partial<ColorSpaceFromName<T>>;
-  // format?:
 }
 
 export class Color<T extends ColorSpace = ColorSpace> {

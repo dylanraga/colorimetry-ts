@@ -275,10 +275,10 @@ export function quantize(
       sigMax = 0.9375 * res;
       break;
   }
-  return round(sigMin + float * sigMax);
+  return round(sigMin + float * (sigMax - sigMin));
 }
 
-export function floatFromQuantized(unorm: number, bitDepth = 8, range: "full" | "limited" | "chrominance" = "full") {
+export function dequantize(unorm: number, bitDepth = 8, range: "full" | "limited" | "chrominance" = "full") {
   const res = 1 << bitDepth;
   let sigMin, sigMax;
   switch (range) {
@@ -295,5 +295,36 @@ export function floatFromQuantized(unorm: number, bitDepth = 8, range: "full" | 
       sigMax = 0.9375 * res;
       break;
   }
-  return (unorm - sigMin) / sigMax;
+  return (unorm - sigMin) / (sigMax - sigMin);
+}
+
+// https://gist.github.com/davidfurlong/463a83a33b70a3b6618e97ec9679e490
+export function deepObjSortStringify(obj: object) {
+  const replacer = (key: string, value: any) =>
+    value instanceof Object && !(value instanceof Array)
+      ? Object.keys(value)
+          .sort()
+          .reduce((sorted: any, key: any) => {
+            sorted[key] = value[key];
+            return sorted;
+          }, {})
+      : value;
+
+  return JSON.stringify(obj, replacer);
+}
+
+export function memoize<T extends (...args: any[]) => any>(fn: T): T {
+  const memoStore = new Map<string, ReturnType<T>>();
+
+  return ((...args) => {
+    const id = args
+      .map((a) => (a instanceof Object && !(a instanceof Array) ? deepObjSortStringify(a) : String(a)))
+      .toString();
+
+    if (!memoStore.has(id)) {
+      memoStore.set(id, fn(...args));
+    }
+
+    return memoStore.get(id);
+  }) as T;
 }
