@@ -30,26 +30,3 @@ export class ColorSpace {
     }
   }
 }
-
-// please don't crucify me for this
-const colorSpaceContextMap = new Map<ColorSpace, Map<string, ColorSpace>>();
-
-function addContextSpace(space: ColorSpace, context: Record<string, any>): ColorSpace {
-  if (!colorSpaceContextMap.has(space)) {
-    colorSpaceContextMap.set(space, new Map());
-  }
-  const contextSpace = Object.assign(space, context);
-  const contextString = JSON.stringify(context, Object.keys(context).sort());
-  colorSpaceContextMap.get(space)?.set(contextString, contextSpace);
-
-  return contextSpace;
-}
-
-function contextSpace(space: ColorSpace, context: Record<string, any>): ColorSpace | undefined {
-  const contextString = JSON.stringify(context, Object.keys(context).sort());
-  const contextSpace = colorSpaceContextMap.get(space)?.get(contextString);
-
-  return contextSpace;
-}
-
-export { contextSpace, addContextSpace };

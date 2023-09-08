@@ -16,13 +16,12 @@ export { spaces };
 
 import {
   rgbSpace,
-  linearRgbSpace,
   LinearRGBColorSpace,
   EncodedRGBColorSpace,
   getRgbToXyzMatrix,
   getXyzToRgbMatrix,
 } from "./src/spaces/rgb.js";
-export { rgbSpace, linearRgbSpace, LinearRGBColorSpace, EncodedRGBColorSpace, getRgbToXyzMatrix, getXyzToRgbMatrix };
+export { rgbSpace, LinearRGBColorSpace, EncodedRGBColorSpace, getRgbToXyzMatrix, getXyzToRgbMatrix };
 
 import { ColorSpace } from "./src/space.js";
 export { ColorSpace };

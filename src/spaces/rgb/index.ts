@@ -1,18 +1,18 @@
-import { linearRgbSpace, rgbSpace } from "../rgb.js";
+import { rgbSpace } from "../rgb.js";
 import { gamuts } from "../../gamuts/index.js";
 import { curves, gammaCurve } from "../../curves/index.js";
 
-export const srgb_linear = linearRgbSpace({
+export const srgb_linear = rgbSpace({
   name: "sRGB Linear",
   gamut: gamuts.srgb,
 });
 
-export const p3_d65_linear = linearRgbSpace({
+export const p3_d65_linear = rgbSpace({
   name: "P3-D65 Linear",
   gamut: gamuts.p3_d65,
 });
 
-export const bt2020_linear = linearRgbSpace({
+export const bt2020_linear = rgbSpace({
   name: "BT.2020 Linear",
   gamut: gamuts.bt2020,
 });
@@ -119,7 +119,7 @@ export const prophoto = rgbSpace({
 });
 
 // ACEScg
-export const acescg = linearRgbSpace({
+export const acescg = rgbSpace({
   name: "ACEScg",
   gamut: gamuts.acesp1,
 });
