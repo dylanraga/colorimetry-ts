@@ -2,47 +2,37 @@
 // Oklab by Björn Ottosson
 //
 
-import { minv, mmult3331 as mmult } from "../common/util.js";
-import { ColorSpace } from "../space.js";
+import { memoize, minv, mmult3331 as mmult } from "../common/util.js";
+import { ColorSpace, fnSpace } from "../space.js";
 import { lchSpaceFromLabSpace } from "./lch.js";
 import { xyz, xyzNToXyz, xyzToXyzN } from "./xyz.js";
 
-// export const LABSPACE_OKLAB = new LabSpace({
-//   name: "Oklab",
-//   keys: ["L", "a", "b"],
-//   conversions: [
-//     {
-//       space: XYZSPACE_D65_NORMALIZED,
-//       toFn: Oklab_to_XnYnZn,
-//       fromFn: XnYnZn_to_Oklab,
-//     },
-//   ],
-//   precision: 3,
-//   convertingProps: {
-//     rgbWhiteLuminance: 1,
-//     rgbBlackLuminance: 0,
-//   },
-// });
+type OklabColorSpaceContext = {
+  whiteLuminance: number;
+};
 
-const oklabContext = { whiteLuminance: 100 } as const;
-
-export const oklab = Object.assign(
-  new ColorSpace({
-    name: "Oklab",
-    keys: ["L", "a", "b"],
-    conversions: [
-      {
-        spaceB: xyz,
-        aToB: (values, newContext) => oklabToXyz(values, Object.assign(oklabContext, newContext)),
-        bToA: (values, newContext) => xyzToOklab(values, Object.assign(oklabContext, newContext)),
-      },
-    ],
-    // precision: 3,
-  }),
-  oklabContext
+export const oklabSpace = memoize((context: OklabColorSpaceContext) =>
+  Object.assign(
+    new ColorSpace({
+      name: "Oklab",
+      keys: ["L", "a", "b"],
+      conversions: [
+        {
+          spaceB: xyz(),
+          aToB: (values) => oklabToXyz(values, context),
+          bToA: (values) => xyzToOklab(values, context),
+        },
+      ],
+      // precision: 3,
+    }),
+    context
+  )
 );
 
-export const oklch = lchSpaceFromLabSpace(oklab, { name: "Oklch", keys: ["L", "C", "h"] });
+export const oklab = fnSpace(oklabSpace, { whiteLuminance: 100 });
+
+export const oklch: typeof oklab = (context) =>
+  lchSpaceFromLabSpace(oklab(context), { name: "Oklch", keys: ["L", "C", "h"] });
 
 /**
  * XYZ <-> Oklab conversion functions
@@ -73,7 +63,7 @@ function xyzToOklab(
   XYZ: [number, number, number],
   { whiteLuminance }: { whiteLuminance: number }
 ): [number, number, number] {
-  const XnYnZn = xyzToXyzN(XYZ, { whiteLuminance });
+  const XnYnZn = xyzToXyzN(XYZ, whiteLuminance);
   const LMS = mmult(M1, XnYnZn);
   const LpMpSp = LMS.map(Math.cbrt);
   const Lab = mmult(M2, LpMpSp);
@@ -88,7 +78,7 @@ function oklabToXyz(
   const LpMpSp = mmult(M2Inv, Lab);
   const LMS = LpMpSp.map((u) => u * u * u);
   const XnYnZn = mmult(M1Inv, LMS);
-  const XYZ = xyzNToXyz(XnYnZn, { whiteLuminance });
+  const XYZ = xyzNToXyz(XnYnZn, whiteLuminance);
 
   return XYZ;
 }

@@ -1,5 +1,5 @@
 import { illuminants } from "../../colorimetry.js";
-import { Color } from "../color.js";
+import { Color, color } from "../color.js";
 import { minv, mmult3333, mmult3331 } from "../common/util.js";
 import { Yxy, xyzFromYxy } from "../spaces/cieyxy.js";
 import { xy, xyzFromXy } from "../spaces/xy.js";
@@ -42,7 +42,7 @@ export function xyzCat(
   xyzSrc: [number, number, number],
   refWhiteSrc: Yxy,
   refWhiteDst: Yxy,
-  method: ChromaticAdaptationMethodName = "bradford"
+  method: ChromaticAdaptationMethodName = "bradford",
 ): [number, number, number] {
   if (method === "xyz") {
     return xyzScale(xyzSrc, refWhiteSrc, refWhiteDst);
@@ -50,8 +50,8 @@ export function xyzCat(
 
   const MA = catMethodMtxMap[method];
 
-  const [ρS, γS, βS] = mmult3331(MA, xyzFromYxy([refWhiteSrc.x, refWhiteSrc.y, refWhiteSrc.Y]));
-  const [ρD, γD, βD] = mmult3331(MA, xyzFromYxy([refWhiteDst.x, refWhiteDst.y, refWhiteDst.Y]));
+  const [ρS, γS, βS] = mmult3331(MA, xyzFromYxy([refWhiteSrc.Y, refWhiteSrc.x, refWhiteSrc.y]));
+  const [ρD, γD, βD] = mmult3331(MA, xyzFromYxy([refWhiteDst.Y, refWhiteDst.x, refWhiteDst.y]));
 
   const M1 = [
     [ρD / ρS, 0, 0],
@@ -70,11 +70,11 @@ function _cat(
     refWhiteSrc = illuminants.d65,
     refWhiteDst,
     method = "bradford",
-  }: { refWhiteSrc?: xy; refWhiteDst: xy; method?: ChromaticAdaptationMethodName }
+  }: { refWhiteSrc?: xy; refWhiteDst: xy; method?: ChromaticAdaptationMethodName },
 ) {
   const xyz = this.toSpace(xyzSpace).values;
-  return new Color(xyzSpace, xyzCat(xyz, { Y: 1, ...refWhiteSrc }, { Y: 1, ...refWhiteDst }, method)).toSpace(
-    this.space
+  return new Color(xyzSpace(), xyzCat(xyz, { Y: 1, ...refWhiteSrc }, { Y: 1, ...refWhiteDst }, method)).toSpace(
+    this.space,
   );
 }
 

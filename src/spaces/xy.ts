@@ -5,17 +5,19 @@
 import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
-export const xy = new ColorSpace({
+const xySpace = new ColorSpace({
   name: "CIE Y-xy",
   keys: ["Y", "x", "y"],
   conversions: [
     {
-      spaceB: xyz,
+      spaceB: xyz(),
       aToB: (values) => xyzFromXy(values.slice(1, 3) as [number, number], values[0]),
       bToA: (values) => [values[1]].concat(xyFromXyz(values)) as [number, number, number],
     },
   ],
 });
+
+export const xy = (context?: object) => xySpace;
 
 export function xyFromXyz([X, Y, Z]: [number, number, number]): [number, number] {
   const denom = X + Y + Z;

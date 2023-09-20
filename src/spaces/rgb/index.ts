@@ -1,24 +1,25 @@
 import { rgbSpace } from "../rgb.js";
 import { gamuts } from "../../gamuts/index.js";
 import { curves, gammaCurve } from "../../curves/index.js";
+import { fnSpace } from "../../space.js";
 
-export const srgb_linear = rgbSpace({
+export const srgb_linear = fnSpace(rgbSpace, {
   name: "sRGB Linear",
   gamut: gamuts.srgb,
 });
 
-export const p3_d65_linear = rgbSpace({
+export const p3_d65_linear = fnSpace(rgbSpace, {
   name: "P3-D65 Linear",
   gamut: gamuts.p3_d65,
 });
 
-export const bt2020_linear = rgbSpace({
+export const bt2020_linear = fnSpace(rgbSpace, {
   name: "BT.2020 Linear",
   gamut: gamuts.bt2020,
 });
 
 // The pseudo-standard color space for computers/the web
-export const rgb = rgbSpace({
+export const rgb = fnSpace(rgbSpace, {
   name: "Computer RGB",
   gamut: gamuts.srgb,
   curve: curves.gamma2p2,
@@ -27,7 +28,7 @@ export const rgb = rgbSpace({
 });
 
 // sRGB IEC 61966-2-1:1999
-export const srgb = rgbSpace({
+export const srgb = fnSpace(rgbSpace, {
   name: "sRGB",
   gamut: gamuts.srgb,
   curve: curves.srgb,
@@ -36,7 +37,7 @@ export const srgb = rgbSpace({
 });
 
 // Rec. 709 with BT.1886 transfer
-export const rec709 = rgbSpace({
+export const rec709 = fnSpace(rgbSpace, {
   name: "Rec. 709",
   gamut: gamuts.srgb,
   curve: curves.bt1886,
@@ -45,7 +46,7 @@ export const rec709 = rgbSpace({
 });
 
 // Apple Inc. Display P3
-export const display_p3 = rgbSpace({
+export const display_p3 = fnSpace(rgbSpace, {
   name: "Display P3",
   gamut: gamuts.p3_d65,
   curve: curves.srgb,
@@ -54,7 +55,7 @@ export const display_p3 = rgbSpace({
 });
 
 // Digital Cinema Initiative P3
-export const p3_dci = rgbSpace({
+export const p3_dci = fnSpace(rgbSpace, {
   name: "DCI-P3",
   gamut: gamuts.p3_dci,
   curve: curves.gamma2p6,
@@ -63,7 +64,7 @@ export const p3_dci = rgbSpace({
 });
 
 // Digital Cinema Initiative P3 with D65
-export const p3_d65 = rgbSpace({
+export const p3_d65 = fnSpace(rgbSpace, {
   name: "Display P3",
   gamut: gamuts.p3_d65,
   curve: curves.gamma2p2,
@@ -72,7 +73,7 @@ export const p3_d65 = rgbSpace({
 });
 
 // Adobe RGB (1998) IEC 61966-2-5:2007
-export const adobergb = rgbSpace({
+export const adobergb = fnSpace(rgbSpace, {
   name: "Adobe RGB 1998",
   gamut: gamuts.a98rgb,
   curve: gammaCurve(563 / 256),
@@ -81,7 +82,7 @@ export const adobergb = rgbSpace({
 });
 
 // BT.2020 gamut with BT.1886 transfer
-export const rec2020 = rgbSpace({
+export const rec2020 = fnSpace(rgbSpace, {
   name: "Rec. 2020",
   gamut: gamuts.bt2020,
   curve: curves.bt1886,
@@ -90,7 +91,7 @@ export const rec2020 = rgbSpace({
 });
 
 // BT.2100: BT.2020 with ST.2084 transfer
-export const bt2100_pq = rgbSpace({
+export const bt2100_pq = fnSpace(rgbSpace, {
   name: "BT.2100 PQ",
   gamut: gamuts.bt2020,
   curve: curves.st2084,
@@ -100,7 +101,7 @@ export const bt2100_pq = rgbSpace({
 });
 
 // BT.2100: BT.2020 with HLG transfer
-export const bt2100_hlg = rgbSpace({
+export const bt2100_hlg = fnSpace(rgbSpace, {
   name: "BT.2100 HLG",
   gamut: gamuts.bt2020,
   curve: curves.hlg,
@@ -110,7 +111,7 @@ export const bt2100_hlg = rgbSpace({
 });
 
 // Kodak ProPhoto RGB
-export const prophoto = rgbSpace({
+export const prophoto = fnSpace(rgbSpace, {
   name: "ProPhoto RGB",
   gamut: gamuts.prophoto,
   curve: curves.romm,
@@ -119,13 +120,13 @@ export const prophoto = rgbSpace({
 });
 
 // ACEScg
-export const acescg = rgbSpace({
+export const acescg = fnSpace(rgbSpace, {
   name: "ACEScg",
   gamut: gamuts.acesp1,
 });
 
 // ACEScc
-export const acescc = rgbSpace({
+export const acescc = fnSpace(rgbSpace, {
   name: "ACEScc",
   gamut: gamuts.acesp1,
   curve: curves.acescc,

@@ -2,7 +2,8 @@
 // CIE XYZ 1931
 //
 
-import { ColorSpace } from "../space.js";
+import { memoize } from "../common/util.js";
+import { ColorSpace, fnSpace } from "../space.js";
 
 export interface XYZ {
   X: number;
@@ -10,35 +11,36 @@ export interface XYZ {
   Z: number;
 }
 
-export const xyz = new ColorSpace({ name: "CIE XYZ", keys: ["X", "Y", "Z"] });
+const xyzSpace = new ColorSpace({ name: "CIE XYZ", keys: ["X", "Y", "Z"] });
 
-export const xyz_n = Object.assign(
-  new ColorSpace({
-    name: "XYZ Normalized",
-    keys: ["Xn", "Yn", "Zn"],
-    conversions: [{ spaceB: xyz, aToB: xyzNToXyz, bToA: xyzToXyzN }],
-  }),
-  { whiteLuminance: 100 }
+const normalizedXyzSpace = memoize((context: { whiteLuminance: number }) =>
+  Object.assign(
+    new ColorSpace({
+      name: "XYZ Normalized",
+      keys: ["Xn", "Yn", "Zn"],
+      conversions: [
+        {
+          spaceB: xyz(),
+          aToB: (values) => xyzNToXyz(values, context.whiteLuminance),
+          bToA: (values) => xyzToXyzN(values, context.whiteLuminance),
+        },
+      ],
+    }),
+    context
+  )
 );
 
-export function xyzToXyzN(
-  [X, Y, Z]: number[],
-  { whiteLuminance = 100 }: { whiteLuminance?: number } = {
-    whiteLuminance: 100,
-  }
-): [number, number, number] {
+export const xyz = (context?: object) => xyzSpace;
+export const xyz_n = fnSpace(normalizedXyzSpace, { whiteLuminance: 100 });
+
+export function xyzToXyzN([X, Y, Z]: number[], whiteLuminance = 100): [number, number, number] {
   const Yn = Y / whiteLuminance;
   const Xn = X / whiteLuminance;
   const Zn = Z / whiteLuminance;
   return [Xn, Yn, Zn];
 }
 
-export function xyzNToXyz(
-  [Xn, Yn, Zn]: number[],
-  { whiteLuminance = 100 }: { whiteLuminance?: number } = {
-    whiteLuminance: 100,
-  }
-): [number, number, number] {
+export function xyzNToXyz([Xn, Yn, Zn]: number[], whiteLuminance = 100): [number, number, number] {
   const Y = whiteLuminance * Yn;
   const X = whiteLuminance * Xn;
   const Z = whiteLuminance * Zn;

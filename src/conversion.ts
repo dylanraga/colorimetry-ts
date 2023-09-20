@@ -8,7 +8,7 @@ export function addSpaceConversion(
   spaceA: ColorSpace,
   spaceB: ColorSpace,
   aToB: ColorSpaceConversion,
-  bToA?: ColorSpaceConversion
+  bToA?: ColorSpaceConversion,
 ) {
   if (!conversionMap.has(spaceA)) conversionMap.set(spaceA, new Map());
   conversionMap.get(spaceA)?.set(spaceB, { path: [spaceA, spaceB], fn: aToB });
@@ -27,12 +27,7 @@ export function addSpaceConversion(
  * @param dstSpace Destination `ColorSpace` or `ColorSpaceName`
  * @returns Function composition transforming source space into the destination color space
  */
-export function getSpaceConversion(
-  srcSpace: ColorSpace,
-  dstSpace: ColorSpace,
-  srcSpaceContext: object = {},
-  dstSpaceContext: object = {}
-): ColorSpaceConversion {
+export function getSpaceConversion(srcSpace: ColorSpace, dstSpace: ColorSpace): ColorSpaceConversion {
   const _srcSpace = typeof srcSpace === "string" ? spaces[srcSpace] : srcSpace;
   const _dstSpace = typeof dstSpace === "string" ? spaces[dstSpace] : dstSpace;
 
@@ -40,25 +35,18 @@ export function getSpaceConversion(
 
   const existingConversion = conversionMap.get(_srcSpace)?.get(_dstSpace)?.fn;
   if (existingConversion) {
-    return (values, props) =>
-      existingConversion(values, {
-        srcSpaceContext,
-        dstSpaceContext,
-        ...srcSpaceContext,
-        ...dstSpaceContext,
-        ...props,
-      });
+    return existingConversion;
   }
 
   // let precisionMin = _dstSpace.precision > _srcSpace.precision ? _srcSpace.precision : _dstSpace.precision;
   const path = bfsPath(_srcSpace, _dstSpace, (curr) =>
     // Consider only direct paths (path length 2 => [spaceA, spaceB])
     // [...(conversionMap.get(curr)?.keys() ?? [])].filter((s) => conversionMap.get(curr)?.get(s)?.path.length === 2)
-    [...(conversionMap.get(curr)?.keys() ?? [])]
+    [...(conversionMap.get(curr)?.keys() ?? [])],
   );
   if (!path) throw new Error(`No conversion path found from ${_srcSpace.name} to ${_dstSpace.name}`);
 
-  // console.log(path.map((p) => p.name));
+  console.log(path.map((p) => p.name));
 
   const fnList: Array<ColorSpaceConversion> = [];
   for (let i = 0; i < path.length - 1; i++) {
@@ -68,7 +56,7 @@ export function getSpaceConversion(
 
   addSpaceConversion(_srcSpace, _dstSpace, newConversion);
 
-  return getSpaceConversion(_srcSpace, _dstSpace, srcSpaceContext, dstSpaceContext);
+  return getSpaceConversion(_srcSpace, _dstSpace);
 
   // i === 0 ? srcSpaceContext : {},
   // i === path.length - 2 ? dstSpaceContext : {}
@@ -99,22 +87,22 @@ export function getSpaceConversion(
 
 function composeFnList(fnList: ColorSpaceConversion[]): ColorSpaceConversion {
   // return (values, props = {}) => fnList.reduce((a, b) => b(a, Object.assign({ ...defaultProps }, props)), values);
-  return (values, { srcSpaceContext, dstSpaceContext, ...props } = {}) =>
+  return (values) =>
     fnList.reduce(
       (a, b, i) =>
         b(
           a,
-          i === 0
-            ? { srcSpaceContext, ...srcSpaceContext }
-            : i === fnList.length - 1
-            ? { dstSpaceContext, ...dstSpaceContext }
-            : {}
+          // i === 0
+          //   ? { srcSpaceContext, ...srcSpaceContext }
+          //   : i === fnList.length - 1
+          //   ? { dstSpaceContext, ...dstSpaceContext }
+          //   : {}
         ),
-      values
+      values,
     );
 }
 
 export type ColorSpaceConversion = (
   values: [number, number, number],
-  newContext?: { [k: string]: any }
+  // newContext?: { [k: string]: any }
 ) => [number, number, number];

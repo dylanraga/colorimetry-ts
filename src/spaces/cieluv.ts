@@ -2,29 +2,40 @@
 // CIELUV 1976
 //
 
+import { memoize } from "../common/util.js";
 import { lstar } from "../curves/lstar.js";
 import { illuminants } from "../illuminants/index.js";
-import { ColorSpace } from "../space.js";
+import { ColorSpace, fnSpace } from "../space.js";
+import { lchSpaceFromLabSpace } from "./lch.js";
 import { uvFromXy, uvFromXyz, xyzFromUv } from "./uv.js";
 import { xy } from "./xy.js";
 import { xyz } from "./xyz.js";
 
-const luvContext = { refWhite: illuminants.d65, whiteLuminance: 100 } as const;
+type LuvColorSpaceContext = {
+  refWhite: xy;
+  whiteLuminance: number;
+};
 
-export const luv = Object.assign(
-  new ColorSpace({
-    name: "CIELUV",
-    keys: ["L", "U", "V"],
-    conversions: [
-      {
-        spaceB: xyz,
-        aToB: (values, newContext) => xyzFromCieluv(values, Object.assign(luvContext, newContext)),
-        bToA: (values, newContext) => cieluvFromXyz(values, Object.assign(luvContext, newContext)),
-      },
-    ],
-  }),
-  luvContext
+const luvSpace = memoize((context: LuvColorSpaceContext) =>
+  Object.assign(
+    new ColorSpace({
+      name: "CIELUV",
+      keys: ["L", "U", "V"],
+      conversions: [
+        {
+          spaceB: xyz(),
+          aToB: (values) => xyzFromCieluv(values, context),
+          bToA: (values) => cieluvFromXyz(values, context),
+        },
+      ],
+    }),
+    context
+  )
 );
+
+export const luv = fnSpace(luvSpace, { refWhite: illuminants.d65, whiteLuminance: 100 });
+
+export const luv_lch: typeof luv = (context) => lchSpaceFromLabSpace(luv(context));
 
 /*
  * CIELUV/u'v' <-> XYZ conversions

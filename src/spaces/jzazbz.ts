@@ -8,12 +8,12 @@ import { ColorSpace } from "../space.js";
 import { lchSpaceFromLabSpace } from "./lch.js";
 import { xyz } from "./xyz.js";
 
-export const jzazbz = new ColorSpace({
+export const jzazbzSpace = new ColorSpace({
   name: "Jzazbz",
   keys: ["Jz", "az", "bz"],
   conversions: [
     {
-      spaceB: xyz,
+      spaceB: xyz(),
       aToB: xyzFromJzazbz,
       bToA: jzazbzFromXyz,
     },
@@ -21,7 +21,10 @@ export const jzazbz = new ColorSpace({
   // precision: 6,
 });
 
-export const jzczhz = lchSpaceFromLabSpace(jzazbz, { name: "JzCzhz", keys: ["J", "C", "h"] });
+export const jzazbz = (context?: object) => jzazbzSpace;
+
+export const jzczhz = (context?: object) =>
+  lchSpaceFromLabSpace(jzazbzSpace, { name: "JzCzhz", keys: ["J", "C", "h"] });
 
 /*
  * JzAzBz <-> XYZ conversions

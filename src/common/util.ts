@@ -176,14 +176,14 @@ export function mmult(A: number[] | number[][], B: number[] | number[][]): numbe
  */
 export function mmult3331(
   [[Ma, Mb, Mc], [Md, Me, Mf], [Mg, Mh, Mi]]: number[][],
-  [Na, Nb, Nc]: number[]
+  [Na, Nb, Nc]: number[],
 ): [number, number, number] {
   return [Ma * Na + Mb * Nb + Mc * Nc, Md * Na + Me * Nb + Mf * Nc, Mg * Na + Mh * Nb + Mi * Nc];
 }
 
 export function mmult3333(
   [[Ma, Mb, Mc], [Md, Me, Mf], [Mg, Mh, Mi]]: number[][],
-  [[Na, Nb, Nc], [Nd, Ne, Nf], [Ng, Nh, Ni]]: number[][]
+  [[Na, Nb, Nc], [Nd, Ne, Nf], [Ng, Nh, Ni]]: number[][],
 ): [[number, number, number], [number, number, number], [number, number, number]] {
   return [
     [Ma * Na + Mb * Nd + Mc * Ng, Ma * Nb + Mb * Ne + Mc * Nh, Ma * Nc + Mb * Nf + Mc * Ni],
@@ -256,7 +256,7 @@ export function quantize(
   float: number,
   bitDepth = 8,
   range: "full" | "limited" | "chrominance" = "full",
-  roundHalfToEven = false
+  roundHalfToEven = false,
 ) {
   const round = roundHalfToEven ? roundHTE : Math.round;
   const res = 1 << bitDepth;
@@ -313,18 +313,25 @@ export function deepObjSortStringify(obj: object) {
   return JSON.stringify(obj, replacer);
 }
 
-export function memoize<T extends (...args: any[]) => any>(fn: T): T {
-  const memoStore = new Map<string, ReturnType<T>>();
+export const defaultMemoizeIdentifier = (...args: any[]) =>
+  args.map((a) => (a instanceof Object && !(a instanceof Array) ? deepObjSortStringify(a) : String(a))).toString();
 
-  return ((...args) => {
-    const id = args
-      .map((a) => (a instanceof Object && !(a instanceof Array) ? deepObjSortStringify(a) : String(a)))
-      .toString();
+// ----------------
+// TODO: make hard-coded space/gamut/curve name be default memoized identifier to avoid json string-parsing monstrosity
+// ----------------
+export function memoize<T extends (...args: any[]) => any>(
+  fn: T,
+  identifier: (...args: Parameters<T>) => any = defaultMemoizeIdentifier,
+) {
+  const memoStore = new Map<any, ReturnType<T>>();
+
+  return ((...args: Parameters<T>) => {
+    const id = identifier(...args);
 
     if (!memoStore.has(id)) {
       memoStore.set(id, fn(...args));
     }
 
-    return memoStore.get(id);
+    return memoStore.get(id)!;
   }) as T;
 }

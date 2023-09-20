@@ -7,17 +7,17 @@ import { ColorSpace } from "../space.js";
 import { xy } from "./xy.js";
 import { xyz } from "./xyz.js";
 
-export const uv76 = new ColorSpace({
+const uv76Space = new ColorSpace({
   name: "CIE Y-u'v'",
   keys: ["Y", "u'", "v'"],
   conversions: [
     {
-      spaceB: xyz,
+      spaceB: xyz(),
       aToB: (values) => xyzFromUv(values.slice(1, 3) as [number, number], values[0]),
       bToA: (values) => [values[1]].concat(uvFromXyz(values)) as [number, number, number],
     },
     {
-      spaceB: xy,
+      spaceB: xy(),
       aToB: (values) =>
         [values[0]].concat(xyFromUv(values.slice(1, 3) as [number, number])) as [number, number, number],
       bToA: (values) =>
@@ -25,6 +25,12 @@ export const uv76 = new ColorSpace({
     },
   ],
 });
+
+export const uv76 = (context?: object) => uv76Space;
+
+//
+// Conversion functions
+//
 
 export function uvFromXyz([X, Y, Z]: [number, number, number]): [number, number] {
   const denom = X + 15 * Y + 3 * Z;

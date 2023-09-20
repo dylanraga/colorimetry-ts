@@ -11,12 +11,12 @@ import { ColorSpace } from "../space.js";
 import { lchSpaceFromLabSpace } from "./lch.js";
 import { xyz } from "./xyz.js";
 
-export const ictcp = new ColorSpace({
+const ictcpSpace = new ColorSpace({
   name: "Dolby ICtCp",
   keys: ["I", "Ct", "Cp"],
   conversions: [
     {
-      spaceB: xyz,
+      spaceB: xyz(),
       aToB: XyzFromIctcp,
       bToA: ictcpFromXyz,
     },
@@ -24,12 +24,12 @@ export const ictcp = new ColorSpace({
   // precision: 5
 });
 
-export const itp = new ColorSpace({
+const itpSpace = new ColorSpace({
   name: "Dolby ITP (ICtCp)",
   keys: ["I", "T", "P"],
   conversions: [
     {
-      spaceB: ictcp,
+      spaceB: ictcpSpace,
       aToB: ([I, T, P]: number[]) => [I, T * 2, P],
       bToA: ([I, Ct, Cp]: number[]) => [I, Ct / 2, Cp],
     },
@@ -37,7 +37,11 @@ export const itp = new ColorSpace({
   // precision: 5
 });
 
-export const itp_lch = lchSpaceFromLabSpace(itp, { name: "Dolby ITP (LCh)" });
+export const ictcp = (context?: object) => ictcpSpace;
+
+export const itp = (context?: object) => itpSpace;
+
+export const itp_lch = (context?: object) => lchSpaceFromLabSpace(itpSpace, { name: "Dolby ITP (LCh)" });
 
 /*
 const mEbner = [

@@ -27,7 +27,7 @@ export function clampInGamut(
   gamut: ColorGamutPrimaries = gamuts.srgb,
   whiteLuminance = 1,
   blackLuminance = 0,
-  tolerance = 1
+  tolerance = 1,
 ) {
   const linearRgbSpace = rgbSpace({ gamut });
   const rgb = color.toSpace(linearRgbSpace).values;
@@ -60,7 +60,7 @@ export function clampInGamut(
       return new Color(linearRgbSpace, rgbClamped).toSpace(color.space);
     }
     rgbLch[1] -= jnd * (Math.SQRT1_2 * minDiffFromClipped);
-    const currLchColor = new Color(lchSpace, rgbLch);
+    const currLchColor = new Color(lchSpace(), rgbLch);
     const currRgb = currLchColor.toSpace(linearRgbSpace).values;
     // if in-gamut, push out of gamut
     // while (Math.min(...currRgb) > blackLuminance && Math.max(...currRgb) < whiteLuminance) {
@@ -90,7 +90,7 @@ function _clampInGamut(
     whiteLuminance = 1,
     blackLuminance = 0,
     tolerance = 1,
-  }: { gamut: ColorGamutPrimaries; whiteLuminance?: number; blackLuminance?: number; tolerance?: number }
+  }: { gamut: ColorGamutPrimaries; whiteLuminance?: number; blackLuminance?: number; tolerance?: number },
 ) {
   return clampInGamut(this, gamut, whiteLuminance, blackLuminance, tolerance);
 }

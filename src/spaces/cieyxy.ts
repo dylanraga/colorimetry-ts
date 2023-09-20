@@ -5,17 +5,19 @@
 import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
-export const yxy = new ColorSpace({
+const yxySpace = new ColorSpace({
   name: "CIE Yxy",
   keys: ["Y", "x", "y"],
   conversions: [
     {
-      spaceB: xyz,
+      spaceB: xyz(),
       aToB: xyzFromYxy,
       bToA: yxyFromXyz,
     },
   ],
 });
+
+export const yxy = (context?: object) => yxySpace;
 
 /**
  * CIE1931 Yxy<->XYZ conversion functions
