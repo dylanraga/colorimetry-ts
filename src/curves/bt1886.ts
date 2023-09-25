@@ -1,6 +1,7 @@
 /**
  * ITU-R BT.1886
  */
+import { evenFn } from "../common/util.js";
 import { ToneResponseCurve } from "./index.js";
 
 type Bt1886TransferProps = {
@@ -25,12 +26,13 @@ export const bt1886: ToneResponseCurve<Bt1886TransferProps> = {
       whiteLuminance = defaults.whiteLuminance,
       blackLuminance = defaults.blackLuminance,
       gamma = defaults.gamma,
-    } = defaults
+    } = defaults,
   ) => {
     const a = (whiteLuminance ** (1 / gamma) - blackLuminance ** (1 / gamma)) ** gamma;
     const b = blackLuminance ** (1 / gamma) / (whiteLuminance ** (1 / gamma) - blackLuminance ** (1 / gamma));
 
-    const L = a * Math.max(V + b, 0) ** gamma;
+    const f = (V: number) => a * Math.max(V + b, 0) ** gamma;
+    const L = evenFn(f)(V);
     return L;
   },
 
@@ -40,12 +42,13 @@ export const bt1886: ToneResponseCurve<Bt1886TransferProps> = {
       whiteLuminance = defaults.whiteLuminance,
       blackLuminance = defaults.blackLuminance,
       gamma = defaults.gamma,
-    } = defaults
+    } = defaults,
   ) => {
     const a = (whiteLuminance ** (1 / gamma) - blackLuminance ** (1 / gamma)) ** gamma;
     const b = blackLuminance ** (1 / gamma) / (whiteLuminance ** (1 / gamma) - blackLuminance ** (1 / gamma));
 
-    const V = Math.max((L / a) ** (1 / gamma) - b, 0);
+    const f = (L: number) => Math.max((L / a) ** (1 / gamma) - b, 0);
+    const V = evenFn(f)(L);
     return V;
   },
 };
