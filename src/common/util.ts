@@ -322,16 +322,18 @@ export const defaultMemoizeIdentifier = (...args: any[]) =>
 export function memoize<T extends (...args: any[]) => any>(
   fn: T,
   identifier: (...args: Parameters<T>) => any = defaultMemoizeIdentifier,
-) {
+): T {
   const memoStore = new Map<any, ReturnType<T>>();
 
   return ((...args: Parameters<T>) => {
     const id = identifier(...args);
 
-    if (!memoStore.has(id)) {
-      memoStore.set(id, fn(...args));
+    const memoizedFn = fn(...args);
+
+    if (id !== undefined && !memoStore.has(id)) {
+      memoStore.set(id, memoizedFn);
     }
 
-    return memoStore.get(id)!;
+    return memoizedFn;
   }) as T;
 }

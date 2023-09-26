@@ -54,8 +54,8 @@ export class ColorSpace {
 type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
 export function fnSpace<T extends FunctionColorSpace, P extends Parameters<T>[0]>($fnSpace: T, defaultContext?: P) {
   return (context?: DistributiveOmit<Parameters<T>[0], keyof P> & Partial<P>) => {
-    console.log("context:", { ...defaultContext, ...context });
-    return $fnSpace({ ...defaultContext, ...context });
+    // console.log("context:", { ...defaultContext, ...context });
+    return $fnSpace({ ...defaultContext, ...context }) as ReturnType<T> & P;
   };
 }
 
