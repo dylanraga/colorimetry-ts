@@ -53,6 +53,8 @@ export { daylightLocusData };
 import { cmfs1931Data } from "./src/misc/cmfs-cie1931xyz-2deg.js";
 export { cmfs1931Data };
 
+// export { srgb } from "./src/spaces/rgb/index.js";
+
 import "./src/defaults.js";
 
 export { mmult3331, mmult3333, minv, mmult, quantize, roundHTE, hexFromArray, arrayEquals } from "./src/common/util.js";

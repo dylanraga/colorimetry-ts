@@ -5,11 +5,13 @@ import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
 type LinearRGBColorSpaceContext = {
+  id?: string;
   gamut: ColorGamutPrimaries;
 };
 export type LinearRGBColorSpace = ColorSpace & LinearRGBColorSpaceContext;
 
 type EncodedRGBColorSpaceContext = {
+  id?: string;
   gamut: ColorGamutPrimaries;
   curve: ToneResponseCurve;
   whiteLuminance: number;
@@ -19,6 +21,7 @@ type EncodedRGBColorSpaceContext = {
 export type EncodedRGBColorSpace = ColorSpace & EncodedRGBColorSpaceContext;
 
 type QuantizedRGBColorSpaceContext = {
+  id?: string;
   gamut: ColorGamutPrimaries;
   curve: ToneResponseCurve;
   whiteLuminance: number;
@@ -88,19 +91,26 @@ export const rgbSpace = memoize(
   <T extends LinearRGBColorSpaceContext | EncodedRGBColorSpaceContext | QuantizedRGBColorSpaceContext>(
     context: T,
   ): ColorSpace & T => {
-    const { gamut } = context;
+    const { id, gamut } = context;
     if (!("curve" in context)) {
-      return linearRgbSpace({ gamut }) as unknown as ColorSpace & T;
+      return linearRgbSpace({ id, gamut }) as unknown as ColorSpace & T;
     }
 
     const { curve, whiteLuminance, blackLuminance, peakLuminance } = context;
     if (!("bitDepth" in context)) {
-      return encodedRgbSpace({ gamut, curve, whiteLuminance, blackLuminance, peakLuminance }) as unknown as ColorSpace &
-        T;
+      return encodedRgbSpace({
+        id,
+        gamut,
+        curve,
+        whiteLuminance,
+        blackLuminance,
+        peakLuminance,
+      }) as unknown as ColorSpace & T;
     }
 
     const { bitDepth, range = "full" } = context;
     return quantizedRgbSpace({
+      id,
       gamut,
       curve,
       whiteLuminance,
@@ -110,6 +120,7 @@ export const rgbSpace = memoize(
       range,
     }) as unknown as ColorSpace & T;
   },
+  (context) => context.id,
 );
 
 // export const createRgbSpace = (origContext: RGBColorSpaceContext) => (context: RGBColorSpaceContext) =>

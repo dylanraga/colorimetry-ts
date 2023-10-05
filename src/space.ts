@@ -51,6 +51,8 @@ export class ColorSpace {
   }
 }
 
+// wrote a monad without even knowing what a monad was
+// can apply `resolveSpace` to this
 type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
 export function fnSpace<T extends FunctionColorSpace, P extends Parameters<T>[0]>($fnSpace: T, defaultContext?: P) {
   return (context?: DistributiveOmit<Parameters<T>[0], keyof P> & Partial<P>) => {

@@ -4,22 +4,26 @@ import { curves, gammaCurve } from "../../curves/index.js";
 import { fnSpace } from "../../space.js";
 
 export const srgb_linear = fnSpace(rgbSpace, {
+  id: "srgb-linear",
   name: "sRGB Linear",
   gamut: gamuts.srgb,
 });
 
 export const p3_d65_linear = fnSpace(rgbSpace, {
+  id: "p3-d65-linear",
   name: "P3-D65 Linear",
   gamut: gamuts.p3_d65,
 });
 
 export const bt2020_linear = fnSpace(rgbSpace, {
+  id: "bt2020-linear",
   name: "BT.2020 Linear",
   gamut: gamuts.bt2020,
 });
 
 // The pseudo-standard color space for computers/the web
 export const rgb = fnSpace(rgbSpace, {
+  id: "rgb",
   name: "Computer RGB",
   gamut: gamuts.srgb,
   curve: curves.gamma2p2,
@@ -29,6 +33,7 @@ export const rgb = fnSpace(rgbSpace, {
 
 // sRGB IEC 61966-2-1:1999
 export const srgb = fnSpace(rgbSpace, {
+  id: "srgb",
   name: "sRGB",
   gamut: gamuts.srgb,
   curve: curves.srgb,

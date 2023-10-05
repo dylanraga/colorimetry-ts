@@ -328,12 +328,13 @@ export function memoize<T extends (...args: any[]) => any>(
   return ((...args: Parameters<T>) => {
     const id = identifier(...args);
 
+    // console.log("identifier", id);
     const memoizedFn = fn(...args);
 
     if (id !== undefined && !memoStore.has(id)) {
       memoStore.set(id, memoizedFn);
     }
 
-    return memoizedFn;
+    return memoStore.get(id);
   }) as T;
 }

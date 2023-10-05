@@ -33,6 +33,8 @@ export function getSpaceConversion(srcSpace: ColorSpace, dstSpace: ColorSpace): 
 
   // if (_srcSpace === _dstSpace) return (values: number[]) => values;
 
+  console.log(_srcSpace, _dstSpace);
+
   const existingConversion = conversionMap.get(_srcSpace)?.get(_dstSpace)?.fn;
   if (existingConversion) {
     return existingConversion;
@@ -89,7 +91,7 @@ function composeFnList(fnList: ColorSpaceConversion[]): ColorSpaceConversion {
   // return (values, props = {}) => fnList.reduce((a, b) => b(a, Object.assign({ ...defaultProps }, props)), values);
   return (values) =>
     fnList.reduce(
-      (a, b, i) =>
+      (a, b) =>
         b(
           a,
           // i === 0
