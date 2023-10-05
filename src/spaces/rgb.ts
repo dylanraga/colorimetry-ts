@@ -32,7 +32,7 @@ type QuantizedRGBColorSpaceContext = {
 };
 export type QuantizedRGBColorSpace = ColorSpace & QuantizedRGBColorSpaceContext;
 
-const linearRgbSpace = memoize((context: LinearRGBColorSpaceContext) => {
+export const linearRgbSpace = memoize((context: LinearRGBColorSpaceContext) => {
   const newSpace = new ColorSpace({
     keys: ["R", "G", "B"],
     conversions: [

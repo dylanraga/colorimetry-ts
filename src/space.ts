@@ -82,5 +82,7 @@ export const resolveSpace: {
     throw new ReferenceError(`Colorspace id ${spaceOrFnSpaceOrId} does not exist`);
   }
 
+  console.log(spaces[spaceOrFnSpaceOrId]);
+
   return (spaces[spaceOrFnSpaceOrId] as FunctionColorSpace)(context);
 };

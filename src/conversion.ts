@@ -33,7 +33,7 @@ export function getSpaceConversion(srcSpace: ColorSpace, dstSpace: ColorSpace): 
 
   // if (_srcSpace === _dstSpace) return (values: number[]) => values;
 
-  console.log(_srcSpace, _dstSpace);
+  // console.log(_srcSpace, _dstSpace);
 
   const existingConversion = conversionMap.get(_srcSpace)?.get(_dstSpace)?.fn;
   if (existingConversion) {
@@ -48,7 +48,7 @@ export function getSpaceConversion(srcSpace: ColorSpace, dstSpace: ColorSpace): 
   );
   if (!path) throw new Error(`No conversion path found from ${_srcSpace.name} to ${_dstSpace.name}`);
 
-  console.log(path.map((p) => p.name));
+  // console.log(path.map((p) => p.name));
 
   const fnList: Array<ColorSpaceConversion> = [];
   for (let i = 0; i < path.length - 1; i++) {
