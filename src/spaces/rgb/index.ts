@@ -43,6 +43,7 @@ export const srgb = fnSpace(rgbSpace, {
 
 // Rec. 709 with BT.1886 transfer
 export const rec709 = fnSpace(rgbSpace, {
+  id: "rec709",
   name: "Rec. 709",
   gamut: gamuts.srgb,
   curve: curves.bt1886,
@@ -52,6 +53,7 @@ export const rec709 = fnSpace(rgbSpace, {
 
 // Apple Inc. Display P3
 export const display_p3 = fnSpace(rgbSpace, {
+  id: "display-p3",
   name: "Display P3",
   gamut: gamuts.p3_d65,
   curve: curves.srgb,
@@ -61,6 +63,7 @@ export const display_p3 = fnSpace(rgbSpace, {
 
 // Digital Cinema Initiative P3
 export const p3_dci = fnSpace(rgbSpace, {
+  id: "p3-dci",
   name: "DCI-P3",
   gamut: gamuts.p3_dci,
   curve: curves.gamma2p6,
@@ -70,6 +73,7 @@ export const p3_dci = fnSpace(rgbSpace, {
 
 // Digital Cinema Initiative P3 with D65
 export const p3_d65 = fnSpace(rgbSpace, {
+  id: "p3-d65",
   name: "Display P3",
   gamut: gamuts.p3_d65,
   curve: curves.gamma2p2,
@@ -78,7 +82,8 @@ export const p3_d65 = fnSpace(rgbSpace, {
 });
 
 // Adobe RGB (1998) IEC 61966-2-5:2007
-export const adobergb = fnSpace(rgbSpace, {
+export const argb98 = fnSpace(rgbSpace, {
+  id: "argb98",
   name: "Adobe RGB 1998",
   gamut: gamuts.a98rgb,
   curve: gammaCurve(563 / 256),
@@ -88,6 +93,7 @@ export const adobergb = fnSpace(rgbSpace, {
 
 // BT.2020 gamut with BT.1886 transfer
 export const rec2020 = fnSpace(rgbSpace, {
+  id: "rec2020",
   name: "Rec. 2020",
   gamut: gamuts.bt2020,
   curve: curves.bt1886,
@@ -97,6 +103,7 @@ export const rec2020 = fnSpace(rgbSpace, {
 
 // BT.2100: BT.2020 with ST.2084 transfer
 export const bt2100_pq = fnSpace(rgbSpace, {
+  id: "bt2100-pq",
   name: "BT.2100 PQ",
   gamut: gamuts.bt2020,
   curve: curves.st2084,
@@ -107,6 +114,7 @@ export const bt2100_pq = fnSpace(rgbSpace, {
 
 // BT.2100: BT.2020 with HLG transfer
 export const bt2100_hlg = fnSpace(rgbSpace, {
+  id: "bt2100-hlg",
   name: "BT.2100 HLG",
   gamut: gamuts.bt2020,
   curve: curves.hlg,
@@ -117,6 +125,7 @@ export const bt2100_hlg = fnSpace(rgbSpace, {
 
 // Kodak ProPhoto RGB
 export const prophoto = fnSpace(rgbSpace, {
+  id: "prophoto",
   name: "ProPhoto RGB",
   gamut: gamuts.prophoto,
   curve: curves.romm,
@@ -126,12 +135,14 @@ export const prophoto = fnSpace(rgbSpace, {
 
 // ACEScg
 export const acescg = fnSpace(rgbSpace, {
+  id: "acescg",
   name: "ACEScg",
   gamut: gamuts.acesp1,
 });
 
 // ACEScc
 export const acescc = fnSpace(rgbSpace, {
+  id: "acescc",
   name: "ACEScc",
   gamut: gamuts.acesp1,
   curve: curves.acescc,

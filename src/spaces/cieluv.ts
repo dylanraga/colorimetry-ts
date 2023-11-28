@@ -19,6 +19,7 @@ type LuvColorSpaceContext = {
 const luvSpace = memoize((context: LuvColorSpaceContext) =>
   Object.assign(
     new ColorSpace({
+      id: "cieluv",
       name: "CIELUV",
       keys: ["L", "U", "V"],
       conversions: [
@@ -29,8 +30,8 @@ const luvSpace = memoize((context: LuvColorSpaceContext) =>
         },
       ],
     }),
-    context
-  )
+    context,
+  ),
 );
 
 export const luv = fnSpace(luvSpace, { refWhite: illuminants.d65, whiteLuminance: 100 });
@@ -43,7 +44,7 @@ export const luv_lch: typeof luv = (context) => lchSpaceFromLabSpace(luv(context
 
 export function cieluvFromXyz(
   [X, Y, Z]: number[],
-  { refWhite, whiteLuminance }: { refWhite: xy; whiteLuminance: number }
+  { refWhite, whiteLuminance }: { refWhite: xy; whiteLuminance: number },
 ): [number, number, number] {
   const [ur, vr] = uvFromXy([refWhite.x, refWhite.y]);
   const [u, v] = uvFromXyz([X, Y, Z]);
@@ -56,7 +57,7 @@ export function cieluvFromXyz(
 
 export function xyzFromCieluv(
   [L, U, V]: number[],
-  { refWhite, whiteLuminance }: { refWhite: xy; whiteLuminance: number }
+  { refWhite, whiteLuminance }: { refWhite: xy; whiteLuminance: number },
 ): [number, number, number] {
   const [ur, vr] = uvFromXy([refWhite.x, refWhite.y]);
   const u = U / (13 * L) + ur;

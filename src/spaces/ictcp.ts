@@ -12,6 +12,7 @@ import { lchSpaceFromLabSpace } from "./lch.js";
 import { xyz } from "./xyz.js";
 
 const ictcpSpace = new ColorSpace({
+  id: "ictcp",
   name: "Dolby ICtCp",
   keys: ["I", "Ct", "Cp"],
   conversions: [
@@ -25,6 +26,7 @@ const ictcpSpace = new ColorSpace({
 });
 
 const itpSpace = new ColorSpace({
+  id: "itp",
   name: "Dolby ITP (ICtCp)",
   keys: ["I", "T", "P"],
   conversions: [

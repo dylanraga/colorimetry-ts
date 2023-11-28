@@ -11,11 +11,12 @@ export interface XYZ {
   Z: number;
 }
 
-const xyzSpace = new ColorSpace({ name: "CIE XYZ", keys: ["X", "Y", "Z"] });
+const xyzSpace = new ColorSpace({ id: "ciexyz", name: "CIE XYZ", keys: ["X", "Y", "Z"] });
 
 const normalizedXyzSpace = memoize((context: { whiteLuminance: number }) =>
   Object.assign(
     new ColorSpace({
+      id: "ciexyz-normalized",
       name: "XYZ Normalized",
       keys: ["Xn", "Yn", "Zn"],
       conversions: [
@@ -26,8 +27,8 @@ const normalizedXyzSpace = memoize((context: { whiteLuminance: number }) =>
         },
       ],
     }),
-    context
-  )
+    context,
+  ),
 );
 
 export const xyz = (context?: object) => xyzSpace;

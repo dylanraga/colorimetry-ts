@@ -31,6 +31,7 @@ type LabColorSpaceContext = {
 export const cielabSpace = memoize((context: LabColorSpaceContext) =>
   Object.assign(
     new ColorSpace({
+      id: "cielab",
       name: "CIELAB",
       keys: ["L", "a", "b"],
       conversions: [

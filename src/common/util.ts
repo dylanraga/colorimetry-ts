@@ -338,3 +338,7 @@ export function memoize<T extends (...args: any[]) => any>(
     return memoStore.get(id);
   }) as T;
 }
+
+export function clamp(num: number, min = 0, max = 1) {
+  return num > max ? max : num < min ? min : num;
+}

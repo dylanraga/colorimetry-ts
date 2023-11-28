@@ -9,6 +9,7 @@ import { lchSpaceFromLabSpace } from "./lch.js";
 import { xyz } from "./xyz.js";
 
 export const jzazbzSpace = new ColorSpace({
+  id: "jzazbz",
   name: "Jzazbz",
   keys: ["Jz", "az", "bz"],
   conversions: [

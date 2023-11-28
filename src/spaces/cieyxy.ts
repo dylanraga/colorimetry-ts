@@ -6,6 +6,7 @@ import { ColorSpace } from "../space.js";
 import { xyz } from "./xyz.js";
 
 const yxySpace = new ColorSpace({
+  id: "cieyxy",
   name: "CIE Yxy",
   keys: ["Y", "x", "y"],
   conversions: [

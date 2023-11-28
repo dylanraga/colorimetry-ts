@@ -61,6 +61,7 @@ export function fnSpace<T extends FunctionColorSpace, P extends Parameters<T>[0]
   };
 }
 
+// when resolving a function space with custom context, omit id for proper memoization
 export const resolveSpace: {
   (space: ColorSpace): ColorSpace;
   <T extends FunctionColorSpace, P extends Parameters<T>[0]>(fnSpace: T, context?: P): ColorSpace;
@@ -70,19 +71,24 @@ export const resolveSpace: {
   ): ColorSpace;
   (spaceOrFnSpaceOrId: ColorSpaceType, context?: object): ColorSpace;
 } = (spaceOrFnSpaceOrId: ColorSpaceType, context?: object): ColorSpace => {
+  // is a true colorspace
   if (spaceOrFnSpaceOrId instanceof ColorSpace) {
     return spaceOrFnSpaceOrId;
   }
 
+  const contextSansId = context ? { ...context, id: undefined } : context;
+
+  // is a function
   if (spaceOrFnSpaceOrId instanceof Function) {
-    return spaceOrFnSpaceOrId(context);
+    return spaceOrFnSpaceOrId(contextSansId);
   }
 
   if (typeof spaceOrFnSpaceOrId === "string" && !(spaceOrFnSpaceOrId in spaces)) {
     throw new ReferenceError(`Colorspace id ${spaceOrFnSpaceOrId} does not exist`);
   }
 
-  console.log(spaces[spaceOrFnSpaceOrId]);
+  // console.log(spaces[spaceOrFnSpaceOrId]);
 
-  return (spaces[spaceOrFnSpaceOrId] as FunctionColorSpace)(context);
+  // is a string
+  return (spaces[spaceOrFnSpaceOrId] as FunctionColorSpace)(contextSansId);
 };

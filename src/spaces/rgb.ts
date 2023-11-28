@@ -1,4 +1,4 @@
-import { dequantize, memoize, minv, mmult3331, quantize } from "../common/util.js";
+import { defaultMemoizeIdentifier, dequantize, memoize, minv, mmult3331, quantize } from "../common/util.js";
 import { ToneResponseCurve } from "../curves/index.js";
 import { ColorGamutPrimaries } from "../gamuts/index.js";
 import { ColorSpace } from "../space.js";
@@ -32,20 +32,24 @@ type QuantizedRGBColorSpaceContext = {
 };
 export type QuantizedRGBColorSpace = ColorSpace & QuantizedRGBColorSpaceContext;
 
-export const linearRgbSpace = memoize((context: LinearRGBColorSpaceContext) => {
-  const newSpace = new ColorSpace({
-    keys: ["R", "G", "B"],
-    conversions: [
-      {
-        spaceB: xyz(),
-        aToB: (values) => xyzFromLinearRGB(values, context.gamut),
-        bToA: (values) => linearRgbFromXyz(values, context.gamut),
-      },
-    ],
-  });
+export const linearRgbSpace = memoize(
+  (context: LinearRGBColorSpaceContext) => {
+    const newSpace = new ColorSpace({
+      id: `${context.gamut.id}-linear`,
+      keys: ["R", "G", "B"],
+      conversions: [
+        {
+          spaceB: xyz(),
+          aToB: (values) => xyzFromLinearRGB(values, context.gamut),
+          bToA: (values) => linearRgbFromXyz(values, context.gamut),
+        },
+      ],
+    });
 
-  return Object.assign(newSpace, context);
-});
+    return Object.assign(newSpace, context);
+  },
+  (context) => context.gamut.id,
+);
 
 const encodedRgbSpace = memoize((context: EncodedRGBColorSpaceContext) =>
   Object.assign(
@@ -120,7 +124,7 @@ export const rgbSpace = memoize(
       range,
     }) as unknown as ColorSpace & T;
   },
-  (context) => context.id,
+  (context) => context.id || defaultMemoizeIdentifier(context),
 );
 
 // export const createRgbSpace = (origContext: RGBColorSpaceContext) => (context: RGBColorSpaceContext) =>

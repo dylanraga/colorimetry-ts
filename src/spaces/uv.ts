@@ -8,6 +8,7 @@ import { xy } from "./xy.js";
 import { xyz } from "./xyz.js";
 
 const uv76Space = new ColorSpace({
+  id: "cieuv",
   name: "CIE Y-u'v'",
   keys: ["Y", "u'", "v'"],
   conversions: [

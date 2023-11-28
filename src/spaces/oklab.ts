@@ -14,6 +14,7 @@ type OklabColorSpaceContext = {
 export const oklabSpace = memoize((context: OklabColorSpaceContext) =>
   Object.assign(
     new ColorSpace({
+      id: "oklab",
       name: "Oklab",
       keys: ["L", "a", "b"],
       conversions: [
@@ -25,14 +26,14 @@ export const oklabSpace = memoize((context: OklabColorSpaceContext) =>
       ],
       // precision: 3,
     }),
-    context
-  )
+    context,
+  ),
 );
 
 export const oklab = fnSpace(oklabSpace, { whiteLuminance: 100 });
 
 export const oklch: typeof oklab = (context) =>
-  lchSpaceFromLabSpace(oklab(context), { name: "Oklch", keys: ["L", "C", "h"] });
+  lchSpaceFromLabSpace(oklab(context), { id: "oklch", name: "Oklch", keys: ["L", "C", "h"] });
 
 /**
  * XYZ <-> Oklab conversion functions
@@ -61,7 +62,7 @@ const M2Inv = minv(M2);
 
 function xyzToOklab(
   XYZ: [number, number, number],
-  { whiteLuminance }: { whiteLuminance: number }
+  { whiteLuminance }: { whiteLuminance: number },
 ): [number, number, number] {
   const XnYnZn = xyzToXyzN(XYZ, whiteLuminance);
   const LMS = mmult(M1, XnYnZn);
@@ -73,7 +74,7 @@ function xyzToOklab(
 
 function oklabToXyz(
   Lab: [number, number, number],
-  { whiteLuminance }: { whiteLuminance: number }
+  { whiteLuminance }: { whiteLuminance: number },
 ): [number, number, number] {
   const LpMpSp = mmult(M2Inv, Lab);
   const LMS = LpMpSp.map((u) => u * u * u);
