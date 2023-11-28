@@ -8,7 +8,7 @@ import { jzazbz, jzczhz } from "./jzazbz.js";
 import { oklab, oklch } from "./oklab.js";
 import { uv76 } from "./uv.js";
 import { xy } from "./xy.js";
-// import { ycbcr, ycbcr10, ypbpr, ycbcr601 } from "./yuv.js";
+import { ycbcr, ycbcr10, ypbpr, ycbcr601 } from "./yuv.js";
 
 export const spaces = {
   ...rgbSpaces,
@@ -28,10 +28,10 @@ export const spaces = {
   oklch,
   uv76,
   xy,
-  // ycbcr,
-  // ycbcr10,
-  // ypbpr,
-  // ycbcr601,
+  ycbcr,
+  ycbcr10,
+  ypbpr,
+  ycbcr601,
 };
 
 // export {

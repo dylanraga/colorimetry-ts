@@ -61,9 +61,9 @@ export const ycbcr601 = fnSpace(ycbcrSpace, {
   bitDepth: 8,
 });
 
-// export const ycbcr = fnSpace(ycbcrSpace, { id: "ycbcr", rgbSpace: rec709(), bitDepth: 8 });
-// export const ycbcr10 = fnSpace(ycbcrSpace, { id: "ycbcr10", rgbSpace: rec709(), bitDepth: 10 });
-// export const ypbpr = fnSpace(ycbcrSpace, { id: "ypbpr", rgbSpace: rec709() });
+export const ycbcr = fnSpace(ycbcrSpace, { id: "ycbcr", rgbSpace: rec709(), bitDepth: 8 });
+export const ycbcr10 = fnSpace(ycbcrSpace, { id: "ycbcr10", rgbSpace: rec709(), bitDepth: 10 });
+export const ypbpr = fnSpace(ycbcrSpace, { id: "ypbpr", rgbSpace: rec709() });
 
 export const getRgbToYpbprMatrix = memoize(
   (gamut: ColorGamutPrimaries): [[number, number, number], [number, number, number], [number, number, number]] => {
