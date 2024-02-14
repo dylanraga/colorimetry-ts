@@ -27,7 +27,7 @@ export const rgb = fnSpace(rgbSpace, {
   name: "Computer RGB",
   gamut: gamuts.srgb,
   curve: curves.gamma2p2,
-  whiteLuminance: 100,
+  whiteLuminance: 200,
   blackLuminance: 0,
 });
 

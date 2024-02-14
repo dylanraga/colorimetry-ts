@@ -1,5 +1,5 @@
 // YUV Y'CbCr
-// TODO: needs testing
+// TODO: needs unit tests
 
 import { dequantize, memoize, minv, mmult3331, quantize } from "../common/util.js";
 import { curves } from "../curves/index.js";

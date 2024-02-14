@@ -2,7 +2,6 @@
 /* Color Structure */
 /*=================*/
 
-// import * as spaces from "./spaces/index.js";
 import {
   ColorSpace,
   ColorSpaceContext,
@@ -14,8 +13,6 @@ import {
   resolveSpace,
 } from "./space.js";
 import { getSpaceConversion } from "./conversion.js";
-import { spaces } from "./spaces/index.js";
-import { curves, gamuts } from "../colorimetry.js";
 
 export interface ColorLike<T extends FunctionColorSpace | FunctionColorSpaceName = FunctionColorSpace> {
   space: T;
@@ -23,15 +20,13 @@ export interface ColorLike<T extends FunctionColorSpace | FunctionColorSpaceName
   context?: Parameters<FunctionColorSpaceFromName<T>>[0];
 }
 
-export class Color<T extends ColorSpace = ColorSpace> {
-  public readonly space: T;
+export class Color {
+  public readonly space: ColorSpace;
   public readonly values: [number, number, number];
-  // public readonly context?: Partial<T>;
 
-  constructor(space: T, values: [number, number, number]) {
+  constructor(space: ColorSpace, values: [number, number, number]) {
     this.space = space;
     this.values = values;
-    // this.context = context;
   }
 
   /**
@@ -57,27 +52,25 @@ export class Color<T extends ColorSpace = ColorSpace> {
 }
 
 type ColorCurriedReturnType<T extends ColorSpaceType> = (
-  values: [number, number, number] | Color<any>,
+  values: [number, number, number] | Color,
   context?: ColorSpaceContext<T>,
-) => Color<ColorSpaceFromColorSpaceType<T>>;
+) => Color;
 
-function color<T extends FunctionColorSpace | FunctionColorSpaceName>(
-  color: ColorLike<T>,
-): Color<ColorSpaceFromColorSpaceType<T>>;
+function color<T extends FunctionColorSpace | FunctionColorSpaceName>(color: ColorLike<T>): Color;
 
 // function color<T extends ColorSpace>(space: T, values: [number, number, number] | Color<any>): Color<T>;
 
+function color<T extends ColorSpaceType>(space: T): ColorCurriedReturnType<T>;
+
 function color<T extends ColorSpaceType, P extends ColorSpaceContext<T>>(
   space: T,
-  values: [number, number, number] | Color<any>,
+  values: [number, number, number] | Color,
   context?: P,
-): Color<ColorSpaceFromColorSpaceType<T>>;
-
-function color<T extends ColorSpaceType, P extends ColorSpaceContext<T>>(space: T): ColorCurriedReturnType<T>;
+): Color;
 
 function color(
   spaceTypeOrColor: ColorSpaceType | ColorLike,
-  valuesOrColor?: [number, number, number] | Color<any>,
+  valuesOrColor?: [number, number, number] | Color,
   context?: object,
 ) {
   if (typeof spaceTypeOrColor === "object" && "space" in spaceTypeOrColor && "values" in spaceTypeOrColor) {
@@ -85,9 +78,9 @@ function color(
   }
 
   if (valuesOrColor === undefined) {
-    const colorCurried: ColorCurriedReturnType<typeof spaceTypeOrColor> = (valuesOrColor2, context2) =>
-      color(spaceTypeOrColor, valuesOrColor2, context2);
-    // const colorCurried = color.bind(null, spaceTypeOrColor) as ColorCurriedReturnType<typeof spaceTypeOrColor>;
+    // const colorCurried: ColorCurriedReturnType<typeof spaceTypeOrColor> = (valuesOrColor2, context2) =>
+    //   color(spaceTypeOrColor, valuesOrColor2, context2);
+    const colorCurried = color.bind(null, spaceTypeOrColor); // as ColorCurriedReturnType<typeof spaceTypeOrColor>;
     return colorCurried;
   }
 
@@ -97,8 +90,6 @@ function color(
 
   return new Color(space, values);
 }
-
-const c1 = color("srgb_linear");
 
 export { color };
 

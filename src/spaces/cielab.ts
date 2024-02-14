@@ -53,7 +53,7 @@ export const lab_d50 = fnSpace(cielabSpace, { refWhite: illuminants.d50, whiteLu
 export const lch: typeof lab = (context) => lchSpaceFromLabSpace(lab(context));
 // export const lchD50 = (context?: Partial<LabColorSpaceContext>) => lchSpaceFromLabSpace(labD50(context));
 
-/**
+/*
  * CIELAB <-> XYZ conversion functions
  */
 export function cielabFromXyz(

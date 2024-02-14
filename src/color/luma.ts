@@ -15,7 +15,7 @@ function getLuma(color: Color, rgbSpace: EncodedRGBColorSpace) {
 function _getLuma(this: Color, rgbSpace?: EncodedRGBColorSpace) {
   let _rgbSpace = rgbSpace;
   // TODO: check space id instead once implemented
-  if ("gamut" in this.space && "curve" in this.space) {
+  if (!rgbSpace && "gamut" in this.space && "curve" in this.space) {
     _rgbSpace = this.space as EncodedRGBColorSpace;
   }
   if (_rgbSpace === undefined) {

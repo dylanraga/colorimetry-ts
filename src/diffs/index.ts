@@ -1,4 +1,4 @@
-export { ColorDifferenceMethod } from "../diff.js";
+export type { ColorDifferenceMethod } from "../diff.js";
 
 import { cie2000 } from "./cie2000.js";
 import { uv } from "./cieuv.js";

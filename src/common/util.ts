@@ -134,7 +134,7 @@ export function mmult(A: number[] | number[][], B: number[] | number[][]): numbe
   const isA2d = is2dArray<number>(A);
   const isB2d = is2dArray<number>(B);
 
-  //Promote row-space and col-space inputs into 2D
+  //P romote row-space and col-space inputs into 2D
   const M: number[][] = isA2d ? A : [A];
   const N: number[][] = isB2d ? B : B.map((u) => [u as number]);
 

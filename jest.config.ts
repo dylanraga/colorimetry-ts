@@ -4,6 +4,16 @@
  */
 
 module.exports = {
+  moduleNameMapper: {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+  },
+  extensionsToTreatAsEsm: [".ts"],
+  globals: {
+    "ts-jest": {
+      //... // your other configurations here
+      useESM: true,
+    },
+  },
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 

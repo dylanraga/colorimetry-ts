@@ -17,7 +17,7 @@ export function colorDiff<T extends ColorDifferenceMethod | ColorDifferenceMetho
   colorA: Color,
   colorB: Color,
   method: T = diffs.itp as T,
-  props = {} as ColorDifferenceMethodProps<T extends ColorDifferenceMethodName ? typeof diffs[T] : T>
+  props = {} as ColorDifferenceMethodProps<T extends ColorDifferenceMethodName ? (typeof diffs)[T] : T>,
 ) {
   if (typeof method === "string" && !(method in diffs))
     throw new ReferenceError(`Color difference '${method}' does not exist`);
@@ -31,7 +31,7 @@ function _diff<T extends ColorDifferenceMethod | ColorDifferenceMethodName>(
   this: Color,
   colorB: Color,
   method: T = diffs.itp as T,
-  props = {} as ColorDifferenceMethodProps<T extends ColorDifferenceMethodName ? typeof diffs[T] : T>
+  props = {} as ColorDifferenceMethodProps<T extends ColorDifferenceMethodName ? (typeof diffs)[T] : T>,
 ) {
   return colorDiff(this, colorB, method, props);
 }

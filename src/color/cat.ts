@@ -1,4 +1,4 @@
-import { illuminants } from "../../colorimetry.js";
+import { illuminants } from "../index.js";
 import { Color, color } from "../color.js";
 import { minv, mmult3333, mmult3331 } from "../common/util.js";
 import { Yxy, xyzFromYxy } from "../spaces/cieyxy.js";
