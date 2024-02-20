@@ -1,22 +1,23 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"module": "ESNext",
-		"declaration": true,
-		"sourceMap": true,
-		"outDir": "build",
-		"lib": ["ESNext", "DOM"],
-		"skipLibCheck": true,
-		// "noUncheckedIndexedAccess": true,
-		//"allowJs": true,
-		//"checkJs": false,
-		"moduleResolution": "node",
-		"resolveJsonModule": true,
-		"strict": true,
-		"forceConsistentCasingInFileNames": true
-	},
-	"exclude": ["node_modules", "build", "test"],
-	"ts-node": {
-		"esm": true
-	}
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    // "noUncheckedIndexedAccess": true,
+    //"allowJs": true,
+    //"checkJs": false,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "build", "test"],
+  "ts-node": {
+    "esm": true
+  }
 }
