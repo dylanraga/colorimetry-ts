@@ -9,7 +9,7 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "tsup",
+    "build": "tsc",
     "prepublish": "npm run build",
     "test": "jest"
   },
