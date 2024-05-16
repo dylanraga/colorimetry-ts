@@ -27,17 +27,17 @@ export const st2084: ToneResponseCurve<St2084TransferProps> = {
   name: "SMPTE ST 2084",
   eotf: (
     V,
-    { peakLuminance = defaults.peakLuminance, blackLuminance = defaults.blackLuminance, m2 = defaults.m2 } = defaults
+    { peakLuminance = defaults.peakLuminance, blackLuminance = defaults.blackLuminance, m2 = defaults.m2 } = defaults,
   ) => {
-    const L = 10000 * (Math.max(V ** (1 / m2) - c1, 0) / (c2 - c3 * V ** (1 / m2))) ** (1 / m1);
+    const f = (V: number) => 10000 * (Math.max(V ** (1 / m2) - c1, 0) / (c2 - c3 * V ** (1 / m2))) ** (1 / m1);
     // return Math.max(Math.min(L, peakLuminance), blackLuminance);
-    return L;
+    return V > 0 ? f(V) : -f(-V);
   },
   invEotf: (
     L,
-    { peakLuminance = defaults.peakLuminance, blackLuminance = defaults.blackLuminance, m2 = defaults.m2 } = defaults
+    { peakLuminance = defaults.peakLuminance, blackLuminance = defaults.blackLuminance, m2 = defaults.m2 } = defaults,
   ) => {
-    const V = ((c1 + c2 * (L / 10000) ** m1) / (1 + c3 * (L / 10000) ** m1)) ** m2;
-    return V;
+    const f = (L: number) => ((c1 + c2 * (L / 10000) ** m1) / (1 + c3 * (L / 10000) ** m1)) ** m2;
+    return L > 0 ? f(L) : -f(-L);
   },
 };

@@ -28,9 +28,9 @@ export const srgb: ToneResponseCurve<SrgbTransferProps> = {
     return L;
   },
   invEotf: (L, { whiteLuminance = defaults.whiteLuminance, blackLuminance = defaults.blackLuminance } = defaults) => {
-    const f = (x: number) => (x <= X2 ? x * 12.92 : 1.055 * x ** (1 / 2.4) - 0.055);
+    const finv = (x: number) => (x <= X2 ? x * 12.92 : 1.055 * x ** (1 / 2.4) - 0.055);
 
-    const V = evenFn(f)((L - blackLuminance) / (whiteLuminance - blackLuminance));
+    const V = evenFn(finv)((L - blackLuminance) / (whiteLuminance - blackLuminance));
     return V;
   },
 };

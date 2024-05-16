@@ -278,7 +278,7 @@ export function quantize(
   return round(sigMin + float * (sigMax - sigMin));
 }
 
-export function dequantize(unorm: number, bitDepth = 8, range: "full" | "limited" | "chrominance" = "full") {
+export function dequantize(int: number, bitDepth = 8, range: "full" | "limited" | "chrominance" = "full") {
   const res = 1 << bitDepth;
   let sigMin, sigMax;
   switch (range) {
@@ -295,7 +295,7 @@ export function dequantize(unorm: number, bitDepth = 8, range: "full" | "limited
       sigMax = 0.9375 * res;
       break;
   }
-  return (unorm - sigMin) / (sigMax - sigMin);
+  return (int - sigMin) / (sigMax - sigMin);
 }
 
 // https://gist.github.com/davidfurlong/463a83a33b70a3b6618e97ec9679e490

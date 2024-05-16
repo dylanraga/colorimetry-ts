@@ -59,7 +59,7 @@ export function clampInGamut(
     if (rgbLch[1] < jnd) {
       return new Color(rgbSpace, rgbClamped).toSpace(color.space);
     }
-    rgbLch[1] -= jnd * (Math.SQRT1_2 * minDiffFromClipped);
+    rgbLch[1] -= 0.0001;
     const currLchColor = new Color(lchSpace(), rgbLch);
     const currRgb = currLchColor.toSpace(rgbSpace).values;
     // if in-gamut, push out of gamut

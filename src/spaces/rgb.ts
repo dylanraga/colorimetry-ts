@@ -95,6 +95,7 @@ export const rgbSpace = memoize(
   <T extends LinearRGBColorSpaceContext | EncodedRGBColorSpaceContext | QuantizedRGBColorSpaceContext>(
     context: T,
   ): ColorSpace & T => {
+    // console.log("[colorimetry-ts] created new rgbSpace (not memoized)");
     const { id, gamut } = context;
     if (!("curve" in context)) {
       return linearRgbSpace({ id, gamut }) as unknown as ColorSpace & T;
